@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GymPass — Let's Go Dodgers</title>
+<title>GymPass</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -25,22 +25,70 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
 
+/* HEADER */
 .header { background: var(--blue); padding: 0 1.25rem; border-bottom: 4px solid var(--blue-deep); }
-.header-inner { max-width: 640px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 0; }
-.logo-wrap { display: flex; align-items: center; gap: 10px; }
-.logo-ball { width: 36px; height: 36px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; flex-shrink: 0; }
-.logo-ball::before, .logo-ball::after { content: ''; position: absolute; border: 1.5px solid #c0392b; border-radius: 50%; }
-.logo-ball::before { width: 60%; height: 100%; left: 20%; border-left-color: transparent; border-right-color: transparent; transform: rotate(10deg); }
-.logo-ball::after { width: 60%; height: 100%; left: 20%; border-left-color: transparent; border-right-color: transparent; transform: rotate(-10deg); }
-.logo-text { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--white); line-height: 1; }
-.logo-sub { font-size: 10px; color: var(--blue-pale); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
+.header-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 0; }
+.logo-text { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 3px; color: var(--white); line-height: 1; }
 .nav-tabs { display: flex; gap: 3px; background: var(--blue-deep); border-radius: 8px; padding: 3px; }
 .tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--blue-pale); transition: all 0.2s; letter-spacing: 0.03em; }
 .tab.active { background: var(--white); color: var(--blue); }
 
-.view { display: none; padding: 1.25rem; max-width: 640px; margin: 0 auto; }
+/* VIEWS */
+.view { display: none; padding: 1.25rem; max-width: 680px; margin: 0 auto; }
 .view.active { display: block; }
 
+/* PROFILE PICKER SCREEN */
+.picker-wrap { padding: 2rem 1.25rem; max-width: 480px; margin: 0 auto; }
+.picker-title { font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 1.5px; color: var(--text); margin-bottom: 6px; }
+.picker-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+.profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+.profile-btn {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 1.1rem 0.75rem;
+  cursor: pointer; text-align: center; transition: all 0.15s;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.profile-btn:hover { border-color: var(--blue); background: #eef5fc; }
+.profile-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--blue); color: var(--white);
+  font-family: 'Anton', sans-serif; font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  letter-spacing: 1px;
+}
+.profile-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.profile-streak { font-size: 11px; color: var(--muted); }
+.add-profile-btn {
+  background: transparent; border: 1.5px dashed var(--border);
+  border-radius: 14px; padding: 1.1rem 0.75rem;
+  cursor: pointer; text-align: center; transition: all 0.15s;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--muted); font-size: 13px; font-weight: 500;
+}
+.add-profile-btn:hover { border-color: var(--blue); color: var(--blue); }
+.add-icon { font-size: 24px; }
+
+/* ADD CHILD FORM */
+.add-form { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; margin-top: 0.5rem; }
+.add-form-title { font-family: 'Anton', sans-serif; font-size: 16px; letter-spacing: 1px; margin-bottom: 1rem; }
+.name-input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s; margin-bottom: 10px; }
+.name-input:focus { border-color: var(--blue); }
+.color-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.color-swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; flex-shrink: 0; }
+.color-swatch.selected { border-color: var(--text); transform: scale(1.15); }
+.form-btn-row { display: flex; gap: 8px; }
+.save-btn { flex: 1; padding: 10px; background: var(--blue); color: var(--white); border: none; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 16px; letter-spacing: 1px; cursor: pointer; }
+.save-btn:hover { background: var(--blue-light); }
+.cancel-btn { padding: 10px 16px; background: var(--bg); color: var(--muted); border: 1px solid var(--border); border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+
+/* BACK BAR */
+.back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+.back-btn { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: var(--blue); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.back-btn:hover { background: var(--blue-pale); }
+.active-name { font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; color: var(--text); }
+.active-avatar { width: 28px; height: 28px; border-radius: 50%; color: var(--white); font-family: 'Anton', sans-serif; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* WEEK CARD */
 .week-card { background: var(--blue); border-radius: 16px; padding: 1.25rem 1.25rem 1rem; margin-bottom: 1.25rem; border: 1px solid var(--blue-deep); }
 .week-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1rem; }
 .week-title { font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1.5px; color: var(--white); }
@@ -48,7 +96,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .days-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 1rem; }
 .day-cell { display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .day-label { font-size: 10px; font-weight: 600; color: var(--blue-pale); text-transform: uppercase; letter-spacing: 0.06em; }
-.day-bubble { width: 36px; height: 36px; border-radius: 50%; background: var(--blue-deep); border: 2px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.2s; color: transparent; font-weight: 700; }
+.day-bubble { width: 36px; height: 36px; border-radius: 50%; background: var(--blue-deep); border: 2px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: transparent; transition: all 0.2s; }
 .day-bubble.done { background: var(--white); border-color: var(--white); color: var(--blue); }
 .day-bubble.pending-day { background: transparent; border-color: var(--gold); color: var(--gold); }
 .day-bubble.today-empty { border-color: rgba(255,255,255,0.45); border-style: dashed; }
@@ -58,6 +106,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .progress-fill.goal-met { background: var(--gold); }
 .progress-label { font-size: 12px; font-weight: 600; color: var(--blue-pale); white-space: nowrap; }
 
+/* STATUS ROW */
 .status-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
 .streak-info { display: flex; align-items: baseline; gap: 6px; }
 .streak-num { font-family: 'Anton', sans-serif; font-size: 40px; color: var(--blue); line-height: 1; }
@@ -68,15 +117,18 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .status-pill.pending { background: #fef3d6; color: var(--amber); border: 1.5px solid #f5d68a; }
 .s-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
 
+/* REWARD BANNER */
 .reward-banner { background: #fef3d6; border: 2px solid var(--gold); border-radius: 14px; padding: 1.1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 12px; }
 .reward-icon { font-size: 30px; flex-shrink: 0; }
 .reward-title { font-family: 'Anton', sans-serif; font-size: 19px; letter-spacing: 1px; color: #3d2e00; }
 .reward-desc { font-size: 12px; color: #7a5c00; margin-top: 2px; }
 
+/* CARDS */
 .section-title { font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; color: var(--text); margin-bottom: 0.85rem; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem; margin-bottom: 0.85rem; }
 .field-label { font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.06em; }
 
+/* UPLOAD */
 .upload-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 1.75rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
 .upload-zone:hover { border-color: var(--blue); background: #eef5fc; }
 .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
@@ -90,6 +142,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; resize: none; outline: none; transition: border-color 0.2s; }
 textarea:focus { border-color: var(--blue); }
 
+/* CHECKLIST */
 .checklist { display: flex; flex-direction: column; gap: 7px; }
 .check-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg); border-radius: 10px; cursor: pointer; border: 1.5px solid var(--border); transition: all 0.15s; }
 .check-item.checked { border-color: var(--blue); background: #eef5fc; }
@@ -102,17 +155,27 @@ textarea:focus { border-color: var(--blue); }
 .submit-btn { width: 100%; padding: 15px; background: var(--blue); color: var(--white); border: none; border-radius: 12px; font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; margin-top: 0.25rem; }
 .submit-btn:hover { background: var(--blue-light); }
 
+/* CONFIRM CARDS */
 .confirm-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; }
 .confirm-icon { font-size: 36px; margin-bottom: 10px; }
 .confirm-title { font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 4px; }
 .confirm-sub { font-size: 13px; color: var(--muted); }
 
+/* HISTORY */
 .history-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 7px; }
 .history-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--bg); }
 .history-thumb-vid { width: 50px; height: 50px; border-radius: 8px; background: var(--blue-pale); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
 .history-info { flex: 1; min-width: 0; }
 .history-date { font-size: 13px; font-weight: 600; }
 .history-note { font-size: 12px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* PARENT DASHBOARD */
+.child-switcher { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.child-tab { display: flex; align-items: center; gap: 7px; padding: 7px 14px; background: var(--card); border: 1.5px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s; color: var(--text); }
+.child-tab:hover { border-color: var(--blue); }
+.child-tab.active { background: var(--blue); color: var(--white); border-color: var(--blue); }
+.child-tab-avatar { width: 20px; height: 20px; border-radius: 50%; color: var(--white); font-family: 'Anton', sans-serif; font-size: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.child-tab.active .child-tab-avatar { background: rgba(255,255,255,0.25); }
 
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
 .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
@@ -128,17 +191,19 @@ textarea:focus { border-color: var(--blue); }
 .action-row { display: flex; gap: 8px; }
 .approve-btn { flex: 1; padding: 13px; background: var(--blue); color: var(--white); border: none; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; }
 .approve-btn:hover { background: var(--blue-light); }
-.deny-btn { flex: 1; padding: 13px; background: #fde8e8; color: var(--red); border: 1.5px solid #f5b8b8; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; }
+.deny-btn { flex: 1; padding: 13px; background: #fde8e8; color: var(--red); border: 1.5px solid #f5b8b8; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; }
 .deny-btn:hover { background: #fbd4d4; }
 
 .empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--muted); }
 .empty-icon { font-size: 36px; margin-bottom: 10px; }
 .empty-text { font-size: 14px; line-height: 1.6; }
 
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--blue); color: var(--white); padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; transition: transform 0.3s ease; z-index: 999; white-space: nowrap; border: 2px solid var(--blue-deep); max-width: 90vw; white-space: normal; text-align: center; }
-.toast.show { transform: translateX(-50%) translateY(0); }
+.no-children { text-align: center; padding: 3rem 1rem; color: var(--muted); }
 
 .divider-line { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--blue); color: var(--white); padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; transition: transform 0.3s ease; z-index: 999; border: 2px solid var(--blue-deep); max-width: 88vw; text-align: center; }
+.toast.show { transform: translateX(-50%) translateY(0); }
 
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 .pending-pulse { animation: pulse 2s infinite; }
@@ -148,371 +213,506 @@ textarea:focus { border-color: var(--blue); }
 
 <div class="header">
   <div class="header-inner">
-    <div class="logo-wrap">
-      <div class="logo-ball"></div>
-      <div>
-        <div class="logo-text">GYMPASS</div>
-        <div class="logo-sub">Let's Go Dodgers</div>
-      </div>
-    </div>
+    <div class="logo-text">GYMPASS</div>
     <div class="nav-tabs">
-      <button class="tab active" onclick="switchTab('son')">My View</button>
-      <button class="tab" onclick="switchTab('parent')">Parent</button>
+      <button class="tab active" onclick="switchMainTab('kid')">My View</button>
+      <button class="tab" onclick="switchMainTab('parent')">Parent</button>
     </div>
   </div>
 </div>
 
-<!-- SON VIEW -->
-<div id="view-son" class="view active">
+<!-- KID SIDE -->
+<div id="view-kid" class="view active">
 
-  <div class="week-card">
-    <div class="week-header">
-      <div class="week-title">THIS WEEK</div>
-      <div class="reward-badge" id="reward-badge">5 days = $20 reward</div>
-    </div>
-    <div class="days-row" id="week-days"></div>
-    <div class="progress-row">
-      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-      <div class="progress-label" id="progress-label">0 / 5</div>
-    </div>
-  </div>
-
-  <div class="status-row">
-    <div class="streak-info">
-      <div class="streak-num" id="streak-count">0</div>
-      <div class="streak-text">day streak</div>
-    </div>
-    <div id="today-status" class="status-pill locked">
-      <span class="s-dot"></span> Internet Locked
-    </div>
-  </div>
-
-  <div id="reward-earned-banner" style="display:none;" class="reward-banner">
-    <div class="reward-icon">&#127942;</div>
-    <div>
-      <div class="reward-title">$20 REWARD EARNED!</div>
-      <div class="reward-desc">You hit 5 workouts this week. Go collect your money!</div>
-    </div>
-  </div>
-
-  <div id="son-submitted-msg" style="display:none;" class="confirm-card">
-    <div class="confirm-icon">&#9203;</div>
-    <div class="confirm-title" style="color:var(--amber);">PROOF SUBMITTED</div>
-    <div class="confirm-sub">Waiting on your parent to review. Sit tight.</div>
-  </div>
-
-  <div id="son-unlocked-msg" style="display:none;" class="confirm-card">
-    <div class="confirm-icon">&#127881;</div>
-    <div class="confirm-title" style="color:var(--green);">YOU'RE UNLOCKED!</div>
-    <div class="confirm-sub">Nice work today. Go enjoy your internet.</div>
-  </div>
-
-  <div id="son-form">
-    <div class="section-title">Submit today's proof</div>
-    <div class="card">
-      <label class="field-label">Photo or video of your workout</label>
-      <div class="upload-zone" id="upload-zone">
-        <input type="file" accept="image/*,video/*" id="file-input" onchange="handleFile(this)">
-        <div class="upload-icon">&#128247;</div>
-        <div class="upload-text"><strong>Tap to upload</strong> or drop here</div>
-        <div class="upload-text" style="font-size:12px;margin-top:4px;">Photo or short video — show your work</div>
-      </div>
-      <div class="preview-wrap" id="preview-wrap" style="display:none;">
-        <button class="remove-btn" onclick="removeFile()">&#10005;</button>
-      </div>
-    </div>
-    <div class="card">
-      <label class="field-label">What did you do? (brag a little)</label>
-      <textarea id="workout-note" rows="3" placeholder="e.g. 5 miles + weights. Feeling like Mookie out there."></textarea>
-    </div>
-    <div class="card">
-      <label class="field-label">Check off what you completed</label>
-      <div class="checklist" id="checklist">
-        <div class="check-item" onclick="toggleCheck(this)">
-          <div class="check-box"><span class="check-mark">&#10003;</span></div>
-          <span class="check-label">Cardio (20+ min)</span>
-        </div>
-        <div class="check-item" onclick="toggleCheck(this)">
-          <div class="check-box"><span class="check-mark">&#10003;</span></div>
-          <span class="check-label">Strength / weights</span>
-        </div>
-        <div class="check-item" onclick="toggleCheck(this)">
-          <div class="check-box"><span class="check-mark">&#10003;</span></div>
-          <span class="check-label">Stretching / cool down</span>
-        </div>
-        <div class="check-item" onclick="toggleCheck(this)">
-          <div class="check-box"><span class="check-mark">&#10003;</span></div>
-          <span class="check-label">Stayed hydrated</span>
+  <!-- PROFILE PICKER -->
+  <div id="kid-picker" class="picker-wrap">
+    <div class="picker-title">WHO'S WORKING OUT?</div>
+    <div class="picker-sub">Pick your name to submit today's proof.</div>
+    <div class="profile-grid" id="kid-profile-grid"></div>
+    <div id="kid-add-form" style="display:none;">
+      <div class="add-form">
+        <div class="add-form-title">ADD YOUR NAME</div>
+        <input class="name-input" id="kid-name-input" placeholder="Your name" maxlength="20">
+        <div class="color-row" id="kid-color-row"></div>
+        <div class="form-btn-row">
+          <button class="cancel-btn" onclick="hideKidAddForm()">Cancel</button>
+          <button class="save-btn" onclick="saveNewKid()">SAVE</button>
         </div>
       </div>
     </div>
-    <button class="submit-btn" onclick="submitProof()">SUBMIT PROOF</button>
   </div>
 
-  <hr class="divider-line" style="margin-top:1.5rem;">
-  <div class="section-title">My history</div>
-  <div id="son-history-list"></div>
+  <!-- ACTIVE KID VIEW -->
+  <div id="kid-active" style="display:none;">
+    <div class="back-bar">
+      <button class="back-btn" onclick="backToKidPicker()">&#8592; Switch</button>
+      <div class="active-avatar" id="kid-active-avatar"></div>
+      <div class="active-name" id="kid-active-name"></div>
+    </div>
+
+    <div class="week-card">
+      <div class="week-header">
+        <div class="week-title">THIS WEEK</div>
+        <div class="reward-badge" id="kid-reward-badge">5 days = $20</div>
+      </div>
+      <div class="days-row" id="kid-week-days"></div>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" id="kid-progress-fill" style="width:0%"></div></div>
+        <div class="progress-label" id="kid-progress-label">0 / 5</div>
+      </div>
+    </div>
+
+    <div class="status-row">
+      <div class="streak-info">
+        <div class="streak-num" id="kid-streak">0</div>
+        <div class="streak-text">day streak</div>
+      </div>
+      <div id="kid-status-pill" class="status-pill locked">
+        <span class="s-dot"></span> Internet Locked
+      </div>
+    </div>
+
+    <div id="kid-reward-banner" style="display:none;" class="reward-banner">
+      <div class="reward-icon">&#127942;</div>
+      <div>
+        <div class="reward-title">$20 REWARD EARNED!</div>
+        <div class="reward-desc" id="kid-reward-desc">You hit 5 workouts this week. Go collect!</div>
+      </div>
+    </div>
+
+    <div id="kid-submitted-msg" style="display:none;" class="confirm-card">
+      <div class="confirm-icon">&#9203;</div>
+      <div class="confirm-title" style="color:var(--amber);">PROOF SUBMITTED</div>
+      <div class="confirm-sub">Waiting on your parent to review. Sit tight.</div>
+    </div>
+
+    <div id="kid-unlocked-msg" style="display:none;" class="confirm-card">
+      <div class="confirm-icon">&#127881;</div>
+      <div class="confirm-title" style="color:var(--green);">YOU'RE UNLOCKED!</div>
+      <div class="confirm-sub">Nice work today. Go enjoy your internet.</div>
+    </div>
+
+    <div id="kid-form">
+      <div class="section-title">Submit today's proof</div>
+      <div class="card">
+        <label class="field-label">Photo or video of your workout</label>
+        <div class="upload-zone" id="kid-upload-zone">
+          <input type="file" accept="image/*,video/*" id="kid-file-input" onchange="handleFile(this)">
+          <div class="upload-icon">&#128247;</div>
+          <div class="upload-text"><strong>Tap to upload</strong> or drop here</div>
+          <div class="upload-text" style="font-size:12px;margin-top:4px;">Photo or short video — show your work</div>
+        </div>
+        <div class="preview-wrap" id="kid-preview-wrap" style="display:none;">
+          <button class="remove-btn" onclick="removeFile()">&#10005;</button>
+        </div>
+      </div>
+      <div class="card">
+        <label class="field-label">What did you do? (brag a little)</label>
+        <textarea id="kid-note" rows="3" placeholder="e.g. 5 miles + weights. Crushed it."></textarea>
+      </div>
+      <div class="card">
+        <label class="field-label">Check off what you completed</label>
+        <div class="checklist">
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Cardio (20+ min)</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Strength / weights</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Stretching / cool down</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Stayed hydrated</span></div>
+        </div>
+      </div>
+      <button class="submit-btn" onclick="submitProof()">SUBMIT PROOF</button>
+    </div>
+
+    <hr class="divider-line" style="margin-top:1.5rem;">
+    <div class="section-title">My history</div>
+    <div id="kid-history-list"></div>
+  </div>
 </div>
 
-<!-- PARENT VIEW -->
+<!-- PARENT SIDE -->
 <div id="view-parent" class="view">
+  <div id="parent-no-children" class="no-children" style="display:none;">
+    <div class="empty-icon">&#128100;</div>
+    <div class="empty-text">No kids added yet.<br>Have them pick their name on the My View tab first.</div>
+  </div>
 
-  <div class="week-card">
-    <div class="week-header">
-      <div class="week-title">HIS WEEK</div>
-      <div class="reward-badge" id="p-reward-badge">5 days = $20</div>
+  <div id="parent-main" style="display:none;">
+    <div class="child-switcher" id="parent-child-switcher"></div>
+
+    <div class="week-card">
+      <div class="week-header">
+        <div class="week-title" id="p-week-title">THIS WEEK</div>
+        <div class="reward-badge" id="p-reward-badge">5 days = $20</div>
+      </div>
+      <div class="days-row" id="p-week-days"></div>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" id="p-progress-fill" style="width:0%"></div></div>
+        <div class="progress-label" id="p-progress-label">0 / 5</div>
+      </div>
     </div>
-    <div class="days-row" id="p-week-days"></div>
-    <div class="progress-row">
-      <div class="progress-track"><div class="progress-fill" id="p-progress-fill" style="width:0%"></div></div>
-      <div class="progress-label" id="p-progress-label">0 / 5</div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="p-streak">0</div><div class="stat-label">Streak</div></div>
+      <div class="stat-card"><div class="stat-num" id="p-total">0</div><div class="stat-label">Total days</div></div>
+      <div class="stat-card"><div class="stat-num" id="p-rewards">0</div><div class="stat-label">$20 rewards</div></div>
     </div>
-  </div>
 
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-num" id="p-streak">0</div><div class="stat-label">Streak</div></div>
-    <div class="stat-card"><div class="stat-num" id="p-total">0</div><div class="stat-label">Total days</div></div>
-    <div class="stat-card"><div class="stat-num" id="p-rewards">0</div><div class="stat-label">$20 rewards</div></div>
-  </div>
+    <div id="p-pending-section" style="display:none;">
+      <div class="section-title" style="color:var(--amber);">&#9889; Pending review</div>
+      <div id="p-pending-wrap"></div>
+    </div>
+    <div id="p-no-pending" class="empty-state">
+      <div class="empty-icon">&#128526;</div>
+      <div class="empty-text">No submissions waiting.<br>Check back after they work out.</div>
+    </div>
 
-  <div id="pending-section" style="display:none;">
-    <div class="section-title" style="color:var(--amber);">&#9889; Pending review</div>
-    <div id="pending-card-wrap"></div>
+    <hr class="divider-line">
+    <div class="section-title">Approval history</div>
+    <div id="p-history-list"></div>
   </div>
-  <div id="no-pending" class="empty-state">
-    <div class="empty-icon">&#9917;</div>
-    <div class="empty-text">No submissions waiting.<br>Check back after he works out.</div>
-  </div>
-
-  <hr class="divider-line">
-  <div class="section-title">Approval history</div>
-  <div id="parent-history-list"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY = 'gympass_dodgers';
+const ROOT_KEY = 'gympass_v2';
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const GOAL = 5;
+const COLORS = ['#005A9C','#1a8a4a','#c0392b','#8e44ad','#d4880a','#16a085','#c0392b','#2c3e50','#b7950b'];
 
-function load() {
-  try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : {submissions:[],streak:0,totalRewards:0}; }
-  catch(e) { return {submissions:[],streak:0,totalRewards:0}; }
+let activeKidId = null;
+let activeParentId = null;
+let fileData = null, fileType = null;
+let selectedColor = COLORS[0];
+
+/* ---- DATA ---- */
+function loadRoot() {
+  try { const r = localStorage.getItem(ROOT_KEY); return r ? JSON.parse(r) : { kids: [] }; }
+  catch(e) { return { kids: [] }; }
 }
-function save(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e) {} }
+function saveRoot(d) { try { localStorage.setItem(ROOT_KEY, JSON.stringify(d)); } catch(e) {} }
+
+function getKid(id) { return loadRoot().kids.find(k => k.id === id); }
+function updateKid(id, fn) {
+  const d = loadRoot();
+  const idx = d.kids.findIndex(k => k.id === id);
+  if (idx === -1) return;
+  fn(d.kids[idx]);
+  saveRoot(d);
+}
+
 function todayStr() { return new Date().toISOString().split('T')[0]; }
 function formatDate(iso) {
-  const d = new Date(iso + 'T12:00:00');
-  return d.toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'});
+  return new Date(iso + 'T12:00:00').toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
 }
 function getWeekDates() {
-  const now = new Date(), dow = now.getDay(), dates = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(now); d.setDate(now.getDate() - dow + i);
-    dates.push(d.toISOString().split('T')[0]);
-  }
-  return dates;
+  const now = new Date(), dow = now.getDay();
+  return Array.from({length:7}, (_,i) => { const d = new Date(now); d.setDate(now.getDate()-dow+i); return d.toISOString().split('T')[0]; });
 }
-function weekApprovedCount(data) {
+function weekApproved(kid) {
   const week = getWeekDates();
-  return data.submissions.filter(s => week.includes(s.date) && s.status === 'approved').length;
+  return (kid.submissions||[]).filter(s => week.includes(s.date) && s.status==='approved').length;
+}
+function initials(name) { return name.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+
+/* ---- PROFILE MANAGEMENT ---- */
+function renderKidPicker() {
+  const d = loadRoot();
+  const grid = document.getElementById('kid-profile-grid');
+  grid.innerHTML = '';
+  d.kids.forEach(kid => {
+    const streak = kid.streak || 0;
+    const btn = document.createElement('div');
+    btn.className = 'profile-btn';
+    btn.innerHTML = `
+      <div class="profile-avatar" style="background:${kid.color}">${initials(kid.name)}</div>
+      <div class="profile-name">${kid.name}</div>
+      <div class="profile-streak">${streak} day streak</div>`;
+    btn.onclick = () => selectKid(kid.id);
+    grid.appendChild(btn);
+  });
+  const addBtn = document.createElement('div');
+  addBtn.className = 'add-profile-btn';
+  addBtn.innerHTML = `<div class="add-icon">&#43;</div><div>Add name</div>`;
+  addBtn.onclick = () => showKidAddForm();
+  grid.appendChild(addBtn);
 }
 
-let fileData = null, fileType = null;
-
-function handleFile(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    fileData = e.target.result;
-    fileType = file.type.startsWith('video') ? 'video' : 'image';
-    const wrap = document.getElementById('preview-wrap');
-    wrap.innerHTML = '<button class="remove-btn" onclick="removeFile()">&#10005;</button>';
-    const el = fileType === 'image'
-      ? Object.assign(document.createElement('img'), {src: fileData})
-      : Object.assign(document.createElement('video'), {src: fileData, controls: true});
-    wrap.appendChild(el);
-    wrap.style.display = 'block';
-    document.getElementById('upload-zone').style.display = 'none';
-  };
-  reader.readAsDataURL(file);
+function showKidAddForm() {
+  document.getElementById('kid-add-form').style.display = 'block';
+  document.getElementById('kid-name-input').focus();
+  const row = document.getElementById('kid-color-row');
+  row.innerHTML = '';
+  selectedColor = COLORS[0];
+  COLORS.forEach((c, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch' + (i===0?' selected':'');
+    sw.style.background = c;
+    sw.onclick = () => { selectedColor = c; document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected')); sw.classList.add('selected'); };
+    row.appendChild(sw);
+  });
+}
+function hideKidAddForm() {
+  document.getElementById('kid-add-form').style.display = 'none';
+  document.getElementById('kid-name-input').value = '';
+}
+function saveNewKid() {
+  const name = document.getElementById('kid-name-input').value.trim();
+  if (!name) { showToast('Enter a name first!'); return; }
+  const d = loadRoot();
+  if (d.kids.find(k => k.name.toLowerCase()===name.toLowerCase())) { showToast('That name is already added.'); return; }
+  const id = 'kid_' + Date.now();
+  d.kids.push({ id, name, color: selectedColor, streak: 0, totalRewards: 0, submissions: [] });
+  saveRoot(d);
+  hideKidAddForm();
+  renderKidPicker();
+  showToast(name + ' added!');
 }
 
-function removeFile() {
+function selectKid(id) {
+  activeKidId = id;
+  const kid = getKid(id);
+  if (!kid) return;
+  document.getElementById('kid-picker').style.display = 'none';
+  document.getElementById('kid-active').style.display = 'block';
+  document.getElementById('kid-active-avatar').style.background = kid.color;
+  document.getElementById('kid-active-avatar').textContent = initials(kid.name);
+  document.getElementById('kid-active-name').textContent = kid.name.toUpperCase();
   fileData = null; fileType = null;
-  document.getElementById('preview-wrap').style.display = 'none';
-  document.getElementById('upload-zone').style.display = 'block';
-  document.getElementById('file-input').value = '';
+  document.getElementById('kid-preview-wrap').style.display = 'none';
+  document.getElementById('kid-upload-zone').style.display = 'block';
+  document.getElementById('kid-file-input').value = '';
+  document.getElementById('kid-note').value = '';
+  document.querySelectorAll('#kid-form .check-item').forEach(el => el.classList.remove('checked'));
+  renderKidActive();
 }
 
-function toggleCheck(el) { el.classList.toggle('checked'); }
-
-function submitProof() {
-  if (!fileData) { showToast('Add a photo or video first!'); return; }
-  const note = document.getElementById('workout-note').value.trim();
-  const checks = [...document.querySelectorAll('#checklist .check-item.checked')].map(el => el.querySelector('.check-label').textContent);
-  const data = load(), t = todayStr();
-  const existing = data.submissions.find(s => s.date === t);
-  if (existing && existing.status === 'pending') { showToast('Already submitted — waiting on approval!'); return; }
-  if (existing && existing.status === 'approved') { showToast("You're already unlocked today!"); return; }
-  if (existing) data.submissions = data.submissions.filter(s => s.date !== t);
-  data.submissions.unshift({date:t, fileData, fileType, note, checks, status:'pending', submittedAt:new Date().toISOString()});
-  save(data);
-  renderSonView();
-  showToast('Proof sent to your parent!');
+function backToKidPicker() {
+  activeKidId = null;
+  document.getElementById('kid-picker').style.display = 'block';
+  document.getElementById('kid-active').style.display = 'none';
+  renderKidPicker();
 }
 
-function renderWeekDots(containerId, fillId, labelId, data, badgeId) {
+/* ---- WEEK DOTS ---- */
+function renderWeekDots(containerId, fillId, labelId, kid, badgeId) {
   const week = getWeekDates(), today = todayStr();
   const container = document.getElementById(containerId);
   container.innerHTML = '';
   week.forEach(dateStr => {
-    const sub = data.submissions.find(s => s.date === dateStr);
-    const isToday = dateStr === today;
+    const sub = (kid.submissions||[]).find(s => s.date===dateStr);
     const cell = document.createElement('div'); cell.className = 'day-cell';
-    const label = document.createElement('div'); label.className = 'day-label';
-    label.textContent = DAYS[new Date(dateStr + 'T12:00:00').getDay()];
+    const lbl = document.createElement('div'); lbl.className = 'day-label';
+    lbl.textContent = DAYS[new Date(dateStr+'T12:00:00').getDay()];
     const bubble = document.createElement('div'); bubble.className = 'day-bubble';
-    if (sub && sub.status === 'approved') { bubble.classList.add('done'); bubble.textContent = '✓'; }
-    else if (sub && sub.status === 'pending') { bubble.classList.add('pending-day'); bubble.textContent = '?'; }
-    else if (isToday) { bubble.classList.add('today-empty'); }
-    cell.appendChild(label); cell.appendChild(bubble); container.appendChild(cell);
+    if (sub && sub.status==='approved') { bubble.classList.add('done'); bubble.textContent='✓'; }
+    else if (sub && sub.status==='pending') { bubble.classList.add('pending-day'); bubble.textContent='?'; }
+    else if (dateStr===today) { bubble.classList.add('today-empty'); }
+    cell.appendChild(lbl); cell.appendChild(bubble); container.appendChild(cell);
   });
-  const approved = weekApprovedCount(data);
-  const pct = Math.min((approved / GOAL) * 100, 100);
+  const cnt = weekApproved(kid);
+  const pct = Math.min((cnt/GOAL)*100,100);
   const fill = document.getElementById(fillId);
-  fill.style.width = pct + '%';
-  fill.className = 'progress-fill' + (approved >= GOAL ? ' goal-met' : '');
-  document.getElementById(labelId).textContent = approved + ' / ' + GOAL;
+  fill.style.width = pct+'%';
+  fill.className = 'progress-fill'+(cnt>=GOAL?' goal-met':'');
+  document.getElementById(labelId).textContent = cnt+' / '+GOAL;
   if (badgeId) {
-    const badge = document.getElementById(badgeId);
-    if (approved >= GOAL) { badge.textContent = '🏆 $20 EARNED!'; }
-    else { badge.textContent = '5 days = $20 reward'; }
+    const b = document.getElementById(badgeId);
+    b.textContent = cnt>=GOAL ? '🏆 $20 EARNED!' : '5 days = $20 reward';
   }
 }
 
-function renderSonView() {
-  const data = load(), t = todayStr();
-  const todaySub = data.submissions.find(s => s.date === t);
-  document.getElementById('streak-count').textContent = data.streak || 0;
-  renderWeekDots('week-days','progress-fill','progress-label', data, 'reward-badge');
-  const approved = weekApprovedCount(data);
-  document.getElementById('reward-earned-banner').style.display = approved >= GOAL ? 'flex' : 'none';
-  const form = document.getElementById('son-form');
-  const subMsg = document.getElementById('son-submitted-msg');
-  const unlMsg = document.getElementById('son-unlocked-msg');
-  const pill = document.getElementById('today-status');
-  if (todaySub && todaySub.status === 'approved') {
+/* ---- KID ACTIVE VIEW ---- */
+function renderKidActive() {
+  const kid = getKid(activeKidId); if (!kid) return;
+  const t = todayStr();
+  const todaySub = (kid.submissions||[]).find(s=>s.date===t);
+  document.getElementById('kid-streak').textContent = kid.streak||0;
+  renderWeekDots('kid-week-days','kid-progress-fill','kid-progress-label', kid, 'kid-reward-badge');
+  const cnt = weekApproved(kid);
+  document.getElementById('kid-reward-banner').style.display = cnt>=GOAL?'flex':'none';
+  if (cnt>=GOAL) document.getElementById('kid-reward-desc').textContent = kid.name+' hit 5 workouts this week. Go collect!';
+  const form = document.getElementById('kid-form');
+  const subMsg = document.getElementById('kid-submitted-msg');
+  const unlMsg = document.getElementById('kid-unlocked-msg');
+  const pill = document.getElementById('kid-status-pill');
+  if (todaySub && todaySub.status==='approved') {
     form.style.display='none'; subMsg.style.display='none'; unlMsg.style.display='block';
     pill.className='status-pill unlocked'; pill.innerHTML='<span class="s-dot"></span> Unlocked Today';
-  } else if (todaySub && todaySub.status === 'pending') {
+  } else if (todaySub && todaySub.status==='pending') {
     form.style.display='none'; subMsg.style.display='block'; unlMsg.style.display='none';
     pill.className='status-pill pending'; pill.innerHTML='<span class="s-dot pending-pulse"></span> Proof Pending';
   } else {
     form.style.display='block'; subMsg.style.display='none'; unlMsg.style.display='none';
     pill.className='status-pill locked'; pill.innerHTML='<span class="s-dot"></span> Internet Locked';
   }
-  const list = document.getElementById('son-history-list');
-  const past = data.submissions.filter(s => s.date !== t).slice(0, 25);
-  if (!past.length) { list.innerHTML = '<div class="empty-state"><div class="empty-text" style="color:var(--muted)">Your workout history will show here.</div></div>'; return; }
+  const list = document.getElementById('kid-history-list');
+  const past = (kid.submissions||[]).filter(s=>s.date!==t).slice(0,25);
+  if (!past.length) { list.innerHTML='<div class="empty-state"><div class="empty-text" style="color:var(--muted)">Your workout history will show here.</div></div>'; return; }
   list.innerHTML = past.map(s => {
-    const thumb = s.fileType==='image' ? `<img class="history-thumb" src="${s.fileData}">` : `<div class="history-thumb-vid">&#127909;</div>`;
+    const thumb = s.fileType==='image'?`<img class="history-thumb" src="${s.fileData}">`:`<div class="history-thumb-vid">&#127909;</div>`;
     const sc = s.status==='approved'?'unlocked':s.status==='denied'?'locked':'pending';
     const sl = s.status==='approved'?'Approved':s.status==='denied'?'Denied':'Pending';
-    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks.length?s.checks.join(', '):'—')}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span></div>`;
+    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks&&s.checks.length?s.checks.join(', '):'—')}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span></div>`;
   }).join('');
 }
 
+/* ---- FILE UPLOAD ---- */
+function handleFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    fileData = e.target.result;
+    fileType = file.type.startsWith('video')?'video':'image';
+    const wrap = document.getElementById('kid-preview-wrap');
+    wrap.innerHTML = '<button class="remove-btn" onclick="removeFile()">&#10005;</button>';
+    const el = fileType==='image'
+      ? Object.assign(document.createElement('img'),{src:fileData})
+      : Object.assign(document.createElement('video'),{src:fileData,controls:true});
+    wrap.appendChild(el);
+    wrap.style.display='block';
+    document.getElementById('kid-upload-zone').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+function removeFile() {
+  fileData=null; fileType=null;
+  document.getElementById('kid-preview-wrap').style.display='none';
+  document.getElementById('kid-upload-zone').style.display='block';
+  document.getElementById('kid-file-input').value='';
+}
+function toggleCheck(el) { el.classList.toggle('checked'); }
+
+/* ---- SUBMIT PROOF ---- */
+function submitProof() {
+  if (!fileData) { showToast('Add a photo or video first!'); return; }
+  const note = document.getElementById('kid-note').value.trim();
+  const checks = [...document.querySelectorAll('#kid-form .check-item.checked')].map(el=>el.querySelector('.check-label').textContent);
+  const t = todayStr();
+  updateKid(activeKidId, kid => {
+    const existing = (kid.submissions||[]).find(s=>s.date===t);
+    if (existing && existing.status==='pending') return;
+    if (existing && existing.status==='approved') return;
+    kid.submissions = (kid.submissions||[]).filter(s=>s.date!==t);
+    kid.submissions.unshift({date:t, fileData, fileType, note, checks, status:'pending', submittedAt:new Date().toISOString()});
+  });
+  renderKidActive();
+  showToast('Proof sent to your parent!');
+}
+
+/* ---- PARENT VIEW ---- */
 function renderParentView() {
-  const data = load(), t = todayStr();
-  renderWeekDots('p-week-days','p-progress-fill','p-progress-label', data, 'p-reward-badge');
-  const approved = data.submissions.filter(s => s.status==='approved');
-  document.getElementById('p-streak').textContent = data.streak || 0;
+  const d = loadRoot();
+  if (!d.kids.length) {
+    document.getElementById('parent-no-children').style.display='block';
+    document.getElementById('parent-main').style.display='none';
+    return;
+  }
+  document.getElementById('parent-no-children').style.display='none';
+  document.getElementById('parent-main').style.display='block';
+  if (!activeParentId || !d.kids.find(k=>k.id===activeParentId)) {
+    activeParentId = d.kids[0].id;
+  }
+  const switcher = document.getElementById('parent-child-switcher');
+  switcher.innerHTML = '';
+  d.kids.forEach(kid => {
+    const btn = document.createElement('div');
+    btn.className = 'child-tab'+(kid.id===activeParentId?' active':'');
+    const hasPending = (kid.submissions||[]).some(s=>s.date===todayStr()&&s.status==='pending');
+    btn.innerHTML = `<div class="child-tab-avatar" style="background:${kid.id===activeParentId?'rgba(255,255,255,0.25)':kid.color}">${initials(kid.name)}</div>${kid.name}${hasPending?' &#9889;':''}`;
+    btn.onclick = () => { activeParentId = kid.id; renderParentView(); };
+    switcher.appendChild(btn);
+  });
+  const kid = d.kids.find(k=>k.id===activeParentId);
+  if (!kid) return;
+  renderWeekDots('p-week-days','p-progress-fill','p-progress-label', kid, 'p-reward-badge');
+  document.getElementById('p-week-title').textContent = kid.name.toUpperCase() + "'S WEEK";
+  const approved = (kid.submissions||[]).filter(s=>s.status==='approved');
+  document.getElementById('p-streak').textContent = kid.streak||0;
   document.getElementById('p-total').textContent = approved.length;
-  document.getElementById('p-rewards').textContent = data.totalRewards || 0;
-  const pending = data.submissions.find(s => s.date===t && s.status==='pending');
+  document.getElementById('p-rewards').textContent = kid.totalRewards||0;
+  const t = todayStr();
+  const pending = (kid.submissions||[]).find(s=>s.date===t&&s.status==='pending');
   if (pending) {
-    document.getElementById('pending-section').style.display='block';
-    document.getElementById('no-pending').style.display='none';
+    document.getElementById('p-pending-section').style.display='block';
+    document.getElementById('p-no-pending').style.display='none';
     const media = pending.fileType==='image'
       ? `<img class="pending-media" src="${pending.fileData}">`
       : `<video class="pending-media" src="${pending.fileData}" controls></video>`;
-    const checks = pending.checks.length ? `<div class="checks-row">${pending.checks.map(c=>`<span class="check-tag">&#10003; ${c}</span>`).join('')}</div>` : '';
-    const note = pending.note ? `<div class="pending-note">"${pending.note}"</div>` : '';
+    const checks = pending.checks&&pending.checks.length ? `<div class="checks-row">${pending.checks.map(c=>`<span class="check-tag">&#10003; ${c}</span>`).join('')}</div>` : '';
+    const note = pending.note?`<div class="pending-note">"${pending.note}"</div>`:'';
     const time = new Date(pending.submittedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    document.getElementById('pending-card-wrap').innerHTML = `
+    document.getElementById('p-pending-wrap').innerHTML = `
       <div class="pending-card">
-        <div class="pending-time">Submitted at ${time}</div>
+        <div class="pending-time">${kid.name} submitted at ${time}</div>
         ${media}${checks}${note}
         <div class="action-row">
-          <button class="approve-btn" onclick="approveToday()">&#10003; APPROVE &amp; UNLOCK</button>
-          <button class="deny-btn" onclick="denyToday()">&#10005; DENY</button>
+          <button class="approve-btn" onclick="approveKid('${kid.id}')">&#10003; APPROVE &amp; UNLOCK</button>
+          <button class="deny-btn" onclick="denyKid('${kid.id}')">&#10005; DENY</button>
         </div>
       </div>`;
   } else {
-    document.getElementById('pending-section').style.display='none';
-    document.getElementById('no-pending').style.display='block';
+    document.getElementById('p-pending-section').style.display='none';
+    document.getElementById('p-no-pending').style.display='block';
   }
-  const phList = document.getElementById('parent-history-list');
-  const hist = data.submissions.filter(s => s.status!=='pending').slice(0,30);
-  if (!hist.length) { phList.innerHTML='<div class="empty-state"><div class="empty-text">No history yet.</div></div>'; return; }
+  const phList = document.getElementById('p-history-list');
+  const hist = (kid.submissions||[]).filter(s=>s.status!=='pending').slice(0,30);
+  if (!hist.length) { phList.innerHTML='<div class="empty-state"><div class="empty-text">No history yet for '+kid.name+'.</div></div>'; return; }
   phList.innerHTML = hist.map(s => {
-    const thumb = s.fileType==='image' ? `<img class="history-thumb" src="${s.fileData}">` : `<div class="history-thumb-vid">&#127909;</div>`;
+    const thumb = s.fileType==='image'?`<img class="history-thumb" src="${s.fileData}">`:`<div class="history-thumb-vid">&#127909;</div>`;
     const sc = s.status==='approved'?'unlocked':'locked';
     const sl = s.status==='approved'?'Approved':'Denied';
-    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks.join(', '))||'—'}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span></div>`;
+    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks&&s.checks.join(', '))||'—'}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span></div>`;
   }).join('');
 }
 
-function approveToday() {
-  const data = load(), t = todayStr();
-  const sub = data.submissions.find(s => s.date===t && s.status==='pending');
-  if (!sub) return;
-  sub.status = 'approved';
-  sub.approvedAt = new Date().toISOString();
-  const yd = new Date(); yd.setDate(yd.getDate()-1);
-  const ydStr = yd.toISOString().split('T')[0];
-  const hadYd = data.submissions.find(s => s.date===ydStr && s.status==='approved');
-  data.streak = hadYd ? (data.streak||0)+1 : 1;
-  save(data);
-  const wc = weekApprovedCount(data);
-  if (wc === GOAL) {
-    data.totalRewards = (data.totalRewards||0)+1;
-    save(data);
-    showToast('Approved! He just hit 5 this week — pay out that $20!');
-  } else {
-    showToast('Approved and unlocked! ' + wc + '/' + GOAL + ' this week.');
-  }
+function approveKid(id) {
+  const t = todayStr();
+  let rewardHit = false;
+  updateKid(id, kid => {
+    const sub = (kid.submissions||[]).find(s=>s.date===t&&s.status==='pending');
+    if (!sub) return;
+    sub.status='approved'; sub.approvedAt=new Date().toISOString();
+    const yd = new Date(); yd.setDate(yd.getDate()-1);
+    const ydStr = yd.toISOString().split('T')[0];
+    const hadYd = (kid.submissions||[]).find(s=>s.date===ydStr&&s.status==='approved');
+    kid.streak = hadYd?(kid.streak||0)+1:1;
+    const wc = weekApproved(kid);
+    if (wc===GOAL) { kid.totalRewards=(kid.totalRewards||0)+1; rewardHit=true; }
+  });
+  const kid = getKid(id);
+  if (rewardHit) showToast(kid.name+' hit 5 this week — pay out that $20!');
+  else { const wc = weekApproved(kid); showToast('Approved! '+kid.name+' is at '+wc+'/'+GOAL+' this week.'); }
   renderParentView();
 }
 
-function denyToday() {
-  const data = load(), t = todayStr();
-  const sub = data.submissions.find(s => s.date===t && s.status==='pending');
-  if (!sub) return;
-  sub.status = 'denied';
-  save(data);
-  showToast('Denied. He can resubmit with better proof.');
+function denyKid(id) {
+  const t = todayStr();
+  updateKid(id, kid => {
+    const sub = (kid.submissions||[]).find(s=>s.date===t&&s.status==='pending');
+    if (sub) sub.status='denied';
+  });
+  const kid = getKid(id);
+  showToast('Denied. '+kid.name+' can resubmit.');
   renderParentView();
 }
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) =>
-    t.classList.toggle('active',(i===0&&tab==='son')||(i===1&&tab==='parent'))
-  );
-  document.getElementById('view-son').classList.toggle('active', tab==='son');
+/* ---- TAB SWITCHING ---- */
+function switchMainTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='kid')||(i===1&&tab==='parent')));
+  document.getElementById('view-kid').classList.toggle('active', tab==='kid');
   document.getElementById('view-parent').classList.toggle('active', tab==='parent');
-  if (tab==='parent') renderParentView(); else renderSonView();
+  if (tab==='parent') renderParentView();
+  else renderKidPicker();
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-renderSonView();
+/* ---- INIT ---- */
+renderKidPicker();
 </script>
 </body>
 </html>
