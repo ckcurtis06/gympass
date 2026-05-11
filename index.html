@@ -105,11 +105,9 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .preview-wrap img, .preview-wrap video { width: 100%; border-radius: 10px; max-height: 260px; object-fit: cover; display: block; }
 .remove-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.55); border: none; color: white; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
 
-/* UPLOAD PROGRESS */
-.upload-progress { margin-top: 10px; }
-.upload-progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-.upload-progress-fill { height: 100%; background: var(--blue); border-radius: 3px; transition: width 0.2s; }
-.upload-progress-text { font-size: 12px; color: var(--muted); margin-top: 4px; text-align: center; }
+.compress-status { margin-top: 8px; font-size: 12px; color: var(--muted); text-align: center; padding: 6px; background: var(--bg); border-radius: 8px; }
+.compress-status.done { color: var(--green); }
+.compress-status.error { color: var(--amber); }
 
 textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; resize: none; outline: none; transition: border-color 0.2s; }
 textarea:focus { border-color: var(--blue); }
@@ -154,8 +152,7 @@ textarea:focus { border-color: var(--blue); }
 
 .pending-card { background: var(--card); border: 2px solid var(--amber); border-radius: 16px; padding: 1.1rem; margin-bottom: 1rem; }
 .pending-time { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
-.pending-media { width: 100%; border-radius: 10px; max-height: 260px; object-fit: cover; margin: 8px 0; display: block; }
-.pending-video { width: 100%; border-radius: 10px; margin: 8px 0; display: block; }
+.pending-media { width: 100%; border-radius: 10px; max-height: 280px; object-fit: cover; margin: 8px 0; display: block; }
 .checks-row { margin-bottom: 8px; }
 .check-tag { display: inline-block; background: var(--blue-pale); color: var(--blue); border-radius: 6px; padding: 3px 9px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; }
 .pending-note { font-size: 13px; color: var(--muted); font-style: italic; margin-bottom: 12px; }
@@ -274,10 +271,7 @@ textarea:focus { border-color: var(--blue); }
         <div class="preview-wrap" id="kid-preview-wrap" style="display:none;">
           <button class="remove-btn" onclick="removeFile()">&#10005;</button>
         </div>
-        <div class="upload-progress" id="upload-progress" style="display:none;">
-          <div class="upload-progress-bar"><div class="upload-progress-fill" id="upload-progress-fill" style="width:0%"></div></div>
-          <div class="upload-progress-text" id="upload-progress-text">Uploading...</div>
-        </div>
+        <div class="compress-status" id="compress-status" style="display:none;"></div>
       </div>
       <div class="card">
         <label class="field-label">What did you do? (brag a little)</label>
@@ -351,10 +345,8 @@ textarea:focus { border-color: var(--blue); }
 
 <div class="toast" id="toast"></div>
 
-<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
 <script>
 // ── FIREBASE ──
@@ -367,16 +359,19 @@ firebase.initializeApp({
   appId: "1:144611291022:web:792aefe5f0c17787d0fedf"
 });
 const db = firebase.firestore();
-const storage = firebase.storage();
 
 // ── CONSTANTS ──
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const GOAL = 5;
 const COLORS = ['#005A9C','#1a8a4a','#c0392b','#8e44ad','#d4880a','#16a085','#c77dff','#2c3e50','#b5451b'];
+const MAX_IMAGE_PX = 900;    // max width/height in pixels
+const IMAGE_QUALITY = 0.72;  // JPEG quality 0-1
+const MAX_KB = 700;          // target max size in KB
 
 let activeKidId = null;
 let activeParentId = null;
-let selectedFile = null;
+let compressedFileData = null; // compressed base64 ready to save
+let compressedFileType = null;
 let selectedColor = COLORS[0];
 let kidsCache = [];
 let unsubscribeListener = null;
@@ -389,181 +384,221 @@ function formatDate(iso) {
   return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 }
 function getWeekDates() {
-  const now = new Date(), dow = now.getDay();
+  const now=new Date(),dow=now.getDay();
   return Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-dow+i);return d.toISOString().split('T')[0];});
 }
-function initials(name) { return name.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
-function weekApprovedCount(kid) {
-  const week = getWeekDates();
+function initials(name){return name.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function weekApprovedCount(kid){
+  const week=getWeekDates();
   return (kid.submissions||[]).filter(s=>week.includes(s.date)&&s.status==='approved').length;
 }
+function formatKB(bytes){return Math.round(bytes/1024)+'KB';}
 
-// ── FIRESTORE ──
-async function loadKids() {
-  const snap = await db.collection('gympass_kids').orderBy('createdAt').get();
-  return snap.docs.map(d=>({id:d.id,...d.data()}));
-}
-async function saveKidData(id, data) {
-  await db.collection('gympass_kids').doc(id).set(data,{merge:true});
-}
-async function getKidDoc(id) {
-  const doc = await db.collection('gympass_kids').doc(id).get();
-  return doc.exists?{id:doc.id,...doc.data()}:null;
-}
-
-// ── FIREBASE STORAGE UPLOAD ──
-async function uploadFile(file, kidId) {
-  const ext = file.name.split('.').pop() || (file.type.startsWith('video')?'mp4':'jpg');
-  const path = `gympass/${kidId}/${todayStr()}_${Date.now()}.${ext}`;
-  const ref = storage.ref(path);
-  const task = ref.put(file);
-
+// ── IMAGE COMPRESSION ──
+function compressImage(file) {
   return new Promise((resolve, reject) => {
-    task.on('state_changed',
-      snap => {
-        const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-        document.getElementById('upload-progress').style.display = 'block';
-        document.getElementById('upload-progress-fill').style.width = pct + '%';
-        document.getElementById('upload-progress-text').textContent = 'Uploading... ' + pct + '%';
-      },
-      err => reject(err),
-      async () => {
-        const url = await task.snapshot.ref.getDownloadURL();
-        document.getElementById('upload-progress').style.display = 'none';
-        resolve(url);
-      }
-    );
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        // Calculate new dimensions
+        let w = img.width, h = img.height;
+        if (w > MAX_IMAGE_PX || h > MAX_IMAGE_PX) {
+          if (w > h) { h = Math.round(h * MAX_IMAGE_PX / w); w = MAX_IMAGE_PX; }
+          else { w = Math.round(w * MAX_IMAGE_PX / h); h = MAX_IMAGE_PX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        // Try progressively lower quality until under MAX_KB
+        let quality = IMAGE_QUALITY;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+        while (dataUrl.length * 0.75 > MAX_KB * 1024 && quality > 0.3) {
+          quality -= 0.08;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+        resolve({ dataUrl, originalKB: Math.round(file.size/1024), compressedKB: Math.round(dataUrl.length*0.75/1024) });
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
 }
 
+// For videos — grab a thumbnail frame and store that + a flag
+function captureVideoThumbnail(file) {
+  return new Promise((resolve) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+    video.playsInline = true;
+    const url = URL.createObjectURL(file);
+    video.src = url;
+    video.onloadeddata = () => {
+      video.currentTime = 1; // seek to 1 second for thumbnail
+    };
+    video.onseeked = () => {
+      const canvas = document.createElement('canvas');
+      const w = Math.min(video.videoWidth, MAX_IMAGE_PX);
+      const h = Math.round(video.videoHeight * w / video.videoWidth);
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      URL.revokeObjectURL(url);
+      resolve({ dataUrl, originalKB: Math.round(file.size/1024), compressedKB: Math.round(dataUrl.length*0.75/1024) });
+    };
+    video.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+  });
+}
+
+// ── FIRESTORE ──
+async function loadKids(){
+  const snap=await db.collection('gympass_kids').orderBy('createdAt').get();
+  return snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+async function saveKidData(id,data){
+  await db.collection('gympass_kids').doc(id).set(data,{merge:true});
+}
+async function getKidDoc(id){
+  const doc=await db.collection('gympass_kids').doc(id).get();
+  return doc.exists?{id:doc.id,...doc.data()}:null;
+}
+
 // ── NOTIFICATIONS ──
-function checkNotifBanner() {
-  if ('Notification' in window && Notification.permission === 'default') {
-    document.getElementById('notif-banner').style.display = 'flex';
+function checkNotifBanner(){
+  if('Notification' in window&&Notification.permission==='default'){
+    document.getElementById('notif-banner').style.display='flex';
   }
 }
-function requestNotifPermission() {
+function requestNotifPermission(){
   Notification.requestPermission().then(p=>{
     document.getElementById('notif-banner').style.display='none';
     if(p==='granted') showToast('Notifications enabled!');
   });
 }
-function sendNotification(title, body) {
-  if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification(title, {body});
+function sendNotification(title,body){
+  if('Notification' in window&&Notification.permission==='granted'){
+    new Notification(title,{body});
   }
 }
 
 // ── REAL-TIME LISTENER ──
-function startParentListener() {
-  if (unsubscribeListener) unsubscribeListener();
-  unsubscribeListener = db.collection('gympass_kids').onSnapshot(snap => {
-    kidsCache = snap.docs.map(d=>({id:d.id,...d.data()}));
-    const t = todayStr();
-    if (!firstLoad) {
-      kidsCache.forEach(kid => {
-        const pending = (kid.submissions||[]).find(s=>s.date===t&&s.status==='pending');
-        if (pending) {
-          const key = kid.id+'_'+t;
-          if (!knownPendingIds.has(key)) {
+function startParentListener(){
+  if(unsubscribeListener) unsubscribeListener();
+  unsubscribeListener=db.collection('gympass_kids').onSnapshot(snap=>{
+    kidsCache=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const t=todayStr();
+    if(!firstLoad){
+      kidsCache.forEach(kid=>{
+        const pending=(kid.submissions||[]).find(s=>s.date===t&&s.status==='pending');
+        if(pending){
+          const key=kid.id+'_'+t;
+          if(!knownPendingIds.has(key)){
             knownPendingIds.add(key);
-            sendNotification('GymPass ⚡', kid.name+' submitted workout proof — tap to review!');
+            sendNotification('GymPass ⚡',kid.name+' submitted workout proof — tap to review!');
           }
         }
       });
     }
-    firstLoad = false;
-    if (document.getElementById('view-parent').classList.contains('active')) {
+    firstLoad=false;
+    if(document.getElementById('view-parent').classList.contains('active')){
       renderParentFromCache();
     }
   });
 }
 
 // ── KID PICKER ──
-async function initKidView() {
+async function initKidView(){
   document.getElementById('kid-loading').style.display='flex';
   document.getElementById('kid-picker').style.display='none';
   document.getElementById('kid-active').style.display='none';
-  try { kidsCache = await loadKids(); } catch(e) { console.error(e); }
+  try{kidsCache=await loadKids();}catch(e){console.error(e);}
   document.getElementById('kid-loading').style.display='none';
   document.getElementById('kid-picker').style.display='block';
   renderKidPicker();
 }
 
-function renderKidPicker() {
-  const grid = document.getElementById('kid-profile-grid');
-  grid.innerHTML = '';
-  kidsCache.forEach(kid => {
-    const btn = document.createElement('div');
-    btn.className = 'profile-btn';
-    btn.innerHTML = `<div class="profile-avatar" style="background:${kid.color}">${initials(kid.name)}</div><div class="profile-name">${kid.name}</div><div class="profile-streak">${kid.streak||0} day streak</div>`;
-    btn.onclick = ()=>selectKid(kid.id);
+function renderKidPicker(){
+  const grid=document.getElementById('kid-profile-grid');
+  grid.innerHTML='';
+  kidsCache.forEach(kid=>{
+    const btn=document.createElement('div');
+    btn.className='profile-btn';
+    btn.innerHTML=`<div class="profile-avatar" style="background:${kid.color}">${initials(kid.name)}</div><div class="profile-name">${kid.name}</div><div class="profile-streak">${kid.streak||0} day streak</div>`;
+    btn.onclick=()=>selectKid(kid.id);
     grid.appendChild(btn);
   });
-  const addBtn = document.createElement('div');
-  addBtn.className = 'add-profile-btn';
-  addBtn.innerHTML = '<div style="font-size:24px;">+</div><div>Add name</div>';
-  addBtn.onclick = showKidAddForm;
+  const addBtn=document.createElement('div');
+  addBtn.className='add-profile-btn';
+  addBtn.innerHTML='<div style="font-size:24px;">+</div><div>Add name</div>';
+  addBtn.onclick=showKidAddForm;
   grid.appendChild(addBtn);
 }
 
-function showKidAddForm() {
+function showKidAddForm(){
   document.getElementById('kid-add-form').style.display='block';
   document.getElementById('kid-name-input').focus();
-  const row = document.getElementById('kid-color-row');
+  const row=document.getElementById('kid-color-row');
   row.innerHTML='';
-  selectedColor = COLORS[0];
+  selectedColor=COLORS[0];
   COLORS.forEach((c,i)=>{
-    const sw = document.createElement('div');
+    const sw=document.createElement('div');
     sw.className='color-swatch'+(i===0?' selected':'');
     sw.style.background=c;
     sw.onclick=()=>{selectedColor=c;document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));sw.classList.add('selected');};
     row.appendChild(sw);
   });
 }
-function hideKidAddForm() {
+function hideKidAddForm(){
   document.getElementById('kid-add-form').style.display='none';
   document.getElementById('kid-name-input').value='';
 }
-async function saveNewKid() {
-  const name = document.getElementById('kid-name-input').value.trim();
-  if (!name) { showToast('Enter a name first!'); return; }
-  if (kidsCache.find(k=>k.name.toLowerCase()===name.toLowerCase())) { showToast('That name is already added.'); return; }
-  const id = 'kid_'+Date.now();
-  const kidData = {name, color:selectedColor, streak:0, totalRewards:0, submissions:[], createdAt:new Date().toISOString()};
-  try {
+async function saveNewKid(){
+  const name=document.getElementById('kid-name-input').value.trim();
+  if(!name){showToast('Enter a name first!');return;}
+  if(kidsCache.find(k=>k.name.toLowerCase()===name.toLowerCase())){showToast('That name is already added.');return;}
+  const id='kid_'+Date.now();
+  const kidData={name,color:selectedColor,streak:0,totalRewards:0,submissions:[],createdAt:new Date().toISOString()};
+  try{
     await db.collection('gympass_kids').doc(id).set(kidData);
     kidsCache.push({id,...kidData});
     hideKidAddForm();
     renderKidPicker();
     showToast(name+' added!');
-  } catch(e) { showToast('Error saving — check connection.'); console.error(e); }
+  }catch(e){showToast('Error saving — check connection.');console.error(e);}
 }
 
-async function selectKid(id) {
-  activeKidId = id;
+async function selectKid(id){
+  activeKidId=id;
   document.getElementById('kid-loading').style.display='flex';
   document.getElementById('kid-picker').style.display='none';
-  const kid = await getKidDoc(id);
-  if (!kid) { showToast('Error loading profile.'); return; }
-  const idx = kidsCache.findIndex(k=>k.id===id);
-  if (idx>=0) kidsCache[idx]=kid; else kidsCache.push(kid);
+  const kid=await getKidDoc(id);
+  if(!kid){showToast('Error loading profile.');return;}
+  const idx=kidsCache.findIndex(k=>k.id===id);
+  if(idx>=0) kidsCache[idx]=kid; else kidsCache.push(kid);
   document.getElementById('kid-loading').style.display='none';
   document.getElementById('kid-active').style.display='block';
   document.getElementById('kid-active-avatar').style.background=kid.color;
   document.getElementById('kid-active-avatar').textContent=initials(kid.name);
   document.getElementById('kid-active-name').textContent=kid.name.toUpperCase();
-  selectedFile=null;
+  compressedFileData=null; compressedFileType=null;
   document.getElementById('kid-preview-wrap').style.display='none';
   document.getElementById('kid-upload-zone').style.display='block';
   document.getElementById('kid-file-input').value='';
   document.getElementById('kid-note').value='';
-  document.getElementById('upload-progress').style.display='none';
+  document.getElementById('compress-status').style.display='none';
   document.querySelectorAll('#kid-form .check-item').forEach(el=>el.classList.remove('checked'));
   renderKidActive(kid);
 }
 
-function backToKidPicker() {
+function backToKidPicker(){
   activeKidId=null;
   document.getElementById('kid-active').style.display='none';
   document.getElementById('kid-picker').style.display='block';
@@ -571,16 +606,16 @@ function backToKidPicker() {
 }
 
 // ── WEEK DOTS ──
-function renderWeekDots(containerId, fillId, labelId, kid, badgeId) {
-  const week=getWeekDates(), today=todayStr();
+function renderWeekDots(containerId,fillId,labelId,kid,badgeId){
+  const week=getWeekDates(),today=todayStr();
   const container=document.getElementById(containerId);
   container.innerHTML='';
   week.forEach(dateStr=>{
     const sub=(kid.submissions||[]).find(s=>s.date===dateStr);
-    const cell=document.createElement('div'); cell.className='day-cell';
-    const lbl=document.createElement('div'); lbl.className='day-label';
+    const cell=document.createElement('div');cell.className='day-cell';
+    const lbl=document.createElement('div');lbl.className='day-label';
     lbl.textContent=DAYS[new Date(dateStr+'T12:00:00').getDay()];
-    const bubble=document.createElement('div'); bubble.className='day-bubble';
+    const bubble=document.createElement('div');bubble.className='day-bubble';
     if(sub&&sub.status==='approved'){bubble.classList.add('done');bubble.textContent='✓';}
     else if(sub&&sub.status==='pending'){bubble.classList.add('pending-day');bubble.textContent='?';}
     else if(dateStr===today) bubble.classList.add('today-empty');
@@ -595,7 +630,7 @@ function renderWeekDots(containerId, fillId, labelId, kid, badgeId) {
 }
 
 // ── KID ACTIVE RENDER ──
-function renderKidActive(kid) {
+function renderKidActive(kid){
   if(!kid){kid=kidsCache.find(k=>k.id===activeKidId);if(!kid)return;}
   const t=todayStr();
   const todaySub=(kid.submissions||[]).find(s=>s.date===t);
@@ -610,10 +645,10 @@ function renderKidActive(kid) {
   if(todaySub&&todaySub.status==='approved'){
     form.style.display='none';subMsg.style.display='none';unlMsg.style.display='block';
     pill.className='status-pill unlocked';pill.innerHTML='<span class="s-dot"></span> Unlocked Today';
-  } else if(todaySub&&todaySub.status==='pending'){
+  }else if(todaySub&&todaySub.status==='pending'){
     form.style.display='none';subMsg.style.display='block';unlMsg.style.display='none';
     pill.className='status-pill pending';pill.innerHTML='<span class="s-dot pending-pulse"></span> Proof Pending';
-  } else {
+  }else{
     form.style.display='block';subMsg.style.display='none';unlMsg.style.display='none';
     pill.className='status-pill locked';pill.innerHTML='<span class="s-dot"></span> Internet Locked';
   }
@@ -621,77 +656,130 @@ function renderKidActive(kid) {
   const past=(kid.submissions||[]).filter(s=>s.date!==t).slice(0,25);
   if(!past.length){list.innerHTML='<div class="empty-state"><div class="empty-text" style="color:var(--muted)">Your workout history will show here.</div></div>';return;}
   list.innerHTML=past.map(s=>{
-    const thumb = s.fileType==='image'
-      ? `<img class="history-thumb" src="${s.fileURL||''}" onerror="this.style.display='none'">`
-      : `<div class="history-thumb-vid">&#127909;</div>`;
+    const thumb=s.fileData
+      ?`<img class="history-thumb" src="${s.fileData}" onerror="this.parentNode.innerHTML='<div class=history-thumb-vid>📹</div>'">`
+      :`<div class="history-thumb-vid">${s.fileType==='video'?'&#127909;':'📷'}</div>`;
     const sc=s.status==='approved'?'unlocked':s.status==='denied'?'locked':'pending';
     const sl=s.status==='approved'?'Approved':s.status==='denied'?'Denied':'Pending';
     return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks&&s.checks.length?s.checks.join(', '):'—')}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span></div>`;
   }).join('');
 }
 
-// ── FILE HANDLING ──
-function handleFile(input) {
+// ── FILE HANDLING + COMPRESSION ──
+async function handleFile(input){
   const file=input.files[0]; if(!file) return;
-  selectedFile=file;
   const isVideo=file.type.startsWith('video');
+  compressedFileType=isVideo?'video':'image';
+  const statusEl=document.getElementById('compress-status');
+  statusEl.style.display='block';
+  statusEl.className='compress-status';
+  statusEl.textContent=isVideo?'Processing video thumbnail...':'Compressing image...';
+
+  // Show preview immediately using object URL
   const wrap=document.getElementById('kid-preview-wrap');
   wrap.innerHTML='<button class="remove-btn" onclick="removeFile()">&#10005;</button>';
   if(isVideo){
     const vid=document.createElement('video');
-    vid.src=URL.createObjectURL(file);vid.controls=true;vid.style.width='100%';vid.style.borderRadius='10px';
+    vid.src=URL.createObjectURL(file);vid.controls=true;
+    vid.style.cssText='width:100%;border-radius:10px;max-height:260px;';
     wrap.appendChild(vid);
-  } else {
+  }else{
     const img=document.createElement('img');
     img.src=URL.createObjectURL(file);
     wrap.appendChild(img);
   }
   wrap.style.display='block';
   document.getElementById('kid-upload-zone').style.display='none';
+
+  try{
+    if(isVideo){
+      // For video: capture thumbnail frame for display, store it as proof image
+      const result=await captureVideoThumbnail(file);
+      if(result){
+        compressedFileData=result.dataUrl;
+        statusEl.className='compress-status done';
+        statusEl.textContent=`✓ Video thumbnail captured (${result.compressedKB}KB)`;
+      }else{
+        // fallback: no thumbnail, just note it's a video
+        compressedFileData=null;
+        statusEl.className='compress-status error';
+        statusEl.textContent='Video noted — no thumbnail preview will be shown to parent';
+      }
+    }else{
+      const result=await compressImage(file);
+      compressedFileData=result.dataUrl;
+      statusEl.className='compress-status done';
+      statusEl.textContent=`✓ Compressed: ${result.originalKB}KB → ${result.compressedKB}KB`;
+    }
+  }catch(e){
+    console.error('Compression error:',e);
+    // Fallback: read as-is but warn if large
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      compressedFileData=ev.target.result;
+      const kb=Math.round(ev.target.result.length*0.75/1024);
+      if(kb>700){
+        statusEl.className='compress-status error';
+        statusEl.textContent=`⚠ File is ${kb}KB — may be large. Try a smaller photo.`;
+      }else{
+        statusEl.className='compress-status done';
+        statusEl.textContent=`✓ Ready (${kb}KB)`;
+      }
+    };
+    reader.readAsDataURL(file);
+  }
 }
-function removeFile() {
-  selectedFile=null;
+
+function removeFile(){
+  compressedFileData=null;compressedFileType=null;
   document.getElementById('kid-preview-wrap').style.display='none';
   document.getElementById('kid-upload-zone').style.display='block';
   document.getElementById('kid-file-input').value='';
-  document.getElementById('upload-progress').style.display='none';
+  document.getElementById('compress-status').style.display='none';
 }
 function toggleCheck(el){el.classList.toggle('checked');}
 
 // ── SUBMIT PROOF ──
-async function submitProof() {
-  if(!selectedFile){showToast('Add a photo or video first!');return;}
+async function submitProof(){
+  if(!compressedFileData&&compressedFileType!=='video'){showToast('Add a photo or video first!');return;}
   const btn=document.getElementById('submit-btn');
-  btn.disabled=true;btn.textContent='UPLOADING...';
+  btn.disabled=true;btn.textContent='SUBMITTING...';
   const note=document.getElementById('kid-note').value.trim();
   const checks=[...document.querySelectorAll('#kid-form .check-item.checked')].map(el=>el.querySelector('.check-label').textContent);
   const t=todayStr();
-  const fileType=selectedFile.type.startsWith('video')?'video':'image';
-  try {
+  try{
     const kid=await getKidDoc(activeKidId);
     const existing=(kid.submissions||[]).find(s=>s.date===t);
     if(existing&&existing.status==='pending'){showToast('Already submitted!');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
     if(existing&&existing.status==='approved'){showToast('Already unlocked today!');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
-    btn.textContent='UPLOADING...';
-    const fileURL=await uploadFile(selectedFile,activeKidId);
-    btn.textContent='SAVING...';
     const subs=(kid.submissions||[]).filter(s=>s.date!==t);
-    subs.unshift({date:t,fileURL,fileType,note,checks,status:'pending',submittedAt:new Date().toISOString()});
+    subs.unshift({
+      date:t,
+      fileData: compressedFileData||null,
+      fileType: compressedFileType||'image',
+      note,checks,
+      status:'pending',
+      submittedAt:new Date().toISOString()
+    });
     await saveKidData(activeKidId,{submissions:subs});
     kid.submissions=subs;
     const idx=kidsCache.findIndex(k=>k.id===activeKidId);
     if(idx>=0) kidsCache[idx]=kid;
     renderKidActive(kid);
     showToast('Proof sent to your parent!');
-  } catch(e) {
-    showToast('Error submitting — check connection.');
+  }catch(e){
     console.error(e);
+    if(e.message&&e.message.includes('exceeds the maximum')){
+      showToast('File too large even after compression. Try a shorter video or smaller photo.');
+    }else{
+      showToast('Error submitting — check connection.');
+    }
   }
   btn.disabled=false;btn.textContent='SUBMIT PROOF';
 }
 
 // ── PARENT VIEW ──
-async function initParentView() {
+async function initParentView(){
   document.getElementById('parent-loading').style.display='flex';
   document.getElementById('parent-content').style.display='none';
   checkNotifBanner();
@@ -703,7 +791,7 @@ async function initParentView() {
   renderParentFromCache();
 }
 
-function renderParentFromCache() {
+function renderParentFromCache(){
   if(!kidsCache.length){
     document.getElementById('parent-no-children').style.display='block';
     document.getElementById('parent-main').style.display='none';
@@ -735,9 +823,11 @@ function renderParentFromCache() {
   if(pending){
     document.getElementById('p-pending-section').style.display='block';
     document.getElementById('p-no-pending').style.display='none';
-    const media=pending.fileType==='image'
-      ?`<img class="pending-media" src="${pending.fileURL}">`
-      :`<video class="pending-video" src="${pending.fileURL}" controls></video>`;
+    const media=pending.fileData
+      ?(pending.fileType==='video'
+        ?`<img class="pending-media" src="${pending.fileData}" title="Video thumbnail">`
+        :`<img class="pending-media" src="${pending.fileData}">`)
+      :`<div style="padding:1rem;text-align:center;color:var(--muted);font-size:13px;">📹 Video submitted — no preview available</div>`;
     const checks=pending.checks&&pending.checks.length?`<div class="checks-row">${pending.checks.map(c=>`<span class="check-tag">✓ ${c}</span>`).join('')}</div>`:'';
     const note=pending.note?`<div class="pending-note">"${pending.note}"</div>`:'';
     const time=new Date(pending.submittedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
@@ -750,7 +840,7 @@ function renderParentFromCache() {
           <button class="deny-btn" onclick="denyKid('${kid.id}')">✕ DENY</button>
         </div>
       </div>`;
-  } else {
+  }else{
     document.getElementById('p-pending-section').style.display='none';
     document.getElementById('p-no-pending').style.display='block';
   }
@@ -758,8 +848,8 @@ function renderParentFromCache() {
   const hist=(kid.submissions||[]).filter(s=>s.status!=='pending').slice(0,30);
   if(!hist.length){phList.innerHTML=`<div class="empty-state"><div class="empty-text">No history yet for ${kid.name}.</div></div>`;return;}
   phList.innerHTML=hist.map(s=>{
-    const thumb=s.fileType==='image'
-      ?`<img class="history-thumb" src="${s.fileURL||''}" onerror="this.style.display='none'">`
+    const thumb=s.fileData
+      ?`<img class="history-thumb" src="${s.fileData}" onerror="this.parentNode.innerHTML='<div class=history-thumb-vid>📷</div>'">`
       :`<div class="history-thumb-vid">&#127909;</div>`;
     const sc=s.status==='approved'?'unlocked':'locked';
     const sl=s.status==='approved'?'Approved':'Denied';
@@ -768,8 +858,8 @@ function renderParentFromCache() {
 }
 
 // ── APPROVE / DENY / DELETE ──
-async function approveKid(id) {
-  try {
+async function approveKid(id){
+  try{
     const kid=await getKidDoc(id);
     const t=todayStr();
     const subs=kid.submissions||[];
@@ -785,11 +875,11 @@ async function approveKid(id) {
     else showToast('Approved! '+kid.name+' is at '+wc+'/'+GOAL+' this week.');
     await saveKidData(id,{submissions:subs,streak:kid.streak,totalRewards:rewards});
     activeParentId=id;
-  } catch(e){showToast('Error — check connection.');console.error(e);}
+  }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 
-async function denyKid(id) {
-  try {
+async function denyKid(id){
+  try{
     const kid=await getKidDoc(id);
     const t=todayStr();
     const subs=kid.submissions||[];
@@ -797,12 +887,12 @@ async function denyKid(id) {
     if(sub) sub.status='denied';
     await saveKidData(id,{submissions:subs});
     showToast('Denied. '+kid.name+' can resubmit.');
-  } catch(e){showToast('Error — check connection.');console.error(e);}
+  }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 
-async function deleteWorkout(kidId,date) {
+async function deleteWorkout(kidId,date){
   if(!confirm('Delete this workout entry for '+formatDate(date)+'? This cannot be undone.')) return;
-  try {
+  try{
     const kid=await getKidDoc(kidId);
     const subs=(kid.submissions||[]).filter(s=>s.date!==date);
     const sortedApproved=subs.filter(s=>s.status==='approved').map(s=>s.date).sort().reverse();
@@ -819,18 +909,18 @@ async function deleteWorkout(kidId,date) {
     }
     await saveKidData(kidId,{submissions:subs,streak});
     showToast('Workout deleted.');
-  } catch(e){showToast('Error — check connection.');console.error(e);}
+  }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 
 // ── TAB SWITCHING ──
-function switchMainTab(tab) {
+function switchMainTab(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='kid')||(i===1&&tab==='parent')));
   document.getElementById('view-kid').classList.toggle('active',tab==='kid');
   document.getElementById('view-parent').classList.toggle('active',tab==='parent');
   if(tab==='parent') initParentView(); else initKidView();
 }
 
-function showToast(msg) {
+function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3500);
