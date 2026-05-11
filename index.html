@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GymPass — Let's Go Dodgers</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: #005A9C;
+  --blue-light: #1a6fad;
+  --blue-pale: #d6e8f5;
+  --blue-deep: #003f6e;
+  --white: #ffffff;
+  --bg: #f4f8fc;
+  --card: #ffffff;
+  --border: #d0e2f0;
+  --text: #0d1f30;
+  --muted: #6b8aa8;
+  --red: #c0392b;
+  --amber: #d4880a;
+  --green: #1a8a4a;
+  --gold: #c8a400;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+.header { background: var(--blue); padding: 0 1.25rem; border-bottom: 4px solid var(--blue-deep); }
+.header-inner { max-width: 640px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 0; }
+.logo-wrap { display: flex; align-items: center; gap: 10px; }
+.logo-ball { width: 36px; height: 36px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; flex-shrink: 0; }
+.logo-ball::before, .logo-ball::after { content: ''; position: absolute; border: 1.5px solid #c0392b; border-radius: 50%; }
+.logo-ball::before { width: 60%; height: 100%; left: 20%; border-left-color: transparent; border-right-color: transparent; transform: rotate(10deg); }
+.logo-ball::after { width: 60%; height: 100%; left: 20%; border-left-color: transparent; border-right-color: transparent; transform: rotate(-10deg); }
+.logo-text { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--white); line-height: 1; }
+.logo-sub { font-size: 10px; color: var(--blue-pale); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
+.nav-tabs { display: flex; gap: 3px; background: var(--blue-deep); border-radius: 8px; padding: 3px; }
+.tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--blue-pale); transition: all 0.2s; letter-spacing: 0.03em; }
+.tab.active { background: var(--white); color: var(--blue); }
+
+.view { display: none; padding: 1.25rem; max-width: 640px; margin: 0 auto; }
+.view.active { display: block; }
+
+.week-card { background: var(--blue); border-radius: 16px; padding: 1.25rem 1.25rem 1rem; margin-bottom: 1.25rem; border: 1px solid var(--blue-deep); }
+.week-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1rem; }
+.week-title { font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1.5px; color: var(--white); }
+.reward-badge { background: var(--gold); color: #3d2e00; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.04em; white-space: nowrap; }
+.days-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 1rem; }
+.day-cell { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.day-label { font-size: 10px; font-weight: 600; color: var(--blue-pale); text-transform: uppercase; letter-spacing: 0.06em; }
+.day-bubble { width: 36px; height: 36px; border-radius: 50%; background: var(--blue-deep); border: 2px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.2s; color: transparent; font-weight: 700; }
+.day-bubble.done { background: var(--white); border-color: var(--white); color: var(--blue); }
+.day-bubble.pending-day { background: transparent; border-color: var(--gold); color: var(--gold); }
+.day-bubble.today-empty { border-color: rgba(255,255,255,0.45); border-style: dashed; }
+.progress-row { display: flex; align-items: center; gap: 10px; }
+.progress-track { flex: 1; height: 8px; background: var(--blue-deep); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--white); border-radius: 4px; transition: width 0.5s ease; }
+.progress-fill.goal-met { background: var(--gold); }
+.progress-label { font-size: 12px; font-weight: 600; color: var(--blue-pale); white-space: nowrap; }
+
+.status-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.streak-info { display: flex; align-items: baseline; gap: 6px; }
+.streak-num { font-family: 'Anton', sans-serif; font-size: 40px; color: var(--blue); line-height: 1; }
+.streak-text { font-size: 13px; color: var(--muted); }
+.status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.status-pill.locked { background: #fde8e8; color: var(--red); border: 1.5px solid #f5b8b8; }
+.status-pill.unlocked { background: #d4f0e0; color: var(--green); border: 1.5px solid #9dd9b8; }
+.status-pill.pending { background: #fef3d6; color: var(--amber); border: 1.5px solid #f5d68a; }
+.s-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+.reward-banner { background: #fef3d6; border: 2px solid var(--gold); border-radius: 14px; padding: 1.1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 12px; }
+.reward-icon { font-size: 30px; flex-shrink: 0; }
+.reward-title { font-family: 'Anton', sans-serif; font-size: 19px; letter-spacing: 1px; color: #3d2e00; }
+.reward-desc { font-size: 12px; color: #7a5c00; margin-top: 2px; }
+
+.section-title { font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; color: var(--text); margin-bottom: 0.85rem; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem; margin-bottom: 0.85rem; }
+.field-label { font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+.upload-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 1.75rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+.upload-zone:hover { border-color: var(--blue); background: #eef5fc; }
+.upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { font-size: 28px; margin-bottom: 6px; color: var(--muted); }
+.upload-text { font-size: 13px; color: var(--muted); }
+.upload-text strong { color: var(--blue); }
+.preview-wrap { position: relative; margin-top: 10px; }
+.preview-wrap img, .preview-wrap video { width: 100%; border-radius: 10px; max-height: 260px; object-fit: cover; display: block; }
+.remove-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.55); border: none; color: white; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+
+textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; resize: none; outline: none; transition: border-color 0.2s; }
+textarea:focus { border-color: var(--blue); }
+
+.checklist { display: flex; flex-direction: column; gap: 7px; }
+.check-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg); border-radius: 10px; cursor: pointer; border: 1.5px solid var(--border); transition: all 0.15s; }
+.check-item.checked { border-color: var(--blue); background: #eef5fc; }
+.check-box { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+.check-item.checked .check-box { background: var(--blue); border-color: var(--blue); }
+.check-mark { color: white; font-size: 11px; font-weight: 700; display: none; }
+.check-item.checked .check-mark { display: block; }
+.check-label { font-size: 14px; }
+
+.submit-btn { width: 100%; padding: 15px; background: var(--blue); color: var(--white); border: none; border-radius: 12px; font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; margin-top: 0.25rem; }
+.submit-btn:hover { background: var(--blue-light); }
+
+.confirm-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; }
+.confirm-icon { font-size: 36px; margin-bottom: 10px; }
+.confirm-title { font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 4px; }
+.confirm-sub { font-size: 13px; color: var(--muted); }
+
+.history-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 7px; }
+.history-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--bg); }
+.history-thumb-vid { width: 50px; height: 50px; border-radius: 8px; background: var(--blue-pale); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.history-info { flex: 1; min-width: 0; }
+.history-date { font-size: 13px; font-weight: 600; }
+.history-note { font-size: 12px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
+.stat-num { font-family: 'Anton', sans-serif; font-size: 34px; color: var(--blue); line-height: 1; }
+.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 2px; }
+
+.pending-card { background: var(--card); border: 2px solid var(--amber); border-radius: 16px; padding: 1.1rem; margin-bottom: 1rem; }
+.pending-time { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.pending-media { width: 100%; border-radius: 10px; max-height: 260px; object-fit: cover; margin: 8px 0; display: block; }
+.checks-row { margin-bottom: 8px; }
+.check-tag { display: inline-block; background: var(--blue-pale); color: var(--blue); border-radius: 6px; padding: 3px 9px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; }
+.pending-note { font-size: 13px; color: var(--muted); font-style: italic; margin-bottom: 12px; }
+.action-row { display: flex; gap: 8px; }
+.approve-btn { flex: 1; padding: 13px; background: var(--blue); color: var(--white); border: none; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; }
+.approve-btn:hover { background: var(--blue-light); }
+.deny-btn { flex: 1; padding: 13px; background: #fde8e8; color: var(--red); border: 1.5px solid #f5b8b8; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; }
+.deny-btn:hover { background: #fbd4d4; }
+
+.empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--muted); }
+.empty-icon { font-size: 36px; margin-bottom: 10px; }
+.empty-text { font-size: 14px; line-height: 1.6; }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--blue); color: var(--white); padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; transition: transform 0.3s ease; z-index: 999; white-space: nowrap; border: 2px solid var(--blue-deep); max-width: 90vw; white-space: normal; text-align: center; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+.divider-line { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.pending-pulse { animation: pulse 2s infinite; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <div class="logo-ball"></div>
+      <div>
+        <div class="logo-text">GYMPASS</div>
+        <div class="logo-sub">Let's Go Dodgers</div>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <button class="tab active" onclick="switchTab('son')">My View</button>
+      <button class="tab" onclick="switchTab('parent')">Parent</button>
+    </div>
+  </div>
+</div>
+
+<!-- SON VIEW -->
+<div id="view-son" class="view active">
+
+  <div class="week-card">
+    <div class="week-header">
+      <div class="week-title">THIS WEEK</div>
+      <div class="reward-badge" id="reward-badge">5 days = $20 reward</div>
+    </div>
+    <div class="days-row" id="week-days"></div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 5</div>
+    </div>
+  </div>
+
+  <div class="status-row">
+    <div class="streak-info">
+      <div class="streak-num" id="streak-count">0</div>
+      <div class="streak-text">day streak</div>
+    </div>
+    <div id="today-status" class="status-pill locked">
+      <span class="s-dot"></span> Internet Locked
+    </div>
+  </div>
+
+  <div id="reward-earned-banner" style="display:none;" class="reward-banner">
+    <div class="reward-icon">&#127942;</div>
+    <div>
+      <div class="reward-title">$20 REWARD EARNED!</div>
+      <div class="reward-desc">You hit 5 workouts this week. Go collect your money!</div>
+    </div>
+  </div>
+
+  <div id="son-submitted-msg" style="display:none;" class="confirm-card">
+    <div class="confirm-icon">&#9203;</div>
+    <div class="confirm-title" style="color:var(--amber);">PROOF SUBMITTED</div>
+    <div class="confirm-sub">Waiting on your parent to review. Sit tight.</div>
+  </div>
+
+  <div id="son-unlocked-msg" style="display:none;" class="confirm-card">
+    <div class="confirm-icon">&#127881;</div>
+    <div class="confirm-title" style="color:var(--green);">YOU'RE UNLOCKED!</div>
+    <div class="confirm-sub">Nice work today. Go enjoy your internet.</div>
+  </div>
+
+  <div id="son-form">
+    <div class="section-title">Submit today's proof</div>
+    <div class="card">
+      <label class="field-label">Photo or video of your workout</label>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" accept="image/*,video/*" id="file-input" onchange="handleFile(this)">
+        <div class="upload-icon">&#128247;</div>
+        <div class="upload-text"><strong>Tap to upload</strong> or drop here</div>
+        <div class="upload-text" style="font-size:12px;margin-top:4px;">Photo or short video — show your work</div>
+      </div>
+      <div class="preview-wrap" id="preview-wrap" style="display:none;">
+        <button class="remove-btn" onclick="removeFile()">&#10005;</button>
+      </div>
+    </div>
+    <div class="card">
+      <label class="field-label">What did you do? (brag a little)</label>
+      <textarea id="workout-note" rows="3" placeholder="e.g. 5 miles + weights. Feeling like Mookie out there."></textarea>
+    </div>
+    <div class="card">
+      <label class="field-label">Check off what you completed</label>
+      <div class="checklist" id="checklist">
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><span class="check-mark">&#10003;</span></div>
+          <span class="check-label">Cardio (20+ min)</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><span class="check-mark">&#10003;</span></div>
+          <span class="check-label">Strength / weights</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><span class="check-mark">&#10003;</span></div>
+          <span class="check-label">Stretching / cool down</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><span class="check-mark">&#10003;</span></div>
+          <span class="check-label">Stayed hydrated</span>
+        </div>
+      </div>
+    </div>
+    <button class="submit-btn" onclick="submitProof()">SUBMIT PROOF</button>
+  </div>
+
+  <hr class="divider-line" style="margin-top:1.5rem;">
+  <div class="section-title">My history</div>
+  <div id="son-history-list"></div>
+</div>
+
+<!-- PARENT VIEW -->
+<div id="view-parent" class="view">
+
+  <div class="week-card">
+    <div class="week-header">
+      <div class="week-title">HIS WEEK</div>
+      <div class="reward-badge" id="p-reward-badge">5 days = $20</div>
+    </div>
+    <div class="days-row" id="p-week-days"></div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="p-progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="p-progress-label">0 / 5</div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num" id="p-streak">0</div><div class="stat-label">Streak</div></div>
+    <div class="stat-card"><div class="stat-num" id="p-total">0</div><div class="stat-label">Total days</div></div>
+    <div class="stat-card"><div class="stat-num" id="p-rewards">0</div><div class="stat-label">$20 rewards</div></div>
+  </div>
+
+  <div id="pending-section" style="display:none;">
+    <div class="section-title" style="color:var(--amber);">&#9889; Pending review</div>
+    <div id="pending-card-wrap"></div>
+  </div>
+  <div id="no-pending" class="empty-state">
+    <div class="empty-icon">&#9917;</div>
+    <div class="empty-text">No submissions waiting.<br>Check back after he works out.</div>
+  </div>
+
+  <hr class="divider-line">
+  <div class="section-title">Approval history</div>
+  <div id="parent-history-list"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'gympass_dodgers';
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const GOAL = 5;
+
+function load() {
+  try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : {submissions:[],streak:0,totalRewards:0}; }
+  catch(e) { return {submissions:[],streak:0,totalRewards:0}; }
+}
+function save(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e) {} }
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function formatDate(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  return d.toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'});
+}
+function getWeekDates() {
+  const now = new Date(), dow = now.getDay(), dates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(now); d.setDate(now.getDate() - dow + i);
+    dates.push(d.toISOString().split('T')[0]);
+  }
+  return dates;
+}
+function weekApprovedCount(data) {
+  const week = getWeekDates();
+  return data.submissions.filter(s => week.includes(s.date) && s.status === 'approved').length;
+}
+
+let fileData = null, fileType = null;
+
+function handleFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    fileData = e.target.result;
+    fileType = file.type.startsWith('video') ? 'video' : 'image';
+    const wrap = document.getElementById('preview-wrap');
+    wrap.innerHTML = '<button class="remove-btn" onclick="removeFile()">&#10005;</button>';
+    const el = fileType === 'image'
+      ? Object.assign(document.createElement('img'), {src: fileData})
+      : Object.assign(document.createElement('video'), {src: fileData, controls: true});
+    wrap.appendChild(el);
+    wrap.style.display = 'block';
+    document.getElementById('upload-zone').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeFile() {
+  fileData = null; fileType = null;
+  document.getElementById('preview-wrap').style.display = 'none';
+  document.getElementById('upload-zone').style.display = 'block';
+  document.getElementById('file-input').value = '';
+}
+
+function toggleCheck(el) { el.classList.toggle('checked'); }
+
+function submitProof() {
+  if (!fileData) { showToast('Add a photo or video first!'); return; }
+  const note = document.getElementById('workout-note').value.trim();
+  const checks = [...document.querySelectorAll('#checklist .check-item.checked')].map(el => el.querySelector('.check-label').textContent);
+  const data = load(), t = todayStr();
+  const existing = data.submissions.find(s => s.date === t);
+  if (existing && existing.status === 'pending') { showToast('Already submitted — waiting on approval!'); return; }
+  if (existing && existing.status === 'approved') { showToast("You're already unlocked today!"); return; }
+  if (existing) data.submissions = data.submissions.filter(s => s.date !== t);
+  data.submissions.unshift({date:t, fileData, fileType, note, checks, status:'pending', submittedAt:new Date().toISOString()});
+  save(data);
+  renderSonView();
+  showToast('Proof sent to your parent!');
+}
+
+function renderWeekDots(containerId, fillId, labelId, data, badgeId) {
+  const week = getWeekDates(), today = todayStr();
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  week.forEach(dateStr => {
+    const sub = data.submissions.find(s => s.date === dateStr);
+    const isToday = dateStr === today;
+    const cell = document.createElement('div'); cell.className = 'day-cell';
+    const label = document.createElement('div'); label.className = 'day-label';
+    label.textContent = DAYS[new Date(dateStr + 'T12:00:00').getDay()];
+    const bubble = document.createElement('div'); bubble.className = 'day-bubble';
+    if (sub && sub.status === 'approved') { bubble.classList.add('done'); bubble.textContent = '✓'; }
+    else if (sub && sub.status === 'pending') { bubble.classList.add('pending-day'); bubble.textContent = '?'; }
+    else if (isToday) { bubble.classList.add('today-empty'); }
+    cell.appendChild(label); cell.appendChild(bubble); container.appendChild(cell);
+  });
+  const approved = weekApprovedCount(data);
+  const pct = Math.min((approved / GOAL) * 100, 100);
+  const fill = document.getElementById(fillId);
+  fill.style.width = pct + '%';
+  fill.className = 'progress-fill' + (approved >= GOAL ? ' goal-met' : '');
+  document.getElementById(labelId).textContent = approved + ' / ' + GOAL;
+  if (badgeId) {
+    const badge = document.getElementById(badgeId);
+    if (approved >= GOAL) { badge.textContent = '🏆 $20 EARNED!'; }
+    else { badge.textContent = '5 days = $20 reward'; }
+  }
+}
+
+function renderSonView() {
+  const data = load(), t = todayStr();
+  const todaySub = data.submissions.find(s => s.date === t);
+  document.getElementById('streak-count').textContent = data.streak || 0;
+  renderWeekDots('week-days','progress-fill','progress-label', data, 'reward-badge');
+  const approved = weekApprovedCount(data);
+  document.getElementById('reward-earned-banner').style.display = approved >= GOAL ? 'flex' : 'none';
+  const form = document.getElementById('son-form');
+  const subMsg = document.getElementById('son-submitted-msg');
+  const unlMsg = document.getElementById('son-unlocked-msg');
+  const pill = document.getElementById('today-status');
+  if (todaySub && todaySub.status === 'approved') {
+    form.style.display='none'; subMsg.style.display='none'; unlMsg.style.display='block';
+    pill.className='status-pill unlocked'; pill.innerHTML='<span class="s-dot"></span> Unlocked Today';
+  } else if (todaySub && todaySub.status === 'pending') {
+    form.style.display='none'; subMsg.style.display='block'; unlMsg.style.display='none';
+    pill.className='status-pill pending'; pill.innerHTML='<span class="s-dot pending-pulse"></span> Proof Pending';
+  } else {
+    form.style.display='block'; subMsg.style.display='none'; unlMsg.style.display='none';
+    pill.className='status-pill locked'; pill.innerHTML='<span class="s-dot"></span> Internet Locked';
+  }
+  const list = document.getElementById('son-history-list');
+  const past = data.submissions.filter(s => s.date !== t).slice(0, 25);
+  if (!past.length) { list.innerHTML = '<div class="empty-state"><div class="empty-text" style="color:var(--muted)">Your workout history will show here.</div></div>'; return; }
+  list.innerHTML = past.map(s => {
+    const thumb = s.fileType==='image' ? `<img class="history-thumb" src="${s.fileData}">` : `<div class="history-thumb-vid">&#127909;</div>`;
+    const sc = s.status==='approved'?'unlocked':s.status==='denied'?'locked':'pending';
+    const sl = s.status==='approved'?'Approved':s.status==='denied'?'Denied':'Pending';
+    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks.length?s.checks.join(', '):'—')}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span></div>`;
+  }).join('');
+}
+
+function renderParentView() {
+  const data = load(), t = todayStr();
+  renderWeekDots('p-week-days','p-progress-fill','p-progress-label', data, 'p-reward-badge');
+  const approved = data.submissions.filter(s => s.status==='approved');
+  document.getElementById('p-streak').textContent = data.streak || 0;
+  document.getElementById('p-total').textContent = approved.length;
+  document.getElementById('p-rewards').textContent = data.totalRewards || 0;
+  const pending = data.submissions.find(s => s.date===t && s.status==='pending');
+  if (pending) {
+    document.getElementById('pending-section').style.display='block';
+    document.getElementById('no-pending').style.display='none';
+    const media = pending.fileType==='image'
+      ? `<img class="pending-media" src="${pending.fileData}">`
+      : `<video class="pending-media" src="${pending.fileData}" controls></video>`;
+    const checks = pending.checks.length ? `<div class="checks-row">${pending.checks.map(c=>`<span class="check-tag">&#10003; ${c}</span>`).join('')}</div>` : '';
+    const note = pending.note ? `<div class="pending-note">"${pending.note}"</div>` : '';
+    const time = new Date(pending.submittedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    document.getElementById('pending-card-wrap').innerHTML = `
+      <div class="pending-card">
+        <div class="pending-time">Submitted at ${time}</div>
+        ${media}${checks}${note}
+        <div class="action-row">
+          <button class="approve-btn" onclick="approveToday()">&#10003; APPROVE &amp; UNLOCK</button>
+          <button class="deny-btn" onclick="denyToday()">&#10005; DENY</button>
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('pending-section').style.display='none';
+    document.getElementById('no-pending').style.display='block';
+  }
+  const phList = document.getElementById('parent-history-list');
+  const hist = data.submissions.filter(s => s.status!=='pending').slice(0,30);
+  if (!hist.length) { phList.innerHTML='<div class="empty-state"><div class="empty-text">No history yet.</div></div>'; return; }
+  phList.innerHTML = hist.map(s => {
+    const thumb = s.fileType==='image' ? `<img class="history-thumb" src="${s.fileData}">` : `<div class="history-thumb-vid">&#127909;</div>`;
+    const sc = s.status==='approved'?'unlocked':'locked';
+    const sl = s.status==='approved'?'Approved':'Denied';
+    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks.join(', '))||'—'}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span></div>`;
+  }).join('');
+}
+
+function approveToday() {
+  const data = load(), t = todayStr();
+  const sub = data.submissions.find(s => s.date===t && s.status==='pending');
+  if (!sub) return;
+  sub.status = 'approved';
+  sub.approvedAt = new Date().toISOString();
+  const yd = new Date(); yd.setDate(yd.getDate()-1);
+  const ydStr = yd.toISOString().split('T')[0];
+  const hadYd = data.submissions.find(s => s.date===ydStr && s.status==='approved');
+  data.streak = hadYd ? (data.streak||0)+1 : 1;
+  save(data);
+  const wc = weekApprovedCount(data);
+  if (wc === GOAL) {
+    data.totalRewards = (data.totalRewards||0)+1;
+    save(data);
+    showToast('Approved! He just hit 5 this week — pay out that $20!');
+  } else {
+    showToast('Approved and unlocked! ' + wc + '/' + GOAL + ' this week.');
+  }
+  renderParentView();
+}
+
+function denyToday() {
+  const data = load(), t = todayStr();
+  const sub = data.submissions.find(s => s.date===t && s.status==='pending');
+  if (!sub) return;
+  sub.status = 'denied';
+  save(data);
+  showToast('Denied. He can resubmit with better proof.');
+  renderParentView();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) =>
+    t.classList.toggle('active',(i===0&&tab==='son')||(i===1&&tab==='parent'))
+  );
+  document.getElementById('view-son').classList.toggle('active', tab==='son');
+  document.getElementById('view-parent').classList.toggle('active', tab==='parent');
+  if (tab==='parent') renderParentView(); else renderSonView();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+renderSonView();
+</script>
+</body>
+</html>
