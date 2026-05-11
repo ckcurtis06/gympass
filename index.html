@@ -200,6 +200,9 @@ textarea:focus { border-color: var(--blue); }
 
 .no-children { text-align: center; padding: 3rem 1rem; color: var(--muted); }
 
+.delete-btn { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 6px; flex-shrink: 0; transition: all 0.15s; }
+.delete-btn:hover { background: #fde8e8; color: var(--red); }
+
 .divider-line { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
 
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--blue); color: var(--white); padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; transition: transform 0.3s ease; z-index: 999; border: 2px solid var(--blue-deep); max-width: 88vw; text-align: center; }
@@ -661,13 +664,12 @@ function renderParentView() {
     const thumb = s.fileType==='image'?`<img class="history-thumb" src="${s.fileData}">`:`<div class="history-thumb-vid">&#127909;</div>`;
     const sc = s.status==='approved'?'unlocked':'locked';
     const sl = s.status==='approved'?'Approved':'Denied';
-    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks&&s.checks.join(', '))||'—'}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span></div>`;
+    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks&&s.checks.join(', '))||'—'}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span><button class="delete-btn" onclick="deleteWorkout('${kid.id}','${s.date}')" title="Delete this entry">&#128465;</button></div>`;
   }).join('');
 }
 
 function approveKid(id) {
   const t = todayStr();
-  let rewardHit = false;
   updateKid(id, kid => {
     const sub = (kid.submissions||[]).find(s=>s.date===t&&s.status==='pending');
     if (!sub) return;
@@ -676,12 +678,19 @@ function approveKid(id) {
     const ydStr = yd.toISOString().split('T')[0];
     const hadYd = (kid.submissions||[]).find(s=>s.date===ydStr&&s.status==='approved');
     kid.streak = hadYd?(kid.streak||0)+1:1;
-    const wc = weekApproved(kid);
-    if (wc===GOAL) { kid.totalRewards=(kid.totalRewards||0)+1; rewardHit=true; }
   });
+  // re-fetch AFTER save so weekApproved reads the updated submission
   const kid = getKid(id);
-  if (rewardHit) showToast(kid.name+' hit 5 this week — pay out that $20!');
-  else { const wc = weekApproved(kid); showToast('Approved! '+kid.name+' is at '+wc+'/'+GOAL+' this week.'); }
+  const wc = weekApproved(kid);
+  if (wc===GOAL && (kid.totalRewards||0) < Math.floor(wc/GOAL)) {
+    updateKid(id, k => { k.totalRewards=(k.totalRewards||0)+1; });
+    showToast(kid.name+' hit 5 this week — pay out that $20!');
+  } else if (wc===GOAL) {
+    showToast(kid.name+' hit 5 this week — pay out that $20!');
+  } else {
+    showToast('Approved! '+kid.name+' is at '+wc+'/'+GOAL+' this week.');
+  }
+  activeParentId = id;
   renderParentView();
 }
 
@@ -693,6 +702,35 @@ function denyKid(id) {
   });
   const kid = getKid(id);
   showToast('Denied. '+kid.name+' can resubmit.');
+  renderParentView();
+}
+
+function deleteWorkout(kidId, date) {
+  if (!confirm('Delete this workout entry for ' + formatDate(date) + '? This cannot be undone.')) return;
+  updateKid(kidId, kid => {
+    const sub = (kid.submissions||[]).find(s=>s.date===date);
+    if (!sub) return;
+    // if it was approved, adjust streak if it was today or recent
+    kid.submissions = kid.submissions.filter(s=>s.date!==date);
+    // recalculate streak from scratch after deletion
+    const sortedApproved = kid.submissions.filter(s=>s.status==='approved').map(s=>s.date).sort().reverse();
+    if (!sortedApproved.length) { kid.streak=0; return; }
+    let streak=0, check=todayStr();
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    check = yesterday.toISOString().split('T')[0];
+    // count backwards from today
+    const today = todayStr();
+    const hasToday = sortedApproved.includes(today);
+    let cursor = hasToday ? today : check;
+    for (let i=0; i<365; i++) {
+      if (sortedApproved.includes(cursor)) { streak++; }
+      else break;
+      const d = new Date(cursor+'T12:00:00'); d.setDate(d.getDate()-1);
+      cursor = d.toISOString().split('T')[0];
+    }
+    kid.streak = streak;
+  });
+  showToast('Workout deleted.');
   renderParentView();
 }
 
