@@ -258,6 +258,13 @@ textarea:focus { border-color: var(--blue); }
       <div class="confirm-sub">Nice work today. Go enjoy your internet.</div>
     </div>
 
+    <div id="kid-denied-msg" style="display:none;" class="confirm-card">
+      <div class="confirm-icon">&#10060;</div>
+      <div class="confirm-title" style="color:var(--red);">PROOF DENIED</div>
+      <div class="confirm-sub">Your parent rejected your submission. Take a better photo or video and resubmit.</div>
+      <button onclick="resetForResubmit()" style="margin-top:1rem;padding:10px 24px;background:var(--blue);color:white;border:none;border-radius:10px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;width:100%;">TRY AGAIN</button>
+    </div>
+
     <div id="kid-form">
       <div class="section-title">Submit today's proof</div>
       <div class="card">
@@ -585,6 +592,8 @@ async function selectKid(id){
   if(idx>=0) kidsCache[idx]=kid; else kidsCache.push(kid);
   document.getElementById('kid-loading').style.display='none';
   document.getElementById('kid-active').style.display='block';
+  // ask kid for notification permission so they get denied alerts
+  if('Notification' in window && Notification.permission==='default') Notification.requestPermission();
   document.getElementById('kid-active-avatar').style.background=kid.color;
   document.getElementById('kid-active-avatar').textContent=initials(kid.name);
   document.getElementById('kid-active-name').textContent=kid.name.toUpperCase();
@@ -596,9 +605,59 @@ async function selectKid(id){
   document.getElementById('compress-status').style.display='none';
   document.querySelectorAll('#kid-form .check-item').forEach(el=>el.classList.remove('checked'));
   renderKidActive(kid);
+  startKidListener(id);
+}
+
+// ── KID REAL-TIME LISTENER ──
+let unsubscribeKidListener = null;
+let lastKnownTodayStatus = null;
+
+function startKidListener(kidId) {
+  if(unsubscribeKidListener) unsubscribeKidListener();
+  lastKnownTodayStatus = null;
+  unsubscribeKidListener = db.collection('gympass_kids').doc(kidId).onSnapshot(snap => {
+    if(!snap.exists) return;
+    const kid = {id: snap.id, ...snap.data()};
+    const idx = kidsCache.findIndex(k=>k.id===kidId);
+    if(idx>=0) kidsCache[idx]=kid; else kidsCache.push(kid);
+    const t = todayStr();
+    const todaySub = (kid.submissions||[]).find(s=>s.date===t);
+    const newStatus = todaySub ? todaySub.status : null;
+    // only notify if status changed from pending to denied
+    if(lastKnownTodayStatus === 'pending' && newStatus === 'denied') {
+      sendNotification('GymPass ❌', 'Your proof was denied. Take a better photo and try again!');
+      showToast('Your proof was denied — take another photo and try again.');
+    }
+    if(lastKnownTodayStatus === 'pending' && newStatus === 'approved') {
+      sendNotification('GymPass ✅', 'Proof approved! You are unlocked for today.');
+      showToast('Approved! You are unlocked for today.');
+    }
+    lastKnownTodayStatus = newStatus;
+    if(document.getElementById('kid-active').style.display !== 'none' && activeKidId === kidId) {
+      renderKidActive(kid);
+    }
+  });
+}
+
+function stopKidListener() {
+  if(unsubscribeKidListener) { unsubscribeKidListener(); unsubscribeKidListener=null; }
+  lastKnownTodayStatus = null;
+}
+
+function resetForResubmit() {
+  compressedFileData=null; compressedFileType=null;
+  document.getElementById('kid-preview-wrap').style.display='none';
+  document.getElementById('kid-upload-zone').style.display='block';
+  document.getElementById('kid-file-input').value='';
+  document.getElementById('kid-note').value='';
+  document.getElementById('compress-status').style.display='none';
+  document.querySelectorAll('#kid-form .check-item').forEach(el=>el.classList.remove('checked'));
+  document.getElementById('kid-denied-msg').style.display='none';
+  document.getElementById('kid-form').style.display='block';
 }
 
 function backToKidPicker(){
+  stopKidListener();
   activeKidId=null;
   document.getElementById('kid-active').style.display='none';
   document.getElementById('kid-picker').style.display='block';
@@ -641,15 +700,20 @@ function renderKidActive(kid){
   const form=document.getElementById('kid-form');
   const subMsg=document.getElementById('kid-submitted-msg');
   const unlMsg=document.getElementById('kid-unlocked-msg');
+  const deniedMsg=document.getElementById('kid-denied-msg');
   const pill=document.getElementById('kid-status-pill');
+  [form,subMsg,unlMsg,deniedMsg].forEach(el=>el.style.display='none');
   if(todaySub&&todaySub.status==='approved'){
-    form.style.display='none';subMsg.style.display='none';unlMsg.style.display='block';
+    unlMsg.style.display='block';
     pill.className='status-pill unlocked';pill.innerHTML='<span class="s-dot"></span> Unlocked Today';
   }else if(todaySub&&todaySub.status==='pending'){
-    form.style.display='none';subMsg.style.display='block';unlMsg.style.display='none';
+    subMsg.style.display='block';
     pill.className='status-pill pending';pill.innerHTML='<span class="s-dot pending-pulse"></span> Proof Pending';
+  }else if(todaySub&&todaySub.status==='denied'){
+    deniedMsg.style.display='block';
+    pill.className='status-pill locked';pill.innerHTML='<span class="s-dot"></span> Internet Locked';
   }else{
-    form.style.display='block';subMsg.style.display='none';unlMsg.style.display='none';
+    form.style.display='block';
     pill.className='status-pill locked';pill.innerHTML='<span class="s-dot"></span> Internet Locked';
   }
   const list=document.getElementById('kid-history-list');
