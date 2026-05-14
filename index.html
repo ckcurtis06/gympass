@@ -157,6 +157,9 @@ textarea:focus { border-color: var(--blue); }
 .check-tag { display: inline-block; background: var(--blue-pale); color: var(--blue); border-radius: 6px; padding: 3px 9px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; }
 .pending-note { font-size: 13px; color: var(--muted); font-style: italic; margin-bottom: 12px; }
 .action-row { display: flex; gap: 8px; }
+.qustodio-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; background: #f4f8fc; color: var(--blue); border: 1.5px solid var(--border); border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; margin-top: 8px; text-decoration: none; }
+.qustodio-btn:hover { background: var(--blue-pale); border-color: var(--blue); }
+.qustodio-btn-wrap { display: none; margin-top: 0; }
 .approve-btn { flex: 1; padding: 13px; background: var(--blue); color: var(--white); border: none; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; }
 .approve-btn:hover { background: var(--blue-light); }
 .deny-btn { flex: 1; padding: 13px; background: #fde8e8; color: var(--red); border: 1.5px solid #f5b8b8; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; }
@@ -339,6 +342,13 @@ textarea:focus { border-color: var(--blue); }
         <div class="section-title" style="color:var(--amber);">&#9889; Pending review</div>
         <div id="p-pending-wrap"></div>
       </div>
+      <div id="p-qustodio-wrap" class="qustodio-btn-wrap">
+        <a href="qustodio://" class="qustodio-btn" id="p-qustodio-btn">
+          &#128274; OPEN QUSTODIO
+        </a>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:6px;">Tap to open Qustodio and toggle internet access</div>
+      </div>
+
       <div id="p-no-pending" class="empty-state">
         <div class="empty-icon">&#128526;</div>
         <div class="empty-text">No submissions waiting.<br>Check back after they work out.</div>
@@ -887,6 +897,7 @@ function renderParentFromCache(){
   if(pending){
     document.getElementById('p-pending-section').style.display='block';
     document.getElementById('p-no-pending').style.display='none';
+    hideQustodioBtn();
     const media=pending.fileData
       ?(pending.fileType==='video'
         ?`<img class="pending-media" src="${pending.fileData}" title="Video thumbnail">`
@@ -939,6 +950,7 @@ async function approveKid(id){
     else showToast('Approved! '+kid.name+' is at '+wc+'/'+GOAL+' this week.');
     await saveKidData(id,{submissions:subs,streak:kid.streak,totalRewards:rewards});
     activeParentId=id;
+    showQustodioBtn();
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 
@@ -951,6 +963,7 @@ async function denyKid(id){
     if(sub) sub.status='denied';
     await saveKidData(id,{submissions:subs});
     showToast('Denied. '+kid.name+' can resubmit.');
+    showQustodioBtn();
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 
@@ -974,6 +987,16 @@ async function deleteWorkout(kidId,date){
     await saveKidData(kidId,{submissions:subs,streak});
     showToast('Workout deleted.');
   }catch(e){showToast('Error — check connection.');console.error(e);}
+}
+
+// ── QUSTODIO BUTTON ──
+function showQustodioBtn() {
+  const wrap = document.getElementById('p-qustodio-wrap');
+  if(wrap) wrap.style.display = 'block';
+}
+function hideQustodioBtn() {
+  const wrap = document.getElementById('p-qustodio-wrap');
+  if(wrap) wrap.style.display = 'none';
 }
 
 // ── TAB SWITCHING ──
