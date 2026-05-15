@@ -402,22 +402,22 @@ textarea:focus { border-color: var(--blue); }
     <div class="pin-dot" id="pd2"></div>
     <div class="pin-dot" id="pd3"></div>
   </div>
-  <div class="pin-keypad">
-    <button class="pin-key" onclick="pinKey('1')">1</button>
-    <button class="pin-key" onclick="pinKey('2')">2</button>
-    <button class="pin-key" onclick="pinKey('3')">3</button>
-    <button class="pin-key" onclick="pinKey('4')">4</button>
-    <button class="pin-key" onclick="pinKey('5')">5</button>
-    <button class="pin-key" onclick="pinKey('6')">6</button>
-    <button class="pin-key" onclick="pinKey('7')">7</button>
-    <button class="pin-key" onclick="pinKey('8')">8</button>
-    <button class="pin-key" onclick="pinKey('9')">9</button>
-    <button class="pin-key" onclick="pinKey('0')">0</button>
-    <button class="pin-key del" onclick="pinBackspace()">&#9003;</button>
-    <button class="pin-key del" onclick="pinClear()">CLR</button>
+  <div class="pin-keypad" id="pin-keypad">
+    <button class="pin-key" data-key="1">1</button>
+    <button class="pin-key" data-key="2">2</button>
+    <button class="pin-key" data-key="3">3</button>
+    <button class="pin-key" data-key="4">4</button>
+    <button class="pin-key" data-key="5">5</button>
+    <button class="pin-key" data-key="6">6</button>
+    <button class="pin-key" data-key="7">7</button>
+    <button class="pin-key" data-key="8">8</button>
+    <button class="pin-key" data-key="9">9</button>
+    <button class="pin-key" data-key="0">0</button>
+    <button class="pin-key del" data-key="back">&#9003;</button>
+    <button class="pin-key del" data-key="clr">CLR</button>
   </div>
   <div class="pin-error" id="pin-error"></div>
-  <div class="pin-forgot" onclick="pinForgot()">Forgot PIN?</div>
+  <div class="pin-forgot" id="pin-forgot-btn">Forgot PIN?</div>
 </div>
 
 <!-- CHANGE PIN MODAL -->
@@ -1102,6 +1102,19 @@ let pinCallback = null;
 let cachedPin = null; // cache so async never races with entry
 
 // Load PIN once at startup and cache it
+// Wire up keypad via event delegation on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('pin-keypad').addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-key]');
+    if (!btn) return;
+    const key = btn.getAttribute('data-key');
+    if (key === 'back') pinBackspace();
+    else if (key === 'clr') pinClear();
+    else pinKey(key);
+  });
+  document.getElementById('pin-forgot-btn').addEventListener('click', pinForgot);
+});
+
 async function initPin() {
   try {
     const doc = await db.collection('gympass_settings').doc('pin').get();
