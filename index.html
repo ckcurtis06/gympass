@@ -177,27 +177,6 @@ textarea:focus { border-color: var(--blue); }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 .pending-pulse { animation: pulse 2s infinite; }
 
-/* ── PIN ── */
-#pin-overlay{position:fixed;inset:0;background:#005A9C;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:0;}
-#pin-overlay .pl{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:3px;color:#fff;margin-bottom:6px;}
-#pin-overlay .ps{font-size:13px;color:#d6e8f5;margin-bottom:28px;}
-#pin-overlay .pd-row{display:flex;gap:16px;margin-bottom:28px;}
-#pin-overlay .pd{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);background:transparent;transition:background 0.15s;}
-#pin-overlay .pd.on{background:#fff;border-color:#fff;}
-#pin-overlay .kp{display:grid;grid-template-columns:repeat(3,72px);gap:10px;}
-#pin-overlay .pk{height:64px;background:rgba(255,255,255,0.15);border:none;border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:#fff;cursor:pointer;}
-#pin-overlay .pk:active{background:rgba(255,255,255,0.35);}
-#pin-overlay .pe{color:#ffb3b3;font-size:13px;margin-top:14px;min-height:18px;}
-#pin-overlay .pf{color:rgba(255,255,255,0.45);font-size:12px;margin-top:18px;cursor:pointer;text-decoration:underline;}
-#change-pin-modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:1.5rem;}
-.cpm-card{background:#fff;border-radius:16px;padding:1.5rem;width:100%;max-width:340px;}
-.cpm-title{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:1px;margin-bottom:1rem;color:#0d1f30;}
-.cpm-input{width:100%;background:#f4f8fc;border:1.5px solid #d0e2f0;border-radius:10px;padding:10px;font-size:22px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:8px;font-family:'DM Sans',sans-serif;}
-.cpm-input:focus{border-color:#005A9C;}
-.cpm-err{color:#c0392b;font-size:13px;min-height:18px;margin-bottom:8px;}
-.cpm-btns{display:flex;gap:8px;}
-.cpm-save{flex:1;padding:11px;background:#005A9C;color:#fff;border:none;border-radius:10px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;}
-.cpm-cancel{padding:11px 14px;background:#f4f8fc;color:#6b8aa8;border:1px solid #d0e2f0;border-radius:10px;font-size:14px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -329,20 +308,52 @@ textarea:focus { border-color: var(--blue); }
 
 <!-- PARENT VIEW -->
 <div id="view-parent" class="view">
+  <!-- PIN GATE - sits inside parent view, shown by default -->
+  <div id="pin-gate" style="display:flex;flex-direction:column;align-items:center;padding:3rem 1rem;">
+    <div style="font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;color:var(--blue);margin-bottom:6px;">PARENT ACCESS</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:2rem;">Enter your PIN to continue</div>
+    <div style="display:flex;gap:14px;margin-bottom:1.5rem;" id="gate-dots">
+      <div id="gd0" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all 0.15s;"></div>
+      <div id="gd1" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all 0.15s;"></div>
+      <div id="gd2" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all 0.15s;"></div>
+      <div id="gd3" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all 0.15s;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,72px);gap:8px;margin-bottom:0.5rem;">
+      <button onclick="gk('1')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">1</button>
+      <button onclick="gk('2')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">2</button>
+      <button onclick="gk('3')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">3</button>
+      <button onclick="gk('4')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">4</button>
+      <button onclick="gk('5')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">5</button>
+      <button onclick="gk('6')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">6</button>
+      <button onclick="gk('7')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">7</button>
+      <button onclick="gk('8')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">8</button>
+      <button onclick="gk('9')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">9</button>
+      <button onclick="gk('0')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">0</button>
+      <button onclick="gb()" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-size:18px;color:var(--muted);cursor:pointer;">&#9003;</button>
+      <button onclick="gc()" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;">CLR</button>
+    </div>
+    <div id="gate-err" style="color:var(--red);font-size:13px;min-height:18px;margin-top:8px;"></div>
+    <div onclick="gf()" style="color:var(--muted);font-size:12px;margin-top:16px;cursor:pointer;text-decoration:underline;">Forgot PIN?</div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);width:100%;max-width:280px;">
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em;">Change PIN</div>
+      <input id="g-cur" type="password" maxlength="4" placeholder="Current PIN" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px;text-align:center;letter-spacing:6px;font-size:18px;margin-bottom:6px;outline:none;">
+      <input id="g-new" type="password" maxlength="4" placeholder="New PIN" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px;text-align:center;letter-spacing:6px;font-size:18px;margin-bottom:6px;outline:none;">
+      <input id="g-con" type="password" maxlength="4" placeholder="Confirm PIN" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px;text-align:center;letter-spacing:6px;font-size:18px;margin-bottom:8px;outline:none;">
+      <div id="g-cpm-err" style="color:var(--red);font-size:12px;min-height:16px;margin-bottom:6px;"></div>
+      <button onclick="gSave()" style="width:100%;padding:10px;background:var(--blue);color:white;border:none;border-radius:8px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;">SAVE NEW PIN</button>
+    </div>
+  </div>
+
   <div id="parent-loading" class="loading-screen">
     <div class="spinner"></div>
     <div class="loading-text">Loading...</div>
   </div>
   <div id="parent-content" style="display:none;">
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button onclick="openCPM()" style="padding:6px 12px;background:#f4f8fc;border:1.5px solid #d0e2f0;border-radius:8px;font-size:12px;font-weight:600;color:#6b8aa8;cursor:pointer;">&#128274; Change PIN</button></div>
-    <div id="notif-banner" class="notif-banner" style="display:none;">
+        <div id="notif-banner" class="notif-banner" style="display:none;">
       <span>&#128276; Get notified when proof is submitted</span>
       <button onclick="requestNotifPermission()">Enable</button>
     </div>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:0.75rem;">
-      <button onclick="openChangePinModal()" style="padding:6px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;">&#128274; Change PIN</button>
-    </div>
-
+    
     <div id="parent-no-children" style="display:none;" class="empty-state">
       <div class="empty-icon">&#128100;</div>
       <div class="empty-text">No kids added yet.<br>Have them pick their name on the My View tab first.</div>
@@ -390,43 +401,6 @@ textarea:focus { border-color: var(--blue); }
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
-// ── PIN ──
-var RC='1965', DP='1234', pe='', pcb=null, cp=null;
-(async function(){try{var d=await db.collection('gympass_settings').doc('pin').get();cp=d.exists?d.data().value:DP;}catch(e){cp=DP;}})();
-function showPin(cb){pe='';pcb=cb;upd();document.getElementById('pe').textContent='';var o=document.getElementById('pin-overlay');o.style.display='flex';}
-function hidePin(){document.getElementById('pin-overlay').style.display='none';pe='';pcb=null;}
-function upd(){for(var i=0;i<4;i++)document.getElementById('pd'+i).classList.toggle('on',i<pe.length);}
-function pk(d){if(pe.length>=4)return;pe+=d;upd();document.getElementById('pe').textContent='';if(pe.length===4){var e=pe;pe='';upd();var stored=cp||DP;if(e===stored||e===RC){hidePin();if(pcb)pcb();}else{document.getElementById('pe').textContent='Incorrect PIN — try again';}}}
-function pb(){pe=pe.slice(0,-1);upd();}
-function pc(){pe='';upd();}
-function pf(){alert('Recovery code: 1965. Use it as the Current PIN when changing your PIN.');}
-function openCPM(){document.getElementById('cpm-cur').value='';document.getElementById('cpm-new').value='';document.getElementById('cpm-con').value='';document.getElementById('cpm-err').textContent='';document.getElementById('change-pin-modal').style.display='flex';}
-function closeCPM(){document.getElementById('change-pin-modal').style.display='none';}
-async function savePIN(){var cur=document.getElementById('cpm-cur').value.trim(),np=document.getElementById('cpm-new').value.trim(),cn=document.getElementById('cpm-con').value.trim(),stored=cp||DP,err=document.getElementById('cpm-err');if(cur!==stored&&cur!==RC){err.textContent='Incorrect current PIN.';return;}if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be 4 digits.';return;}if(np!==cn){err.textContent='PINs do not match.';return;}if(np===RC){err.textContent='Cannot use recovery code as PIN.';return;}await db.collection('gympass_settings').doc('pin').set({value:np});cp=np;closeCPM();showToast('PIN updated!');}
-
-
-
-</script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js">
-// ── PIN ──
-var RC='1965', DP='1234', pe='', pcb=null, cp=null;
-(async function(){try{var d=await db.collection('gympass_settings').doc('pin').get();cp=d.exists?d.data().value:DP;}catch(e){cp=DP;}})();
-function showPin(cb){pe='';pcb=cb;upd();document.getElementById('pe').textContent='';var o=document.getElementById('pin-overlay');o.style.display='flex';}
-function hidePin(){document.getElementById('pin-overlay').style.display='none';pe='';pcb=null;}
-function upd(){for(var i=0;i<4;i++)document.getElementById('pd'+i).classList.toggle('on',i<pe.length);}
-function pk(d){if(pe.length>=4)return;pe+=d;upd();document.getElementById('pe').textContent='';if(pe.length===4){var e=pe;pe='';upd();var stored=cp||DP;if(e===stored||e===RC){hidePin();if(pcb)pcb();}else{document.getElementById('pe').textContent='Incorrect PIN — try again';}}}
-function pb(){pe=pe.slice(0,-1);upd();}
-function pc(){pe='';upd();}
-function pf(){alert('Recovery code: 1965. Use it as the Current PIN when changing your PIN.');}
-function openCPM(){document.getElementById('cpm-cur').value='';document.getElementById('cpm-new').value='';document.getElementById('cpm-con').value='';document.getElementById('cpm-err').textContent='';document.getElementById('change-pin-modal').style.display='flex';}
-function closeCPM(){document.getElementById('change-pin-modal').style.display='none';}
-async function savePIN(){var cur=document.getElementById('cpm-cur').value.trim(),np=document.getElementById('cpm-new').value.trim(),cn=document.getElementById('cpm-con').value.trim(),stored=cp||DP,err=document.getElementById('cpm-err');if(cur!==stored&&cur!==RC){err.textContent='Incorrect current PIN.';return;}if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be 4 digits.';return;}if(np!==cn){err.textContent='PINs do not match.';return;}if(np===RC){err.textContent='Cannot use recovery code as PIN.';return;}await db.collection('gympass_settings').doc('pin').set({value:np});cp=np;closeCPM();showToast('PIN updated!');}
-
-
-
-</script>
-
-<script>
 // ── FIREBASE ──
 firebase.initializeApp({
   apiKey: "AIzaSyCF9Edprk9FwL5Y6S3eTLwOVhB5nNMxN-8",
@@ -1062,86 +1036,80 @@ function hideQustodioBtn() {
 
 // ── TAB SWITCHING ──
 function switchMainTab(tab){
-  if(tab==='parent'){
-    showPin(function(){
-      document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===1));
-      document.getElementById('view-kid').classList.remove('active');
-      document.getElementById('view-parent').classList.add('active');
-      initParentView();
-    });
-    return;
-  }
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0));
-  document.getElementById('view-kid').classList.add('active');
-  document.getElementById('view-parent').classList.remove('active');
-  initKidView();
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='kid')||(i===1&&tab==='parent')));
+  document.getElementById('view-kid').classList.toggle('active',tab==='kid');
+  document.getElementById('view-parent').classList.toggle('active',tab==='parent');
+  if(tab==='parent'){ document.getElementById('pin-gate').style.display='flex'; document.getElementById('parent-loading').style.display='none'; document.getElementById('parent-content').style.display='none'; } else initKidView();
 }
 
 
 initKidView();
 
-// ── PIN ──
-var RC='1965', DP='1234', pe='', pcb=null, cp=null;
-(async function(){try{var d=await db.collection('gympass_settings').doc('pin').get();cp=d.exists?d.data().value:DP;}catch(e){cp=DP;}})();
-function showPin(cb){pe='';pcb=cb;upd();document.getElementById('pe').textContent='';var o=document.getElementById('pin-overlay');o.style.display='flex';}
-function hidePin(){document.getElementById('pin-overlay').style.display='none';pe='';pcb=null;}
-function upd(){for(var i=0;i<4;i++)document.getElementById('pd'+i).classList.toggle('on',i<pe.length);}
-function pk(d){if(pe.length>=4)return;pe+=d;upd();document.getElementById('pe').textContent='';if(pe.length===4){var e=pe;pe='';upd();var stored=cp||DP;if(e===stored||e===RC){hidePin();if(pcb)pcb();}else{document.getElementById('pe').textContent='Incorrect PIN — try again';}}}
-function pb(){pe=pe.slice(0,-1);upd();}
-function pc(){pe='';upd();}
-function pf(){alert('Recovery code: 1965. Use it as the Current PIN when changing your PIN.');}
-function openCPM(){document.getElementById('cpm-cur').value='';document.getElementById('cpm-new').value='';document.getElementById('cpm-con').value='';document.getElementById('cpm-err').textContent='';document.getElementById('change-pin-modal').style.display='flex';}
-function closeCPM(){document.getElementById('change-pin-modal').style.display='none';}
-async function savePIN(){var cur=document.getElementById('cpm-cur').value.trim(),np=document.getElementById('cpm-new').value.trim(),cn=document.getElementById('cpm-con').value.trim(),stored=cp||DP,err=document.getElementById('cpm-err');if(cur!==stored&&cur!==RC){err.textContent='Incorrect current PIN.';return;}if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be 4 digits.';return;}if(np!==cn){err.textContent='PINs do not match.';return;}if(np===RC){err.textContent='Cannot use recovery code as PIN.';return;}await db.collection('gympass_settings').doc('pin').set({value:np});cp=np;closeCPM();showToast('PIN updated!');}
 
 
+
+
+
+// ── PIN GATE ──
+var G_RC='1965', G_DP='1234', G_ENTRY='', G_PIN=null;
+// Load PIN from Firestore
+db.collection('gympass_settings').doc('pin').get().then(function(d){
+  G_PIN = (d.exists && d.data().value) ? d.data().value : G_DP;
+}).catch(function(){ G_PIN = G_DP; });
+
+function gUpd(){
+  for(var i=0;i<4;i++){
+    var dot=document.getElementById('gd'+i);
+    dot.style.background = i<G_ENTRY.length ? 'var(--blue)' : 'transparent';
+    dot.style.borderColor = i<G_ENTRY.length ? 'var(--blue)' : 'var(--border)';
+  }
+}
+function gk(d){
+  if(G_ENTRY.length>=4) return;
+  G_ENTRY+=d;
+  gUpd();
+  document.getElementById('gate-err').textContent='';
+  if(G_ENTRY.length===4){
+    var pin=G_PIN||G_DP;
+    var entered=G_ENTRY;
+    G_ENTRY='';
+    gUpd();
+    if(entered===pin||entered===G_RC){
+      document.getElementById('pin-gate').style.display='none';
+      document.getElementById('parent-loading').style.display='flex';
+      document.getElementById('parent-content').style.display='none';
+      initParentView();
+    } else {
+      document.getElementById('gate-err').textContent='Incorrect PIN — try again';
+    }
+  }
+}
+function gb(){ G_ENTRY=G_ENTRY.slice(0,-1); gUpd(); }
+function gc(){ G_ENTRY=''; gUpd(); }
+function gf(){ alert('Recovery code: 1965. Enter it as the Current PIN to change your PIN.'); }
+async function gSave(){
+  var cur=document.getElementById('g-cur').value.trim();
+  var np=document.getElementById('g-new').value.trim();
+  var cn=document.getElementById('g-con').value.trim();
+  var pin=G_PIN||G_DP;
+  var err=document.getElementById('g-cpm-err');
+  if(cur!==pin&&cur!==G_RC){err.textContent='Incorrect current PIN.';return;}
+  if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be exactly 4 digits.';return;}
+  if(np!==cn){err.textContent='PINs do not match.';return;}
+  if(np===G_RC){err.textContent='Cannot use recovery code as PIN.';return;}
+  await db.collection('gympass_settings').doc('pin').set({value:np});
+  G_PIN=np;
+  document.getElementById('g-cur').value='';
+  document.getElementById('g-new').value='';
+  document.getElementById('g-con').value='';
+  err.textContent='';
+  showToast('PIN updated!');
+}
+
+// Reset gate when switching back to kid view
+var _st = switchMainTab;
 
 </script>
-
-<!-- PIN OVERLAY -->
-<div id="pin-overlay" style="display:none;">
-  <div class="pl">GYMPASS</div>
-  <div class="ps">Parent access only</div>
-  <div class="pd-row">
-    <div class="pd" id="pd0"></div>
-    <div class="pd" id="pd1"></div>
-    <div class="pd" id="pd2"></div>
-    <div class="pd" id="pd3"></div>
-  </div>
-  <div class="kp">
-    <button class="pk" onclick="pk('1')">1</button>
-    <button class="pk" onclick="pk('2')">2</button>
-    <button class="pk" onclick="pk('3')">3</button>
-    <button class="pk" onclick="pk('4')">4</button>
-    <button class="pk" onclick="pk('5')">5</button>
-    <button class="pk" onclick="pk('6')">6</button>
-    <button class="pk" onclick="pk('7')">7</button>
-    <button class="pk" onclick="pk('8')">8</button>
-    <button class="pk" onclick="pk('9')">9</button>
-    <button class="pk" onclick="pk('0')">0</button>
-    <button class="pk" onclick="pb()">&#9003;</button>
-    <button class="pk" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;" onclick="pc()">CLR</button>
-  </div>
-  <div class="pe" id="pe"></div>
-  <div class="pf" onclick="pf()">Forgot PIN?</div>
-</div>
-
-<!-- CHANGE PIN MODAL -->
-<div id="change-pin-modal" style="display:none;">
-  <div class="cpm-card">
-    <div class="cpm-title">CHANGE PIN</div>
-    <label class="field-label">Current PIN or recovery code</label>
-    <input class="cpm-input" id="cpm-cur" type="password" maxlength="4" placeholder="••••">
-    <label class="field-label" style="margin-top:6px;">New PIN (4 digits)</label>
-    <input class="cpm-input" id="cpm-new" type="password" maxlength="4" placeholder="••••">
-    <label class="field-label" style="margin-top:6px;">Confirm new PIN</label>
-    <input class="cpm-input" id="cpm-con" type="password" maxlength="4" placeholder="••••">
-    <div class="cpm-err" id="cpm-err"></div>
-    <div class="cpm-btns">
-      <button class="cpm-cancel" onclick="closeCPM()">Cancel</button>
-      <button class="cpm-save" onclick="savePIN()">SAVE</button>
-    </div>
-  </div>
 </div>
 </body>
 </html>
