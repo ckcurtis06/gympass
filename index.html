@@ -393,7 +393,7 @@ textarea:focus { border-color: var(--blue); }
 </div>
 
 <!-- PIN OVERLAY -->
-<div class="pin-overlay hidden" id="pin-overlay">
+<div class="pin-overlay" id="pin-overlay" style="display:none;">
   <div class="pin-logo">GYMPASS</div>
   <div class="pin-subtitle">Parent access only — enter PIN</div>
   <div class="pin-display" id="pin-display">
@@ -421,7 +421,7 @@ textarea:focus { border-color: var(--blue); }
 </div>
 
 <!-- CHANGE PIN MODAL -->
-<div class="modal-overlay hidden" id="change-pin-modal">
+<div class="modal-overlay" id="change-pin-modal" style="display:none;">
   <div class="modal-card">
     <div class="modal-title">CHANGE PARENT PIN</div>
     <label class="field-label">Current PIN (or recovery code)</label>
@@ -1118,10 +1118,10 @@ function showPinOverlay(callback) {
   pinCallback = callback;
   updatePinDisplay();
   document.getElementById('pin-error').textContent = '';
-  document.getElementById('pin-overlay').classList.remove('hidden');
+  document.getElementById('pin-overlay').style.display='flex';
 }
 function hidePinOverlay() {
-  document.getElementById('pin-overlay').classList.add('hidden');
+  document.getElementById('pin-overlay').style.display='none';
   pinEntry = '';
   pinCallback = null;
 }
@@ -1166,10 +1166,10 @@ function openChangePinModal() {
   document.getElementById('cp-new').value='';
   document.getElementById('cp-confirm').value='';
   document.getElementById('cp-error').textContent='';
-  document.getElementById('change-pin-modal').classList.remove('hidden');
+  document.getElementById('change-pin-modal').style.display='flex';
 }
 function closeChangePinModal() {
-  document.getElementById('change-pin-modal').classList.add('hidden');
+  document.getElementById('change-pin-modal').style.display='none';
 }
 async function saveNewPin() {
   const current = document.getElementById('cp-current').value.trim();
