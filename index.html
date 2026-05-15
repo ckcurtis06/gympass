@@ -308,42 +308,6 @@ textarea:focus { border-color: var(--blue); }
 
 <!-- PARENT VIEW -->
 <div id="view-parent" class="view">
-  <!-- PIN GATE - sits inside parent view, shown by default -->
-  <div id="pin-gate" style="display:flex;flex-direction:column;align-items:center;padding:3rem 1rem;">
-    <div style="font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;color:var(--blue);margin-bottom:6px;">PARENT ACCESS</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:2rem;">Enter your PIN to continue</div>
-    <div style="display:flex;gap:14px;margin-bottom:1.5rem;" id="gate-dots">
-      <div id="gd0" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all 0.15s;"></div>
-      <div id="gd1" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all 0.15s;"></div>
-      <div id="gd2" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all 0.15s;"></div>
-      <div id="gd3" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all 0.15s;"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,72px);gap:8px;margin-bottom:0.5rem;">
-      <button onclick="gk('1')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">1</button>
-      <button onclick="gk('2')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">2</button>
-      <button onclick="gk('3')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">3</button>
-      <button onclick="gk('4')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">4</button>
-      <button onclick="gk('5')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">5</button>
-      <button onclick="gk('6')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">6</button>
-      <button onclick="gk('7')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">7</button>
-      <button onclick="gk('8')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">8</button>
-      <button onclick="gk('9')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">9</button>
-      <button onclick="gk('0')" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;">0</button>
-      <button onclick="gb()" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-size:18px;color:var(--muted);cursor:pointer;">&#9003;</button>
-      <button onclick="gc()" style="height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;">CLR</button>
-    </div>
-    <div id="gate-err" style="color:var(--red);font-size:13px;min-height:18px;margin-top:8px;"></div>
-    <div onclick="gf()" style="color:var(--muted);font-size:12px;margin-top:16px;cursor:pointer;text-decoration:underline;">Forgot PIN?</div>
-    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);width:100%;max-width:280px;">
-      <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em;">Change PIN</div>
-      <input id="g-cur" type="password" maxlength="4" placeholder="Current PIN" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px;text-align:center;letter-spacing:6px;font-size:18px;margin-bottom:6px;outline:none;">
-      <input id="g-new" type="password" maxlength="4" placeholder="New PIN" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px;text-align:center;letter-spacing:6px;font-size:18px;margin-bottom:6px;outline:none;">
-      <input id="g-con" type="password" maxlength="4" placeholder="Confirm PIN" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px;text-align:center;letter-spacing:6px;font-size:18px;margin-bottom:8px;outline:none;">
-      <div id="g-cpm-err" style="color:var(--red);font-size:12px;min-height:16px;margin-bottom:6px;"></div>
-      <button onclick="gSave()" style="width:100%;padding:10px;background:var(--blue);color:white;border:none;border-radius:8px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;">SAVE NEW PIN</button>
-    </div>
-  </div>
-
   <div id="parent-loading" class="loading-screen">
     <div class="spinner"></div>
     <div class="loading-text">Loading...</div>
@@ -889,6 +853,15 @@ async function submitProof(){
 
 // ── PARENT VIEW ──
 async function initParentView(){
+  // Simple PIN check
+  var PPIN = null;
+  try { var pd = await db.collection('gympass_settings').doc('pin').get(); PPIN = pd.exists ? pd.data().value : '1234'; } catch(e){ PPIN='1234'; }
+  var entered = prompt('Enter parent PIN:');
+  if(entered !== PPIN && entered !== '1965') {
+    showToast('Incorrect PIN.');
+    switchMainTab('kid');
+    return;
+  }
   document.getElementById('parent-loading').style.display='flex';
   document.getElementById('parent-content').style.display='none';
   checkNotifBanner();
@@ -1039,7 +1012,7 @@ function switchMainTab(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='kid')||(i===1&&tab==='parent')));
   document.getElementById('view-kid').classList.toggle('active',tab==='kid');
   document.getElementById('view-parent').classList.toggle('active',tab==='parent');
-  if(tab==='parent'){ document.getElementById('pin-gate').style.display='flex'; document.getElementById('parent-loading').style.display='none'; document.getElementById('parent-content').style.display='none'; } else initKidView();
+  if(tab==='parent') initParentView(); else initKidView();
 }
 
 
@@ -1049,65 +1022,6 @@ initKidView();
 
 
 
-
-// ── PIN GATE ──
-var G_RC='1965', G_DP='1234', G_ENTRY='', G_PIN=null;
-// Load PIN from Firestore
-db.collection('gympass_settings').doc('pin').get().then(function(d){
-  G_PIN = (d.exists && d.data().value) ? d.data().value : G_DP;
-}).catch(function(){ G_PIN = G_DP; });
-
-function gUpd(){
-  for(var i=0;i<4;i++){
-    var dot=document.getElementById('gd'+i);
-    dot.style.background = i<G_ENTRY.length ? 'var(--blue)' : 'transparent';
-    dot.style.borderColor = i<G_ENTRY.length ? 'var(--blue)' : 'var(--border)';
-  }
-}
-function gk(d){
-  if(G_ENTRY.length>=4) return;
-  G_ENTRY+=d;
-  gUpd();
-  document.getElementById('gate-err').textContent='';
-  if(G_ENTRY.length===4){
-    var pin=G_PIN||G_DP;
-    var entered=G_ENTRY;
-    G_ENTRY='';
-    gUpd();
-    if(entered===pin||entered===G_RC){
-      document.getElementById('pin-gate').style.display='none';
-      document.getElementById('parent-loading').style.display='flex';
-      document.getElementById('parent-content').style.display='none';
-      initParentView();
-    } else {
-      document.getElementById('gate-err').textContent='Incorrect PIN — try again';
-    }
-  }
-}
-function gb(){ G_ENTRY=G_ENTRY.slice(0,-1); gUpd(); }
-function gc(){ G_ENTRY=''; gUpd(); }
-function gf(){ alert('Recovery code: 1965. Enter it as the Current PIN to change your PIN.'); }
-async function gSave(){
-  var cur=document.getElementById('g-cur').value.trim();
-  var np=document.getElementById('g-new').value.trim();
-  var cn=document.getElementById('g-con').value.trim();
-  var pin=G_PIN||G_DP;
-  var err=document.getElementById('g-cpm-err');
-  if(cur!==pin&&cur!==G_RC){err.textContent='Incorrect current PIN.';return;}
-  if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be exactly 4 digits.';return;}
-  if(np!==cn){err.textContent='PINs do not match.';return;}
-  if(np===G_RC){err.textContent='Cannot use recovery code as PIN.';return;}
-  await db.collection('gympass_settings').doc('pin').set({value:np});
-  G_PIN=np;
-  document.getElementById('g-cur').value='';
-  document.getElementById('g-new').value='';
-  document.getElementById('g-con').value='';
-  err.textContent='';
-  showToast('PIN updated!');
-}
-
-// Reset gate when switching back to kid view
-var _st = switchMainTab;
 
 </script>
 </div>
