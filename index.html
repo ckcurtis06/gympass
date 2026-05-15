@@ -404,12 +404,7 @@ function openCPM(){document.getElementById('cpm-cur').value='';document.getEleme
 function closeCPM(){document.getElementById('change-pin-modal').style.display='none';}
 async function savePIN(){var cur=document.getElementById('cpm-cur').value.trim(),np=document.getElementById('cpm-new').value.trim(),cn=document.getElementById('cpm-con').value.trim(),stored=cp||DP,err=document.getElementById('cpm-err');if(cur!==stored&&cur!==RC){err.textContent='Incorrect current PIN.';return;}if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be 4 digits.';return;}if(np!==cn){err.textContent='PINs do not match.';return;}if(np===RC){err.textContent='Cannot use recovery code as PIN.';return;}await db.collection('gympass_settings').doc('pin').set({value:np});cp=np;closeCPM();showToast('PIN updated!');}
 
-// Override switchMainTab to require PIN for parent
-var _origSwitch = switchMainTab;
-switchMainTab = function(tab){
-  if(tab==='parent'){showPin(function(){_origSwitch('parent');});return;}
-  _origSwitch(tab);
-};
+
 
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js">
@@ -427,12 +422,7 @@ function openCPM(){document.getElementById('cpm-cur').value='';document.getEleme
 function closeCPM(){document.getElementById('change-pin-modal').style.display='none';}
 async function savePIN(){var cur=document.getElementById('cpm-cur').value.trim(),np=document.getElementById('cpm-new').value.trim(),cn=document.getElementById('cpm-con').value.trim(),stored=cp||DP,err=document.getElementById('cpm-err');if(cur!==stored&&cur!==RC){err.textContent='Incorrect current PIN.';return;}if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be 4 digits.';return;}if(np!==cn){err.textContent='PINs do not match.';return;}if(np===RC){err.textContent='Cannot use recovery code as PIN.';return;}await db.collection('gympass_settings').doc('pin').set({value:np});cp=np;closeCPM();showToast('PIN updated!');}
 
-// Override switchMainTab to require PIN for parent
-var _origSwitch = switchMainTab;
-switchMainTab = function(tab){
-  if(tab==='parent'){showPin(function(){_origSwitch('parent');});return;}
-  _origSwitch(tab);
-};
+
 
 </script>
 
@@ -1072,10 +1062,19 @@ function hideQustodioBtn() {
 
 // ── TAB SWITCHING ──
 function switchMainTab(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='kid')||(i===1&&tab==='parent')));
-  document.getElementById('view-kid').classList.toggle('active',tab==='kid');
-  document.getElementById('view-parent').classList.toggle('active',tab==='parent');
-  if(tab==='parent') initParentView(); else initKidView();
+  if(tab==='parent'){
+    showPin(function(){
+      document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===1));
+      document.getElementById('view-kid').classList.remove('active');
+      document.getElementById('view-parent').classList.add('active');
+      initParentView();
+    });
+    return;
+  }
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.getElementById('view-kid').classList.add('active');
+  document.getElementById('view-parent').classList.remove('active');
+  initKidView();
 }
 
 
@@ -1095,12 +1094,7 @@ function openCPM(){document.getElementById('cpm-cur').value='';document.getEleme
 function closeCPM(){document.getElementById('change-pin-modal').style.display='none';}
 async function savePIN(){var cur=document.getElementById('cpm-cur').value.trim(),np=document.getElementById('cpm-new').value.trim(),cn=document.getElementById('cpm-con').value.trim(),stored=cp||DP,err=document.getElementById('cpm-err');if(cur!==stored&&cur!==RC){err.textContent='Incorrect current PIN.';return;}if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be 4 digits.';return;}if(np!==cn){err.textContent='PINs do not match.';return;}if(np===RC){err.textContent='Cannot use recovery code as PIN.';return;}await db.collection('gympass_settings').doc('pin').set({value:np});cp=np;closeCPM();showToast('PIN updated!');}
 
-// Override switchMainTab to require PIN for parent
-var _origSwitch = switchMainTab;
-switchMainTab = function(tab){
-  if(tab==='parent'){showPin(function(){_origSwitch('parent');});return;}
-  _origSwitch(tab);
-};
+
 
 </script>
 
