@@ -1095,19 +1095,22 @@ function switchMainTab(tab){
 }
 
 // ── PIN SYSTEM ──
-const RECOVERY_CODE = '1965';  // Secret backup — always works, cannot be changed
+const RECOVERY_CODE = '1965';
 const DEFAULT_PIN = '1234';
 let pinEntry = '';
 let pinCallback = null;
+let cachedPin = null; // cache so async never races with entry
 
-async function loadPin() {
+// Load PIN once at startup and cache it
+async function initPin() {
   try {
     const doc = await db.collection('gympass_settings').doc('pin').get();
-    return doc.exists ? doc.data().value : DEFAULT_PIN;
-  } catch(e) { return DEFAULT_PIN; }
+    cachedPin = (doc.exists && doc.data().value) ? doc.data().value : DEFAULT_PIN;
+  } catch(e) { cachedPin = DEFAULT_PIN; }
 }
 async function storePin(newPin) {
-  await db.collection('gympass_settings').doc('pin').set({ value: newPin });
+  await db.collection('gympass_settings').doc('pin').set({value: newPin});
+  cachedPin = newPin;
 }
 
 function showPinOverlay(callback) {
@@ -1142,8 +1145,8 @@ function pinClear() {
   pinEntry = '';
   updatePinDisplay();
 }
-async function checkPin() {
-  const stored = await loadPin();
+function checkPin() {
+  const stored = cachedPin || DEFAULT_PIN;
   if(pinEntry === stored || pinEntry === RECOVERY_CODE) {
     hidePinOverlay();
     if(pinCallback) pinCallback();
@@ -1154,8 +1157,7 @@ async function checkPin() {
   }
 }
 function pinForgot() {
-  document.getElementById('pin-error').textContent = '';
-  alert('Use your recovery code to get in, then change your PIN from the Parent dashboard settings.');
+  alert('Use your recovery code: 1965\nEnter it as the Current PIN when changing your PIN from the Parent dashboard.');
 }
 
 // Change PIN modal
@@ -1173,24 +1175,18 @@ async function saveNewPin() {
   const current = document.getElementById('cp-current').value.trim();
   const newPin = document.getElementById('cp-new').value.trim();
   const confirm = document.getElementById('cp-confirm').value.trim();
-  const stored = await loadPin();
+  const stored = cachedPin || DEFAULT_PIN;
   const errEl = document.getElementById('cp-error');
   if(current !== stored && current !== RECOVERY_CODE) { errEl.textContent='Current PIN or recovery code is incorrect.'; return; }
   if(!/^[0-9]{4}$/.test(newPin)) { errEl.textContent='New PIN must be exactly 4 digits.'; return; }
   if(newPin !== confirm) { errEl.textContent='PINs do not match.'; return; }
-  if(newPin === RECOVERY_CODE) { errEl.textContent='Cannot use recovery code as PIN. Choose a different number.'; return; }
+  if(newPin === RECOVERY_CODE) { errEl.textContent='Cannot use recovery code as PIN.'; return; }
   await storePin(newPin);
   closeChangePinModal();
   showToast('PIN updated successfully!');
 }
 
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3500);
-}
-
+initPin();
 initKidView();
 </script>
 </body>
