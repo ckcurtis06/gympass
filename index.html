@@ -403,21 +403,21 @@ textarea:focus { border-color: var(--blue); }
     <div class="pin-dot" id="pd3"></div>
   </div>
   <div class="pin-keypad">
-    <button class="pin-key" onclick="window.pinKey('1')">1</button>
-    <button class="pin-key" onclick="window.pinKey('2')">2</button>
-    <button class="pin-key" onclick="window.pinKey('3')">3</button>
-    <button class="pin-key" onclick="window.pinKey('4')">4</button>
-    <button class="pin-key" onclick="window.pinKey('5')">5</button>
-    <button class="pin-key" onclick="window.pinKey('6')">6</button>
-    <button class="pin-key" onclick="window.pinKey('7')">7</button>
-    <button class="pin-key" onclick="window.pinKey('8')">8</button>
-    <button class="pin-key" onclick="window.pinKey('9')">9</button>
-    <button class="pin-key" onclick="window.pinKey('0')">0</button>
-    <button class="pin-key del" onclick="window.pinBackspace()">&#9003;</button>
-    <button class="pin-key del" onclick="window.pinClear()">CLR</button>
+    <button class="pin-key" onclick="pinKey('1')">1</button>
+    <button class="pin-key" onclick="pinKey('2')">2</button>
+    <button class="pin-key" onclick="pinKey('3')">3</button>
+    <button class="pin-key" onclick="pinKey('4')">4</button>
+    <button class="pin-key" onclick="pinKey('5')">5</button>
+    <button class="pin-key" onclick="pinKey('6')">6</button>
+    <button class="pin-key" onclick="pinKey('7')">7</button>
+    <button class="pin-key" onclick="pinKey('8')">8</button>
+    <button class="pin-key" onclick="pinKey('9')">9</button>
+    <button class="pin-key" onclick="pinKey('0')">0</button>
+    <button class="pin-key del" onclick="pinBackspace()">&#9003;</button>
+    <button class="pin-key del" onclick="pinClear()">CLR</button>
   </div>
   <div class="pin-error" id="pin-error"></div>
-  <div class="pin-forgot" onclick="window.pinForgot()">Forgot PIN?</div>
+  <div class="pin-forgot" onclick="pinForgot()">Forgot PIN?</div>
 </div>
 
 <!-- CHANGE PIN MODAL -->
@@ -1113,39 +1113,39 @@ async function storePin(newPin) {
   cachedPin = newPin;
 }
 
-window.showPinOverlay = function(callback) {
+function showPinOverlay(callback) {
   pinEntry = '';
   pinCallback = callback;
   updatePinDisplay();
   document.getElementById('pin-error').textContent = '';
   document.getElementById('pin-overlay').style.display='flex';
 }
-window.hidePinOverlay = function() {
+function hidePinOverlay() {
   document.getElementById('pin-overlay').style.display='none';
   pinEntry = '';
   pinCallback = null;
 }
-window.updatePinDisplay = function() {
+function updatePinDisplay() {
   for(let i=0;i<4;i++){
     document.getElementById('pd'+i).classList.toggle('filled', i < pinEntry.length);
   }
 }
-window.pinKey = function(digit) {
+function pinKey(digit) {
   if(pinEntry.length >= 4) return;
   pinEntry += digit;
   updatePinDisplay();
   document.getElementById('pin-error').textContent = '';
-  if(pinEntry.length === 4) setTimeout(window.checkPin, 120);
+  if(pinEntry.length === 4) setTimeout(checkPin, 120);
 }
-window.pinBackspace = function() {
+function pinBackspace() {
   pinEntry = pinEntry.slice(0,-1);
   updatePinDisplay();
 }
-window.pinClear = function() {
+function pinClear() {
   pinEntry = '';
   updatePinDisplay();
 }
-window.checkPin = function() {
+function checkPin() {
   const stored = cachedPin || DEFAULT_PIN;
   if(pinEntry === stored || pinEntry === RECOVERY_CODE) {
     hidePinOverlay();
@@ -1156,22 +1156,22 @@ window.checkPin = function() {
     updatePinDisplay();
   }
 }
-window.pinForgot = function() {
+function pinForgot() {
   alert('Use your recovery code: 1965\nEnter it as the Current PIN when changing your PIN from the Parent dashboard.');
 }
 
 // Change PIN modal
-window.openChangePinModal = function() {
+function openChangePinModal() {
   document.getElementById('cp-current').value='';
   document.getElementById('cp-new').value='';
   document.getElementById('cp-confirm').value='';
   document.getElementById('cp-error').textContent='';
   document.getElementById('change-pin-modal').style.display='flex';
 }
-window.closeChangePinModal = function() {
+function closeChangePinModal() {
   document.getElementById('change-pin-modal').style.display='none';
 }
-async window.saveNewPin = function() {
+async function saveNewPin() {
   const current = document.getElementById('cp-current').value.trim();
   const newPin = document.getElementById('cp-new').value.trim();
   const confirm = document.getElementById('cp-confirm').value.trim();
