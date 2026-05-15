@@ -165,6 +165,34 @@ textarea:focus { border-color: var(--blue); }
 .deny-btn { flex: 1; padding: 13px; background: #fde8e8; color: var(--red); border: 1.5px solid #f5b8b8; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; }
 .deny-btn:hover { background: #fbd4d4; }
 
+/* PIN OVERLAY */
+.pin-overlay { position: fixed; inset: 0; background: var(--blue); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+.pin-overlay.hidden { display: none; }
+.pin-logo { font-family: "Anton", sans-serif; font-size: 32px; letter-spacing: 3px; color: var(--white); margin-bottom: 8px; }
+.pin-subtitle { font-size: 13px; color: var(--blue-pale); margin-bottom: 2.5rem; }
+.pin-display { display: flex; gap: 14px; margin-bottom: 2rem; }
+.pin-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); background: transparent; transition: all 0.15s; }
+.pin-dot.filled { background: var(--white); border-color: var(--white); }
+.pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 240px; }
+.pin-key { background: rgba(255,255,255,0.12); border: none; border-radius: 14px; padding: 18px; font-family: "Anton", sans-serif; font-size: 22px; color: var(--white); cursor: pointer; transition: all 0.15s; text-align: center; }
+.pin-key:hover { background: rgba(255,255,255,0.22); }
+.pin-key:active { background: rgba(255,255,255,0.35); transform: scale(0.95); }
+.pin-key.del { font-size: 16px; font-family: "DM Sans", sans-serif; font-weight: 600; }
+.pin-error { color: #ffb3b3; font-size: 13px; margin-top: 12px; min-height: 20px; text-align: center; }
+.pin-forgot { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 20px; cursor: pointer; text-decoration: underline; }
+.pin-forgot:hover { color: rgba(255,255,255,0.8); }
+
+/* CHANGE PIN MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 8888; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+.modal-overlay.hidden { display: none; }
+.modal-card { background: var(--card); border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 360px; }
+.modal-title { font-family: "Anton", sans-serif; font-size: 20px; letter-spacing: 1px; margin-bottom: 1rem; color: var(--text); }
+.pin-input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 20px; letter-spacing: 8px; text-align: center; outline: none; font-family: "DM Sans", sans-serif; color: var(--text); transition: border-color 0.2s; margin-bottom: 10px; }
+.pin-input:focus { border-color: var(--blue); }
+.modal-btn-row { display: flex; gap: 8px; margin-top: 0.5rem; }
+.modal-save { flex: 1; padding: 11px; background: var(--blue); color: white; border: none; border-radius: 10px; font-family: "Anton", sans-serif; font-size: 16px; letter-spacing: 1px; cursor: pointer; }
+.modal-cancel { padding: 11px 16px; background: var(--bg); color: var(--muted); border: 1px solid var(--border); border-radius: 10px; font-size: 14px; cursor: pointer; }
+
 .notif-banner { background: var(--blue-pale); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--blue-deep); }
 .notif-banner button { margin-left: auto; padding: 5px 12px; background: var(--blue); color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 
@@ -316,6 +344,10 @@ textarea:focus { border-color: var(--blue); }
       <span>&#128276; Get notified when proof is submitted</span>
       <button onclick="requestNotifPermission()">Enable</button>
     </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:0.75rem;">
+      <button onclick="openChangePinModal()" style="padding:6px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;">&#128274; Change PIN</button>
+    </div>
+
     <div id="parent-no-children" style="display:none;" class="empty-state">
       <div class="empty-icon">&#128100;</div>
       <div class="empty-text">No kids added yet.<br>Have them pick their name on the My View tab first.</div>
@@ -356,6 +388,52 @@ textarea:focus { border-color: var(--blue); }
       <hr class="divider-line">
       <div class="section-title">Approval history</div>
       <div id="p-history-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PIN OVERLAY -->
+<div class="pin-overlay hidden" id="pin-overlay">
+  <div class="pin-logo">GYMPASS</div>
+  <div class="pin-subtitle">Parent access only — enter PIN</div>
+  <div class="pin-display" id="pin-display">
+    <div class="pin-dot" id="pd0"></div>
+    <div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div>
+    <div class="pin-dot" id="pd3"></div>
+  </div>
+  <div class="pin-keypad">
+    <button class="pin-key" onclick="pinKey('1')">1</button>
+    <button class="pin-key" onclick="pinKey('2')">2</button>
+    <button class="pin-key" onclick="pinKey('3')">3</button>
+    <button class="pin-key" onclick="pinKey('4')">4</button>
+    <button class="pin-key" onclick="pinKey('5')">5</button>
+    <button class="pin-key" onclick="pinKey('6')">6</button>
+    <button class="pin-key" onclick="pinKey('7')">7</button>
+    <button class="pin-key" onclick="pinKey('8')">8</button>
+    <button class="pin-key" onclick="pinKey('9')">9</button>
+    <button class="pin-key" onclick="pinKey('0')">0</button>
+    <button class="pin-key del" onclick="pinBackspace()">&#9003;</button>
+    <button class="pin-key del" onclick="pinClear()">CLR</button>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-forgot" onclick="pinForgot()">Forgot PIN?</div>
+</div>
+
+<!-- CHANGE PIN MODAL -->
+<div class="modal-overlay hidden" id="change-pin-modal">
+  <div class="modal-card">
+    <div class="modal-title">CHANGE PARENT PIN</div>
+    <label class="field-label">Current PIN (or recovery code)</label>
+    <input class="pin-input" id="cp-current" type="password" maxlength="4" placeholder="••••">
+    <label class="field-label" style="margin-top:8px;">New PIN (4 digits)</label>
+    <input class="pin-input" id="cp-new" type="password" maxlength="4" placeholder="••••">
+    <label class="field-label" style="margin-top:8px;">Confirm new PIN</label>
+    <input class="pin-input" id="cp-confirm" type="password" maxlength="4" placeholder="••••">
+    <div class="pin-error" id="cp-error" style="color:var(--red);"></div>
+    <div class="modal-btn-row">
+      <button class="modal-cancel" onclick="closeChangePinModal()">Cancel</button>
+      <button class="modal-save" onclick="saveNewPin()">SAVE PIN</button>
     </div>
   </div>
 </div>
@@ -671,7 +749,97 @@ function backToKidPicker(){
   activeKidId=null;
   document.getElementById('kid-active').style.display='none';
   document.getElementById('kid-picker').style.display='block';
-  initKidView();
+  // ── PIN SYSTEM ──
+const RECOVERY_CODE = '1965';  // Secret backup — always works, cannot be changed
+const DEFAULT_PIN = '1234';
+let pinEntry = '';
+let pinCallback = null;
+
+async function loadPin() {
+  try {
+    const doc = await db.collection('gympass_settings').doc('pin').get();
+    return doc.exists ? doc.data().value : DEFAULT_PIN;
+  } catch(e) { return DEFAULT_PIN; }
+}
+async function storePin(newPin) {
+  await db.collection('gympass_settings').doc('pin').set({ value: newPin });
+}
+
+function showPinOverlay(callback) {
+  pinEntry = '';
+  pinCallback = callback;
+  updatePinDisplay();
+  document.getElementById('pin-error').textContent = '';
+  document.getElementById('pin-overlay').classList.remove('hidden');
+}
+function hidePinOverlay() {
+  document.getElementById('pin-overlay').classList.add('hidden');
+  pinEntry = '';
+  pinCallback = null;
+}
+function updatePinDisplay() {
+  for(let i=0;i<4;i++){
+    document.getElementById('pd'+i).classList.toggle('filled', i < pinEntry.length);
+  }
+}
+function pinKey(digit) {
+  if(pinEntry.length >= 4) return;
+  pinEntry += digit;
+  updatePinDisplay();
+  document.getElementById('pin-error').textContent = '';
+  if(pinEntry.length === 4) setTimeout(checkPin, 120);
+}
+function pinBackspace() {
+  pinEntry = pinEntry.slice(0,-1);
+  updatePinDisplay();
+}
+function pinClear() {
+  pinEntry = '';
+  updatePinDisplay();
+}
+async function checkPin() {
+  const stored = await loadPin();
+  if(pinEntry === stored || pinEntry === RECOVERY_CODE) {
+    hidePinOverlay();
+    if(pinCallback) pinCallback();
+  } else {
+    document.getElementById('pin-error').textContent = 'Incorrect PIN — try again';
+    pinEntry = '';
+    updatePinDisplay();
+  }
+}
+function pinForgot() {
+  document.getElementById('pin-error').textContent = '';
+  alert('Use your recovery code to get in, then change your PIN from the Parent dashboard settings.');
+}
+
+// Change PIN modal
+function openChangePinModal() {
+  document.getElementById('cp-current').value='';
+  document.getElementById('cp-new').value='';
+  document.getElementById('cp-confirm').value='';
+  document.getElementById('cp-error').textContent='';
+  document.getElementById('change-pin-modal').classList.remove('hidden');
+}
+function closeChangePinModal() {
+  document.getElementById('change-pin-modal').classList.add('hidden');
+}
+async function saveNewPin() {
+  const current = document.getElementById('cp-current').value.trim();
+  const newPin = document.getElementById('cp-new').value.trim();
+  const confirm = document.getElementById('cp-confirm').value.trim();
+  const stored = await loadPin();
+  const errEl = document.getElementById('cp-error');
+  if(current !== stored && current !== RECOVERY_CODE) { errEl.textContent='Current PIN or recovery code is incorrect.'; return; }
+  if(!/^[0-9]{4}$/.test(newPin)) { errEl.textContent='New PIN must be exactly 4 digits.'; return; }
+  if(newPin !== confirm) { errEl.textContent='PINs do not match.'; return; }
+  if(newPin === RECOVERY_CODE) { errEl.textContent='Cannot use recovery code as PIN. Choose a different number.'; return; }
+  await storePin(newPin);
+  closeChangePinModal();
+  showToast('PIN updated successfully!');
+}
+
+initKidView();
 }
 
 // ── WEEK DOTS ──
@@ -1001,10 +1169,19 @@ function hideQustodioBtn() {
 
 // ── TAB SWITCHING ──
 function switchMainTab(tab){
+  if(tab==='parent'){
+    showPinOverlay(()=>{
+      document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===1));
+      document.getElementById('view-kid').classList.remove('active');
+      document.getElementById('view-parent').classList.add('active');
+      initParentView();
+    });
+    return;
+  }
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='kid')||(i===1&&tab==='parent')));
   document.getElementById('view-kid').classList.toggle('active',tab==='kid');
   document.getElementById('view-parent').classList.toggle('active',tab==='parent');
-  if(tab==='parent') initParentView(); else initKidView();
+  initKidView();
 }
 
 function showToast(msg){
