@@ -749,97 +749,7 @@ function backToKidPicker(){
   activeKidId=null;
   document.getElementById('kid-active').style.display='none';
   document.getElementById('kid-picker').style.display='block';
-  // ── PIN SYSTEM ──
-const RECOVERY_CODE = '1965';  // Secret backup — always works, cannot be changed
-const DEFAULT_PIN = '1234';
-let pinEntry = '';
-let pinCallback = null;
-
-async function loadPin() {
-  try {
-    const doc = await db.collection('gympass_settings').doc('pin').get();
-    return doc.exists ? doc.data().value : DEFAULT_PIN;
-  } catch(e) { return DEFAULT_PIN; }
-}
-async function storePin(newPin) {
-  await db.collection('gympass_settings').doc('pin').set({ value: newPin });
-}
-
-function showPinOverlay(callback) {
-  pinEntry = '';
-  pinCallback = callback;
-  updatePinDisplay();
-  document.getElementById('pin-error').textContent = '';
-  document.getElementById('pin-overlay').classList.remove('hidden');
-}
-function hidePinOverlay() {
-  document.getElementById('pin-overlay').classList.add('hidden');
-  pinEntry = '';
-  pinCallback = null;
-}
-function updatePinDisplay() {
-  for(let i=0;i<4;i++){
-    document.getElementById('pd'+i).classList.toggle('filled', i < pinEntry.length);
-  }
-}
-function pinKey(digit) {
-  if(pinEntry.length >= 4) return;
-  pinEntry += digit;
-  updatePinDisplay();
-  document.getElementById('pin-error').textContent = '';
-  if(pinEntry.length === 4) setTimeout(checkPin, 120);
-}
-function pinBackspace() {
-  pinEntry = pinEntry.slice(0,-1);
-  updatePinDisplay();
-}
-function pinClear() {
-  pinEntry = '';
-  updatePinDisplay();
-}
-async function checkPin() {
-  const stored = await loadPin();
-  if(pinEntry === stored || pinEntry === RECOVERY_CODE) {
-    hidePinOverlay();
-    if(pinCallback) pinCallback();
-  } else {
-    document.getElementById('pin-error').textContent = 'Incorrect PIN — try again';
-    pinEntry = '';
-    updatePinDisplay();
-  }
-}
-function pinForgot() {
-  document.getElementById('pin-error').textContent = '';
-  alert('Use your recovery code to get in, then change your PIN from the Parent dashboard settings.');
-}
-
-// Change PIN modal
-function openChangePinModal() {
-  document.getElementById('cp-current').value='';
-  document.getElementById('cp-new').value='';
-  document.getElementById('cp-confirm').value='';
-  document.getElementById('cp-error').textContent='';
-  document.getElementById('change-pin-modal').classList.remove('hidden');
-}
-function closeChangePinModal() {
-  document.getElementById('change-pin-modal').classList.add('hidden');
-}
-async function saveNewPin() {
-  const current = document.getElementById('cp-current').value.trim();
-  const newPin = document.getElementById('cp-new').value.trim();
-  const confirm = document.getElementById('cp-confirm').value.trim();
-  const stored = await loadPin();
-  const errEl = document.getElementById('cp-error');
-  if(current !== stored && current !== RECOVERY_CODE) { errEl.textContent='Current PIN or recovery code is incorrect.'; return; }
-  if(!/^[0-9]{4}$/.test(newPin)) { errEl.textContent='New PIN must be exactly 4 digits.'; return; }
-  if(newPin !== confirm) { errEl.textContent='PINs do not match.'; return; }
-  if(newPin === RECOVERY_CODE) { errEl.textContent='Cannot use recovery code as PIN. Choose a different number.'; return; }
-  await storePin(newPin);
-  closeChangePinModal();
-  showToast('PIN updated successfully!');
-}
-
-initKidView();
+  initKidView();
 }
 
 // ── WEEK DOTS ──
@@ -1183,6 +1093,97 @@ function switchMainTab(tab){
   document.getElementById('view-parent').classList.toggle('active',tab==='parent');
   initKidView();
 }
+
+// ── PIN SYSTEM ──
+const RECOVERY_CODE = '1965';  // Secret backup — always works, cannot be changed
+const DEFAULT_PIN = '1234';
+let pinEntry = '';
+let pinCallback = null;
+
+async function loadPin() {
+  try {
+    const doc = await db.collection('gympass_settings').doc('pin').get();
+    return doc.exists ? doc.data().value : DEFAULT_PIN;
+  } catch(e) { return DEFAULT_PIN; }
+}
+async function storePin(newPin) {
+  await db.collection('gympass_settings').doc('pin').set({ value: newPin });
+}
+
+function showPinOverlay(callback) {
+  pinEntry = '';
+  pinCallback = callback;
+  updatePinDisplay();
+  document.getElementById('pin-error').textContent = '';
+  document.getElementById('pin-overlay').classList.remove('hidden');
+}
+function hidePinOverlay() {
+  document.getElementById('pin-overlay').classList.add('hidden');
+  pinEntry = '';
+  pinCallback = null;
+}
+function updatePinDisplay() {
+  for(let i=0;i<4;i++){
+    document.getElementById('pd'+i).classList.toggle('filled', i < pinEntry.length);
+  }
+}
+function pinKey(digit) {
+  if(pinEntry.length >= 4) return;
+  pinEntry += digit;
+  updatePinDisplay();
+  document.getElementById('pin-error').textContent = '';
+  if(pinEntry.length === 4) setTimeout(checkPin, 120);
+}
+function pinBackspace() {
+  pinEntry = pinEntry.slice(0,-1);
+  updatePinDisplay();
+}
+function pinClear() {
+  pinEntry = '';
+  updatePinDisplay();
+}
+async function checkPin() {
+  const stored = await loadPin();
+  if(pinEntry === stored || pinEntry === RECOVERY_CODE) {
+    hidePinOverlay();
+    if(pinCallback) pinCallback();
+  } else {
+    document.getElementById('pin-error').textContent = 'Incorrect PIN — try again';
+    pinEntry = '';
+    updatePinDisplay();
+  }
+}
+function pinForgot() {
+  document.getElementById('pin-error').textContent = '';
+  alert('Use your recovery code to get in, then change your PIN from the Parent dashboard settings.');
+}
+
+// Change PIN modal
+function openChangePinModal() {
+  document.getElementById('cp-current').value='';
+  document.getElementById('cp-new').value='';
+  document.getElementById('cp-confirm').value='';
+  document.getElementById('cp-error').textContent='';
+  document.getElementById('change-pin-modal').classList.remove('hidden');
+}
+function closeChangePinModal() {
+  document.getElementById('change-pin-modal').classList.add('hidden');
+}
+async function saveNewPin() {
+  const current = document.getElementById('cp-current').value.trim();
+  const newPin = document.getElementById('cp-new').value.trim();
+  const confirm = document.getElementById('cp-confirm').value.trim();
+  const stored = await loadPin();
+  const errEl = document.getElementById('cp-error');
+  if(current !== stored && current !== RECOVERY_CODE) { errEl.textContent='Current PIN or recovery code is incorrect.'; return; }
+  if(!/^[0-9]{4}$/.test(newPin)) { errEl.textContent='New PIN must be exactly 4 digits.'; return; }
+  if(newPin !== confirm) { errEl.textContent='PINs do not match.'; return; }
+  if(newPin === RECOVERY_CODE) { errEl.textContent='Cannot use recovery code as PIN. Choose a different number.'; return; }
+  await storePin(newPin);
+  closeChangePinModal();
+  showToast('PIN updated successfully!');
+}
+
 
 function showToast(msg){
   const t=document.getElementById('toast');
