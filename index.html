@@ -402,22 +402,22 @@ textarea:focus { border-color: var(--blue); }
     <div class="pin-dot" id="pd2"></div>
     <div class="pin-dot" id="pd3"></div>
   </div>
-  <div class="pin-keypad" id="pin-keypad">
-    <button class="pin-key" data-key="1">1</button>
-    <button class="pin-key" data-key="2">2</button>
-    <button class="pin-key" data-key="3">3</button>
-    <button class="pin-key" data-key="4">4</button>
-    <button class="pin-key" data-key="5">5</button>
-    <button class="pin-key" data-key="6">6</button>
-    <button class="pin-key" data-key="7">7</button>
-    <button class="pin-key" data-key="8">8</button>
-    <button class="pin-key" data-key="9">9</button>
-    <button class="pin-key" data-key="0">0</button>
-    <button class="pin-key del" data-key="back">&#9003;</button>
-    <button class="pin-key del" data-key="clr">CLR</button>
+  <div class="pin-keypad">
+    <button class="pin-key" onclick="window.pinKey('1')">1</button>
+    <button class="pin-key" onclick="window.pinKey('2')">2</button>
+    <button class="pin-key" onclick="window.pinKey('3')">3</button>
+    <button class="pin-key" onclick="window.pinKey('4')">4</button>
+    <button class="pin-key" onclick="window.pinKey('5')">5</button>
+    <button class="pin-key" onclick="window.pinKey('6')">6</button>
+    <button class="pin-key" onclick="window.pinKey('7')">7</button>
+    <button class="pin-key" onclick="window.pinKey('8')">8</button>
+    <button class="pin-key" onclick="window.pinKey('9')">9</button>
+    <button class="pin-key" onclick="window.pinKey('0')">0</button>
+    <button class="pin-key del" onclick="window.pinBackspace()">&#9003;</button>
+    <button class="pin-key del" onclick="window.pinClear()">CLR</button>
   </div>
   <div class="pin-error" id="pin-error"></div>
-  <div class="pin-forgot" id="pin-forgot-btn">Forgot PIN?</div>
+  <div class="pin-forgot" onclick="window.pinForgot()">Forgot PIN?</div>
 </div>
 
 <!-- CHANGE PIN MODAL -->
@@ -1102,19 +1102,6 @@ let pinCallback = null;
 let cachedPin = null; // cache so async never races with entry
 
 // Load PIN once at startup and cache it
-// Wire up keypad via event delegation on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('pin-keypad').addEventListener('click', function(e) {
-    const btn = e.target.closest('[data-key]');
-    if (!btn) return;
-    const key = btn.getAttribute('data-key');
-    if (key === 'back') pinBackspace();
-    else if (key === 'clr') pinClear();
-    else pinKey(key);
-  });
-  document.getElementById('pin-forgot-btn').addEventListener('click', pinForgot);
-});
-
 async function initPin() {
   try {
     const doc = await db.collection('gympass_settings').doc('pin').get();
@@ -1126,39 +1113,39 @@ async function storePin(newPin) {
   cachedPin = newPin;
 }
 
-function showPinOverlay(callback) {
+window.showPinOverlay = function(callback) {
   pinEntry = '';
   pinCallback = callback;
   updatePinDisplay();
   document.getElementById('pin-error').textContent = '';
   document.getElementById('pin-overlay').style.display='flex';
 }
-function hidePinOverlay() {
+window.hidePinOverlay = function() {
   document.getElementById('pin-overlay').style.display='none';
   pinEntry = '';
   pinCallback = null;
 }
-function updatePinDisplay() {
+window.updatePinDisplay = function() {
   for(let i=0;i<4;i++){
     document.getElementById('pd'+i).classList.toggle('filled', i < pinEntry.length);
   }
 }
-function pinKey(digit) {
+window.pinKey = function(digit) {
   if(pinEntry.length >= 4) return;
   pinEntry += digit;
   updatePinDisplay();
   document.getElementById('pin-error').textContent = '';
-  if(pinEntry.length === 4) setTimeout(checkPin, 120);
+  if(pinEntry.length === 4) setTimeout(window.checkPin, 120);
 }
-function pinBackspace() {
+window.pinBackspace = function() {
   pinEntry = pinEntry.slice(0,-1);
   updatePinDisplay();
 }
-function pinClear() {
+window.pinClear = function() {
   pinEntry = '';
   updatePinDisplay();
 }
-function checkPin() {
+window.checkPin = function() {
   const stored = cachedPin || DEFAULT_PIN;
   if(pinEntry === stored || pinEntry === RECOVERY_CODE) {
     hidePinOverlay();
@@ -1169,22 +1156,22 @@ function checkPin() {
     updatePinDisplay();
   }
 }
-function pinForgot() {
+window.pinForgot = function() {
   alert('Use your recovery code: 1965\nEnter it as the Current PIN when changing your PIN from the Parent dashboard.');
 }
 
 // Change PIN modal
-function openChangePinModal() {
+window.openChangePinModal = function() {
   document.getElementById('cp-current').value='';
   document.getElementById('cp-new').value='';
   document.getElementById('cp-confirm').value='';
   document.getElementById('cp-error').textContent='';
   document.getElementById('change-pin-modal').style.display='flex';
 }
-function closeChangePinModal() {
+window.closeChangePinModal = function() {
   document.getElementById('change-pin-modal').style.display='none';
 }
-async function saveNewPin() {
+async window.saveNewPin = function() {
   const current = document.getElementById('cp-current').value.trim();
   const newPin = document.getElementById('cp-new').value.trim();
   const confirm = document.getElementById('cp-confirm').value.trim();
