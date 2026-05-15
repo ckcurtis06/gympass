@@ -399,8 +399,7 @@ function upd(){for(var i=0;i<4;i++)document.getElementById('pd'+i).classList.tog
 function pk(d){if(pe.length>=4)return;pe+=d;upd();document.getElementById('pe').textContent='';if(pe.length===4){var e=pe;pe='';upd();var stored=cp||DP;if(e===stored||e===RC){hidePin();if(pcb)pcb();}else{document.getElementById('pe').textContent='Incorrect PIN — try again';}}}
 function pb(){pe=pe.slice(0,-1);upd();}
 function pc(){pe='';upd();}
-function pf(){alert('Recovery code: 1965
-Use it as the Current PIN when changing your PIN.');}
+function pf(){alert('Recovery code: 1965. Use it as the Current PIN when changing your PIN.');}
 function openCPM(){document.getElementById('cpm-cur').value='';document.getElementById('cpm-new').value='';document.getElementById('cpm-con').value='';document.getElementById('cpm-err').textContent='';document.getElementById('change-pin-modal').style.display='flex';}
 function closeCPM(){document.getElementById('change-pin-modal').style.display='none';}
 async function savePIN(){var cur=document.getElementById('cpm-cur').value.trim(),np=document.getElementById('cpm-new').value.trim(),cn=document.getElementById('cpm-con').value.trim(),stored=cp||DP,err=document.getElementById('cpm-err');if(cur!==stored&&cur!==RC){err.textContent='Incorrect current PIN.';return;}if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be 4 digits.';return;}if(np!==cn){err.textContent='PINs do not match.';return;}if(np===RC){err.textContent='Cannot use recovery code as PIN.';return;}await db.collection('gympass_settings').doc('pin').set({value:np});cp=np;closeCPM();showToast('PIN updated!');}
@@ -423,8 +422,7 @@ function upd(){for(var i=0;i<4;i++)document.getElementById('pd'+i).classList.tog
 function pk(d){if(pe.length>=4)return;pe+=d;upd();document.getElementById('pe').textContent='';if(pe.length===4){var e=pe;pe='';upd();var stored=cp||DP;if(e===stored||e===RC){hidePin();if(pcb)pcb();}else{document.getElementById('pe').textContent='Incorrect PIN — try again';}}}
 function pb(){pe=pe.slice(0,-1);upd();}
 function pc(){pe='';upd();}
-function pf(){alert('Recovery code: 1965
-Use it as the Current PIN when changing your PIN.');}
+function pf(){alert('Recovery code: 1965. Use it as the Current PIN when changing your PIN.');}
 function openCPM(){document.getElementById('cpm-cur').value='';document.getElementById('cpm-new').value='';document.getElementById('cpm-con').value='';document.getElementById('cpm-err').textContent='';document.getElementById('change-pin-modal').style.display='flex';}
 function closeCPM(){document.getElementById('change-pin-modal').style.display='none';}
 async function savePIN(){var cur=document.getElementById('cpm-cur').value.trim(),np=document.getElementById('cpm-new').value.trim(),cn=document.getElementById('cpm-con').value.trim(),stored=cp||DP,err=document.getElementById('cpm-err');if(cur!==stored&&cur!==RC){err.textContent='Incorrect current PIN.';return;}if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be 4 digits.';return;}if(np!==cn){err.textContent='PINs do not match.';return;}if(np===RC){err.textContent='Cannot use recovery code as PIN.';return;}await db.collection('gympass_settings').doc('pin').set({value:np});cp=np;closeCPM();showToast('PIN updated!');}
@@ -1092,8 +1090,7 @@ function upd(){for(var i=0;i<4;i++)document.getElementById('pd'+i).classList.tog
 function pk(d){if(pe.length>=4)return;pe+=d;upd();document.getElementById('pe').textContent='';if(pe.length===4){var e=pe;pe='';upd();var stored=cp||DP;if(e===stored||e===RC){hidePin();if(pcb)pcb();}else{document.getElementById('pe').textContent='Incorrect PIN — try again';}}}
 function pb(){pe=pe.slice(0,-1);upd();}
 function pc(){pe='';upd();}
-function pf(){alert('Recovery code: 1965
-Use it as the Current PIN when changing your PIN.');}
+function pf(){alert('Recovery code: 1965. Use it as the Current PIN when changing your PIN.');}
 function openCPM(){document.getElementById('cpm-cur').value='';document.getElementById('cpm-new').value='';document.getElementById('cpm-con').value='';document.getElementById('cpm-err').textContent='';document.getElementById('change-pin-modal').style.display='flex';}
 function closeCPM(){document.getElementById('change-pin-modal').style.display='none';}
 async function savePIN(){var cur=document.getElementById('cpm-cur').value.trim(),np=document.getElementById('cpm-new').value.trim(),cn=document.getElementById('cpm-con').value.trim(),stored=cp||DP,err=document.getElementById('cpm-err');if(cur!==stored&&cur!==RC){err.textContent='Incorrect current PIN.';return;}if(!/^[0-9]{4}$/.test(np)){err.textContent='Must be 4 digits.';return;}if(np!==cn){err.textContent='PINs do not match.';return;}if(np===RC){err.textContent='Cannot use recovery code as PIN.';return;}await db.collection('gympass_settings').doc('pin').set({value:np});cp=np;closeCPM();showToast('PIN updated!');}
