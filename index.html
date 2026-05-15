@@ -7,176 +7,187 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --blue: #005A9C; --blue-light: #1a6fad; --blue-pale: #d6e8f5; --blue-deep: #003f6e;
-  --white: #ffffff; --bg: #f4f8fc; --card: #ffffff; --border: #d0e2f0;
-  --text: #0d1f30; --muted: #6b8aa8; --red: #c0392b; --amber: #d4880a;
-  --green: #1a8a4a; --gold: #c8a400;
+  --blue:#005A9C;--blue-light:#1a6fad;--blue-pale:#d6e8f5;--blue-deep:#003f6e;
+  --white:#fff;--bg:#f4f8fc;--card:#fff;--border:#d0e2f0;
+  --text:#0d1f30;--muted:#6b8aa8;--red:#c0392b;--amber:#d4880a;
+  --green:#1a8a4a;--gold:#c8a400;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
 
-.header { background: var(--blue); padding: 0 1.25rem; border-bottom: 4px solid var(--blue-deep); }
-.header-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 0; }
-.logo-text { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 3px; color: var(--white); line-height: 1; }
-.nav-tabs { display: flex; gap: 3px; background: var(--blue-deep); border-radius: 8px; padding: 3px; }
-.tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--blue-pale); transition: all 0.2s; letter-spacing: 0.03em; }
-.tab.active { background: var(--white); color: var(--blue); }
+/* HEADER */
+.header{background:var(--blue);padding:0 1.25rem;border-bottom:4px solid var(--blue-deep);}
+.header-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;}
+.logo-text{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:3px;color:var(--white);}
+.nav-tabs{display:flex;gap:3px;background:var(--blue-deep);border-radius:8px;padding:3px;}
+.tab{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--blue-pale);transition:all .2s;letter-spacing:.03em;}
+.tab.active{background:var(--white);color:var(--blue);}
 
-.view { display: none; padding: 1.25rem; max-width: 680px; margin: 0 auto; }
-.view.active { display: block; }
+/* VIEWS */
+.view{display:none;padding:1.25rem;max-width:680px;margin:0 auto;}
+.view.active{display:block;}
 
-.loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; }
-.spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { font-size: 14px; color: var(--muted); }
+/* LOADING */
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:14px;color:var(--muted);}
 
-.picker-wrap { padding: 1.5rem 0; }
-.picker-title { font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 1.5px; color: var(--text); margin-bottom: 6px; }
-.picker-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
-.profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
-.profile-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 1.1rem 0.75rem; cursor: pointer; text-align: center; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.profile-btn:hover { border-color: var(--blue); background: #eef5fc; }
-.profile-avatar { width: 48px; height: 48px; border-radius: 50%; color: var(--white); font-family: 'Anton', sans-serif; font-size: 20px; display: flex; align-items: center; justify-content: center; }
-.profile-name { font-size: 14px; font-weight: 600; color: var(--text); }
-.profile-streak { font-size: 11px; color: var(--muted); }
-.add-profile-btn { background: transparent; border: 1.5px dashed var(--border); border-radius: 14px; padding: 1.1rem 0.75rem; cursor: pointer; text-align: center; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 500; }
-.add-profile-btn:hover { border-color: var(--blue); color: var(--blue); }
+/* PIN GATE */
+.pin-gate{padding:2.5rem 1rem;text-align:center;}
+.pin-gate-title{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;color:var(--blue);margin-bottom:6px;}
+.pin-gate-sub{font-size:13px;color:var(--muted);margin-bottom:1.75rem;}
+.pin-dots{display:flex;gap:14px;justify-content:center;margin-bottom:1.75rem;}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .15s;}
+.pin-dot.on{background:var(--blue);border-color:var(--blue);}
+.pin-grid{display:inline-grid;grid-template-columns:repeat(3,72px);gap:8px;}
+.pin-btn{height:60px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;color:var(--text);cursor:pointer;transition:background .15s;}
+.pin-btn:active{background:var(--blue-pale);}
+.pin-btn.sm{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--muted);}
+.pin-err{color:var(--red);font-size:13px;min-height:18px;margin-top:12px;}
+.pin-forgot{color:var(--muted);font-size:12px;margin-top:16px;cursor:pointer;text-decoration:underline;}
 
-.add-form { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; margin-top: 0.5rem; }
-.add-form-title { font-family: 'Anton', sans-serif; font-size: 16px; letter-spacing: 1px; margin-bottom: 1rem; }
-.name-input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s; margin-bottom: 10px; }
-.name-input:focus { border-color: var(--blue); }
-.color-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-.color-swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; flex-shrink: 0; }
-.color-swatch.selected { border-color: var(--text); transform: scale(1.15); }
-.form-btn-row { display: flex; gap: 8px; }
-.save-btn { flex: 1; padding: 10px; background: var(--blue); color: var(--white); border: none; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 16px; letter-spacing: 1px; cursor: pointer; }
-.save-btn:hover { background: var(--blue-light); }
-.cancel-btn { padding: 10px 16px; background: var(--bg); color: var(--muted); border: 1px solid var(--border); border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+/* PROFILE PICKER */
+.picker-wrap{padding:1.5rem 0;}
+.picker-title{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:1.5px;color:var(--text);margin-bottom:6px;}
+.picker-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem;}
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem;}
+.profile-btn{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:1.1rem .75rem;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.profile-btn:hover{border-color:var(--blue);background:#eef5fc;}
+.profile-avatar{width:48px;height:48px;border-radius:50%;color:var(--white);font-family:'Anton',sans-serif;font-size:20px;display:flex;align-items:center;justify-content:center;}
+.profile-name{font-size:14px;font-weight:600;color:var(--text);}
+.profile-streak{font-size:11px;color:var(--muted);}
+.add-profile-btn{background:transparent;border:1.5px dashed var(--border);border-radius:14px;padding:1.1rem .75rem;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:13px;font-weight:500;}
+.add-profile-btn:hover{border-color:var(--blue);color:var(--blue);}
 
-.back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
-.back-btn { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: var(--blue); cursor: pointer; }
-.back-btn:hover { background: var(--blue-pale); }
-.active-name { font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; }
-.active-avatar { width: 28px; height: 28px; border-radius: 50%; color: var(--white); font-family: 'Anton', sans-serif; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+/* ADD FORM */
+.add-form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-top:.5rem;}
+.add-form-title{font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;margin-bottom:1rem;}
+.name-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color .2s;margin-bottom:10px;}
+.name-input:focus{border-color:var(--blue);}
+.color-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0;}
+.color-swatch.selected{border-color:var(--text);transform:scale(1.15);}
+.form-btn-row{display:flex;gap:8px;}
+.save-btn{flex:1;padding:10px;background:var(--blue);color:var(--white);border:none;border-radius:10px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;}
+.cancel-btn{padding:10px 16px;background:var(--bg);color:var(--muted);border:1px solid var(--border);border-radius:10px;font-size:14px;cursor:pointer;}
 
-.week-card { background: var(--blue); border-radius: 16px; padding: 1.25rem 1.25rem 1rem; margin-bottom: 1.25rem; }
-.week-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1rem; }
-.week-title { font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1.5px; color: var(--white); }
-.reward-badge { background: var(--gold); color: #3d2e00; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
-.days-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 1rem; }
-.day-cell { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-.day-label { font-size: 10px; font-weight: 600; color: var(--blue-pale); text-transform: uppercase; letter-spacing: 0.06em; }
-.day-bubble { width: 36px; height: 36px; border-radius: 50%; background: var(--blue-deep); border: 2px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: transparent; transition: all 0.2s; }
-.day-bubble.done { background: var(--white); border-color: var(--white); color: var(--blue); }
-.day-bubble.pending-day { border-color: var(--gold); color: var(--gold); }
-.day-bubble.today-empty { border-color: rgba(255,255,255,0.45); border-style: dashed; }
-.progress-row { display: flex; align-items: center; gap: 10px; }
-.progress-track { flex: 1; height: 8px; background: var(--blue-deep); border-radius: 4px; overflow: hidden; }
-.progress-fill { height: 100%; background: var(--white); border-radius: 4px; transition: width 0.5s ease; }
-.progress-fill.goal-met { background: var(--gold); }
-.progress-label { font-size: 12px; font-weight: 600; color: var(--blue-pale); white-space: nowrap; }
+/* BACK BAR */
+.back-bar{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;}
+.back-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--blue);cursor:pointer;}
+.active-name{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1px;}
+.active-avatar{width:28px;height:28px;border-radius:50%;color:var(--white);font-family:'Anton',sans-serif;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
-.status-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
-.streak-info { display: flex; align-items: baseline; gap: 6px; }
-.streak-num { font-family: 'Anton', sans-serif; font-size: 40px; color: var(--blue); line-height: 1; }
-.streak-text { font-size: 13px; color: var(--muted); }
-.status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
-.status-pill.locked { background: #fde8e8; color: var(--red); border: 1.5px solid #f5b8b8; }
-.status-pill.unlocked { background: #d4f0e0; color: var(--green); border: 1.5px solid #9dd9b8; }
-.status-pill.pending { background: #fef3d6; color: var(--amber); border: 1.5px solid #f5d68a; }
-.s-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+/* WEEK CARD */
+.week-card{background:var(--blue);border-radius:16px;padding:1.25rem 1.25rem 1rem;margin-bottom:1.25rem;}
+.week-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1rem;}
+.week-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1.5px;color:var(--white);}
+.reward-badge{background:var(--gold);color:#3d2e00;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+.days-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:1rem;}
+.day-cell{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.day-label{font-size:10px;font-weight:600;color:var(--blue-pale);text-transform:uppercase;letter-spacing:.06em;}
+.day-bubble{width:36px;height:36px;border-radius:50%;background:var(--blue-deep);border:2px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:transparent;transition:all .2s;}
+.day-bubble.done{background:var(--white);border-color:var(--white);color:var(--blue);}
+.day-bubble.pending-day{border-color:var(--gold);color:var(--gold);}
+.day-bubble.today-empty{border-color:rgba(255,255,255,.45);border-style:dashed;}
+.progress-row{display:flex;align-items:center;gap:10px;}
+.progress-track{flex:1;height:8px;background:var(--blue-deep);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--white);border-radius:4px;transition:width .5s ease;}
+.progress-fill.goal-met{background:var(--gold);}
+.progress-label{font-size:12px;font-weight:600;color:var(--blue-pale);white-space:nowrap;}
 
-.reward-banner { background: #fef3d6; border: 2px solid var(--gold); border-radius: 14px; padding: 1.1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 12px; }
-.reward-title { font-family: 'Anton', sans-serif; font-size: 19px; letter-spacing: 1px; color: #3d2e00; }
-.reward-desc { font-size: 12px; color: #7a5c00; margin-top: 2px; }
+/* STATUS */
+.status-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.streak-info{display:flex;align-items:baseline;gap:6px;}
+.streak-num{font-family:'Anton',sans-serif;font-size:40px;color:var(--blue);line-height:1;}
+.streak-text{font-size:13px;color:var(--muted);}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.status-pill.locked{background:#fde8e8;color:var(--red);border:1.5px solid #f5b8b8;}
+.status-pill.unlocked{background:#d4f0e0;color:var(--green);border:1.5px solid #9dd9b8;}
+.status-pill.pending{background:#fef3d6;color:var(--amber);border:1.5px solid #f5d68a;}
+.s-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
 
-.section-title { font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; color: var(--text); margin-bottom: 0.85rem; }
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem; margin-bottom: 0.85rem; }
-.field-label { font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.06em; }
+/* REWARD */
+.reward-banner{background:#fef3d6;border:2px solid var(--gold);border-radius:14px;padding:1.1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:12px;}
+.reward-title{font-family:'Anton',sans-serif;font-size:19px;letter-spacing:1px;color:#3d2e00;}
+.reward-desc{font-size:12px;color:#7a5c00;margin-top:2px;}
 
-.upload-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 1.75rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
-.upload-zone:hover { border-color: var(--blue); background: #eef5fc; }
-.upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-.upload-icon { font-size: 28px; margin-bottom: 6px; color: var(--muted); }
-.upload-text { font-size: 13px; color: var(--muted); }
-.upload-text strong { color: var(--blue); }
-.preview-wrap { position: relative; margin-top: 10px; }
-.preview-wrap img, .preview-wrap video { width: 100%; border-radius: 10px; max-height: 260px; object-fit: cover; display: block; }
-.remove-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.55); border: none; color: white; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+/* FORM */
+.section-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1px;color:var(--text);margin-bottom:.85rem;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.1rem;margin-bottom:.85rem;}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em;}
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:1.75rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+.upload-zone:hover{border-color:var(--blue);background:#eef5fc;}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:28px;margin-bottom:6px;color:var(--muted);}
+.upload-text{font-size:13px;color:var(--muted);}
+.upload-text strong{color:var(--blue);}
+.preview-wrap{position:relative;margin-top:10px;}
+.preview-wrap img,.preview-wrap video{width:100%;border-radius:10px;max-height:260px;object-fit:cover;display:block;}
+.remove-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.compress-status{margin-top:8px;font-size:12px;color:var(--muted);text-align:center;padding:6px;background:var(--bg);border-radius:8px;}
+.compress-status.done{color:var(--green);}
+textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;resize:none;outline:none;transition:border-color .2s;}
+textarea:focus{border-color:var(--blue);}
+.checklist{display:flex;flex-direction:column;gap:7px;}
+.check-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:10px;cursor:pointer;border:1.5px solid var(--border);transition:all .15s;}
+.check-item.checked{border-color:var(--blue);background:#eef5fc;}
+.check-box{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.check-item.checked .check-box{background:var(--blue);border-color:var(--blue);}
+.check-mark{color:#fff;font-size:11px;font-weight:700;display:none;}
+.check-item.checked .check-mark{display:block;}
+.check-label{font-size:14px;}
+.submit-btn{width:100%;padding:15px;background:var(--blue);color:var(--white);border:none;border-radius:12px;font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;cursor:pointer;transition:all .2s;margin-top:.25rem;}
+.submit-btn:hover{background:var(--blue-light);}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
 
-.compress-status { margin-top: 8px; font-size: 12px; color: var(--muted); text-align: center; padding: 6px; background: var(--bg); border-radius: 8px; }
-.compress-status.done { color: var(--green); }
-.compress-status.error { color: var(--amber); }
+/* CONFIRM CARDS */
+.confirm-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:1.5rem;text-align:center;margin-bottom:1rem;}
+.confirm-icon{font-size:36px;margin-bottom:10px;}
+.confirm-title{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:4px;}
+.confirm-sub{font-size:13px;color:var(--muted);}
 
-textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; resize: none; outline: none; transition: border-color 0.2s; }
-textarea:focus { border-color: var(--blue); }
+/* HISTORY */
+.history-item{display:flex;align-items:center;gap:12px;padding:11px 12px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:7px;}
+.history-thumb{width:50px;height:50px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--bg);}
+.history-thumb-vid{width:50px;height:50px;border-radius:8px;background:var(--blue-pale);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.history-info{flex:1;min-width:0;}
+.history-date{font-size:13px;font-weight:600;}
+.history-note{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.delete-btn{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px 6px;border-radius:6px;flex-shrink:0;}
+.delete-btn:hover{background:#fde8e8;color:var(--red);}
 
-.checklist { display: flex; flex-direction: column; gap: 7px; }
-.check-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg); border-radius: 10px; cursor: pointer; border: 1.5px solid var(--border); transition: all 0.15s; }
-.check-item.checked { border-color: var(--blue); background: #eef5fc; }
-.check-box { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
-.check-item.checked .check-box { background: var(--blue); border-color: var(--blue); }
-.check-mark { color: white; font-size: 11px; font-weight: 700; display: none; }
-.check-item.checked .check-mark { display: block; }
-.check-label { font-size: 14px; }
-
-.submit-btn { width: 100%; padding: 15px; background: var(--blue); color: var(--white); border: none; border-radius: 12px; font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; margin-top: 0.25rem; }
-.submit-btn:hover { background: var(--blue-light); }
-.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.confirm-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; }
-.confirm-icon { font-size: 36px; margin-bottom: 10px; }
-.confirm-title { font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 4px; }
-.confirm-sub { font-size: 13px; color: var(--muted); }
-
-.history-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 7px; }
-.history-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--bg); }
-.history-thumb-vid { width: 50px; height: 50px; border-radius: 8px; background: var(--blue-pale); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-.history-info { flex: 1; min-width: 0; }
-.history-date { font-size: 13px; font-weight: 600; }
-.history-note { font-size: 12px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.delete-btn { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 6px; flex-shrink: 0; transition: all 0.15s; }
-.delete-btn:hover { background: #fde8e8; color: var(--red); }
-
-.child-switcher { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
-.child-tab { display: flex; align-items: center; gap: 7px; padding: 7px 14px; background: var(--card); border: 1.5px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s; color: var(--text); }
-.child-tab:hover { border-color: var(--blue); }
-.child-tab.active { background: var(--blue); color: var(--white); border-color: var(--blue); }
-.child-tab-avatar { width: 20px; height: 20px; border-radius: 50%; font-family: 'Anton', sans-serif; font-size: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--white); }
-
-.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
-.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
-.stat-num { font-family: 'Anton', sans-serif; font-size: 34px; color: var(--blue); line-height: 1; }
-.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 2px; }
-
-.pending-card { background: var(--card); border: 2px solid var(--amber); border-radius: 16px; padding: 1.1rem; margin-bottom: 1rem; }
-.pending-time { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
-.pending-media { width: 100%; border-radius: 10px; max-height: 280px; object-fit: cover; margin: 8px 0; display: block; }
-.checks-row { margin-bottom: 8px; }
-.check-tag { display: inline-block; background: var(--blue-pale); color: var(--blue); border-radius: 6px; padding: 3px 9px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; }
-.pending-note { font-size: 13px; color: var(--muted); font-style: italic; margin-bottom: 12px; }
-.action-row { display: flex; gap: 8px; }
-.qustodio-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; background: #f4f8fc; color: var(--blue); border: 1.5px solid var(--border); border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; margin-top: 8px; text-decoration: none; }
-.qustodio-btn:hover { background: var(--blue-pale); border-color: var(--blue); }
-.qustodio-btn-wrap { display: none; margin-top: 0; }
-.approve-btn { flex: 1; padding: 13px; background: var(--blue); color: var(--white); border: none; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; }
-.approve-btn:hover { background: var(--blue-light); }
-.deny-btn { flex: 1; padding: 13px; background: #fde8e8; color: var(--red); border: 1.5px solid #f5b8b8; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 1px; cursor: pointer; }
-.deny-btn:hover { background: #fbd4d4; }
-
-.notif-banner { background: var(--blue-pale); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--blue-deep); }
-.notif-banner button { margin-left: auto; padding: 5px 12px; background: var(--blue); color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-
-.empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--muted); }
-.empty-icon { font-size: 36px; margin-bottom: 10px; }
-.empty-text { font-size: 14px; line-height: 1.6; }
-.divider-line { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--blue); color: var(--white); padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; transition: transform 0.3s ease; z-index: 999; border: 2px solid var(--blue-deep); max-width: 88vw; text-align: center; }
-.toast.show { transform: translateX(-50%) translateY(0); }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.pending-pulse { animation: pulse 2s infinite; }
-
+/* PARENT */
+.child-switcher{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;}
+.child-tab{display:flex;align-items:center;gap:7px;padding:7px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s;color:var(--text);}
+.child-tab.active{background:var(--blue);color:var(--white);border-color:var(--blue);}
+.child-tab-avatar{width:20px;height:20px;border-radius:50%;font-family:'Anton',sans-serif;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--white);}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;}
+.stat-num{font-family:'Anton',sans-serif;font-size:34px;color:var(--blue);line-height:1;}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;}
+.pending-card{background:var(--card);border:2px solid var(--amber);border-radius:16px;padding:1.1rem;margin-bottom:1rem;}
+.pending-time{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.pending-media{width:100%;border-radius:10px;max-height:280px;object-fit:cover;margin:8px 0;display:block;}
+.checks-row{margin-bottom:8px;}
+.check-tag{display:inline-block;background:var(--blue-pale);color:var(--blue);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;margin:2px 3px 2px 0;}
+.pending-note{font-size:13px;color:var(--muted);font-style:italic;margin-bottom:12px;}
+.action-row{display:flex;gap:8px;}
+.approve-btn{flex:1;padding:13px;background:var(--blue);color:var(--white);border:none;border-radius:10px;font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1px;cursor:pointer;}
+.deny-btn{flex:1;padding:13px;background:#fde8e8;color:var(--red);border:1.5px solid #f5b8b8;border-radius:10px;font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1px;cursor:pointer;}
+.notif-banner{background:var(--blue-pale);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--blue-deep);}
+.notif-banner button{margin-left:auto;padding:5px 12px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.qustodio-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:var(--bg);color:var(--blue);border:1.5px solid var(--border);border-radius:10px;font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1px;cursor:pointer;transition:all .2s;margin-top:8px;text-decoration:none;}
+.qustodio-btn:hover{background:var(--blue-pale);border-color:var(--blue);}
+.qustodio-btn-wrap{display:none;margin-top:0;}
+.empty-state{text-align:center;padding:2.5rem 1rem;color:var(--muted);}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+.empty-text{font-size:14px;line-height:1.6;}
+.divider-line{border:none;border-top:1px solid var(--border);margin:1.25rem 0;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--blue);color:var(--white);padding:12px 24px;border-radius:30px;font-weight:600;font-size:14px;transition:transform .3s ease;z-index:999;border:2px solid var(--blue-deep);max-width:88vw;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pending-pulse{animation:pulse 2s infinite;}
 </style>
 </head>
 <body>
@@ -193,10 +204,7 @@ textarea:focus { border-color: var(--blue); }
 
 <!-- KID VIEW -->
 <div id="view-kid" class="view active">
-  <div id="kid-loading" class="loading-screen">
-    <div class="spinner"></div>
-    <div class="loading-text">Loading...</div>
-  </div>
+  <div id="kid-loading" class="loading-screen"><div class="spinner"></div><div class="loading-text">Loading...</div></div>
 
   <div id="kid-picker" class="picker-wrap" style="display:none;">
     <div class="picker-title">WHO'S WORKING OUT?</div>
@@ -221,54 +229,35 @@ textarea:focus { border-color: var(--blue); }
       <div class="active-avatar" id="kid-active-avatar"></div>
       <div class="active-name" id="kid-active-name"></div>
     </div>
-
     <div class="week-card">
-      <div class="week-header">
-        <div class="week-title">THIS WEEK</div>
-        <div class="reward-badge" id="kid-reward-badge">5 days = $20</div>
-      </div>
+      <div class="week-header"><div class="week-title">THIS WEEK</div><div class="reward-badge" id="kid-reward-badge">5 days = $20</div></div>
       <div class="days-row" id="kid-week-days"></div>
-      <div class="progress-row">
-        <div class="progress-track"><div class="progress-fill" id="kid-progress-fill" style="width:0%"></div></div>
-        <div class="progress-label" id="kid-progress-label">0 / 5</div>
-      </div>
+      <div class="progress-row"><div class="progress-track"><div class="progress-fill" id="kid-progress-fill" style="width:0%"></div></div><div class="progress-label" id="kid-progress-label">0 / 5</div></div>
     </div>
-
     <div class="status-row">
-      <div class="streak-info">
-        <div class="streak-num" id="kid-streak">0</div>
-        <div class="streak-text">day streak</div>
-      </div>
+      <div class="streak-info"><div class="streak-num" id="kid-streak">0</div><div class="streak-text">day streak</div></div>
       <div id="kid-status-pill" class="status-pill locked"><span class="s-dot"></span> Internet Locked</div>
     </div>
-
     <div id="kid-reward-banner" style="display:none;" class="reward-banner">
       <div style="font-size:30px;flex-shrink:0;">&#127942;</div>
-      <div>
-        <div class="reward-title">$20 REWARD EARNED!</div>
-        <div class="reward-desc" id="kid-reward-desc">You hit 5 workouts this week!</div>
-      </div>
+      <div><div class="reward-title">$20 REWARD EARNED!</div><div class="reward-desc" id="kid-reward-desc">You hit 5 workouts this week!</div></div>
     </div>
-
     <div id="kid-submitted-msg" style="display:none;" class="confirm-card">
       <div class="confirm-icon">&#9203;</div>
       <div class="confirm-title" style="color:var(--amber);">PROOF SUBMITTED</div>
       <div class="confirm-sub">Waiting on your parent to review. Sit tight.</div>
     </div>
-
     <div id="kid-unlocked-msg" style="display:none;" class="confirm-card">
       <div class="confirm-icon">&#127881;</div>
       <div class="confirm-title" style="color:var(--green);">YOU'RE UNLOCKED!</div>
       <div class="confirm-sub">Nice work today. Go enjoy your internet.</div>
     </div>
-
     <div id="kid-denied-msg" style="display:none;" class="confirm-card">
       <div class="confirm-icon">&#10060;</div>
       <div class="confirm-title" style="color:var(--red);">PROOF DENIED</div>
-      <div class="confirm-sub">Your parent rejected your submission. Take a better photo or video and resubmit.</div>
-      <button onclick="resetForResubmit()" style="margin-top:1rem;padding:10px 24px;background:var(--blue);color:white;border:none;border-radius:10px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;width:100%;">TRY AGAIN</button>
+      <div class="confirm-sub">Your parent rejected your submission. Take a better photo or video and try again.</div>
+      <button onclick="resetForResubmit()" style="margin-top:1rem;padding:10px 24px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;width:100%;">TRY AGAIN</button>
     </div>
-
     <div id="kid-form">
       <div class="section-title">Submit today's proof</div>
       <div class="card">
@@ -279,9 +268,7 @@ textarea:focus { border-color: var(--blue); }
           <div class="upload-text"><strong>Tap to upload</strong> or drop here</div>
           <div class="upload-text" style="font-size:12px;margin-top:4px;">Photo or short video</div>
         </div>
-        <div class="preview-wrap" id="kid-preview-wrap" style="display:none;">
-          <button class="remove-btn" onclick="removeFile()">&#10005;</button>
-        </div>
+        <div class="preview-wrap" id="kid-preview-wrap" style="display:none;"><button class="remove-btn" onclick="removeFile()">&#10005;</button></div>
         <div class="compress-status" id="compress-status" style="display:none;"></div>
       </div>
       <div class="card">
@@ -299,7 +286,6 @@ textarea:focus { border-color: var(--blue); }
       </div>
       <button class="submit-btn" id="submit-btn" onclick="submitProof()">SUBMIT PROOF</button>
     </div>
-
     <hr class="divider-line" style="margin-top:1.5rem;">
     <div class="section-title">My history</div>
     <div id="kid-history-list"></div>
@@ -308,227 +294,227 @@ textarea:focus { border-color: var(--blue); }
 
 <!-- PARENT VIEW -->
 <div id="view-parent" class="view">
-  <div id="parent-loading" class="loading-screen">
-    <div class="spinner"></div>
-    <div class="loading-text">Loading...</div>
-  </div>
-  <div id="parent-content" style="display:none;">
-        <div id="notif-banner" class="notif-banner" style="display:none;">
-      <span>&#128276; Get notified when proof is submitted</span>
-      <button onclick="requestNotifPermission()">Enable</button>
-    </div>
-    
-    <div id="parent-no-children" style="display:none;" class="empty-state">
-      <div class="empty-icon">&#128100;</div>
-      <div class="empty-text">No kids added yet.<br>Have them pick their name on the My View tab first.</div>
-    </div>
-    <div id="parent-main" style="display:none;">
-      <div class="child-switcher" id="parent-child-switcher"></div>
-      <div class="week-card">
-        <div class="week-header">
-          <div class="week-title" id="p-week-title">THIS WEEK</div>
-          <div class="reward-badge" id="p-reward-badge">5 days = $20</div>
-        </div>
-        <div class="days-row" id="p-week-days"></div>
-        <div class="progress-row">
-          <div class="progress-track"><div class="progress-fill" id="p-progress-fill" style="width:0%"></div></div>
-          <div class="progress-label" id="p-progress-label">0 / 5</div>
-        </div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-num" id="p-streak">0</div><div class="stat-label">Streak</div></div>
-        <div class="stat-card"><div class="stat-num" id="p-total">0</div><div class="stat-label">Total days</div></div>
-        <div class="stat-card"><div class="stat-num" id="p-rewards">0</div><div class="stat-label">$20 rewards</div></div>
-      </div>
-      <div id="p-pending-section" style="display:none;">
-        <div class="section-title" style="color:var(--amber);">&#9889; Pending review</div>
-        <div id="p-pending-wrap"></div>
-      </div>
-      <div id="p-qustodio-wrap" class="qustodio-btn-wrap">
-        <a href="https://family.qustodio.com" class="qustodio-btn" id="p-qustodio-btn" target="_blank">
-          &#128274; OPEN QUSTODIO
-        </a>
-        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:6px;">Opens Qustodio — toggle internet from there</div>
-      </div>
 
-      <div id="p-no-pending" class="empty-state">
-        <div class="empty-icon">&#128526;</div>
-        <div class="empty-text">No submissions waiting.<br>Check back after they work out.</div>
+  <!-- PIN GATE: always shown first, hidden after correct PIN -->
+  <div id="pin-gate" class="pin-gate">
+    <div class="pin-gate-title">PARENT ACCESS</div>
+    <div class="pin-gate-sub">Enter your PIN to continue</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-btn" onclick="gpKey('1')">1</button>
+      <button class="pin-btn" onclick="gpKey('2')">2</button>
+      <button class="pin-btn" onclick="gpKey('3')">3</button>
+      <button class="pin-btn" onclick="gpKey('4')">4</button>
+      <button class="pin-btn" onclick="gpKey('5')">5</button>
+      <button class="pin-btn" onclick="gpKey('6')">6</button>
+      <button class="pin-btn" onclick="gpKey('7')">7</button>
+      <button class="pin-btn" onclick="gpKey('8')">8</button>
+      <button class="pin-btn" onclick="gpKey('9')">9</button>
+      <button class="pin-btn sm" onclick="gpDel()">&#9003;</button>
+      <button class="pin-btn" onclick="gpKey('0')">0</button>
+      <button class="pin-btn sm" onclick="gpClr()">CLR</button>
+    </div>
+    <div class="pin-err" id="pin-err"></div>
+    <div class="pin-forgot" onclick="gpForgot()">Forgot PIN?</div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);width:100%;max-width:260px;margin-left:auto;margin-right:auto;">
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em;">Change PIN</div>
+      <input id="cp-cur" type="password" maxlength="4" placeholder="Current PIN" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px;text-align:center;letter-spacing:6px;font-size:18px;margin-bottom:6px;outline:none;font-family:'DM Sans',sans-serif;">
+      <input id="cp-new" type="password" maxlength="4" placeholder="New PIN" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px;text-align:center;letter-spacing:6px;font-size:18px;margin-bottom:6px;outline:none;font-family:'DM Sans',sans-serif;">
+      <input id="cp-con" type="password" maxlength="4" placeholder="Confirm PIN" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:8px;text-align:center;letter-spacing:6px;font-size:18px;margin-bottom:8px;outline:none;font-family:'DM Sans',sans-serif;">
+      <div id="cp-err" style="color:var(--red);font-size:12px;min-height:16px;margin-bottom:6px;"></div>
+      <button onclick="savePin()" style="width:100%;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;">SAVE NEW PIN</button>
+    </div>
+  </div>
+
+  <!-- PARENT DASHBOARD: hidden until PIN correct -->
+  <div id="parent-dashboard" style="display:none;">
+    <div id="parent-loading" class="loading-screen"><div class="spinner"></div><div class="loading-text">Loading...</div></div>
+    <div id="parent-content" style="display:none;">
+      <div id="notif-banner" class="notif-banner" style="display:none;">
+        <span>&#128276; Get notified when proof is submitted</span>
+        <button onclick="requestNotifPermission()">Enable</button>
       </div>
-      <hr class="divider-line">
-      <div class="section-title">Approval history</div>
-      <div id="p-history-list"></div>
+      <div id="parent-no-children" style="display:none;" class="empty-state">
+        <div class="empty-icon">&#128100;</div>
+        <div class="empty-text">No kids added yet.<br>Have them pick their name on the My View tab first.</div>
+      </div>
+      <div id="parent-main" style="display:none;">
+        <div class="child-switcher" id="parent-child-switcher"></div>
+        <div class="week-card">
+          <div class="week-header"><div class="week-title" id="p-week-title">THIS WEEK</div><div class="reward-badge" id="p-reward-badge">5 days = $20</div></div>
+          <div class="days-row" id="p-week-days"></div>
+          <div class="progress-row"><div class="progress-track"><div class="progress-fill" id="p-progress-fill" style="width:0%"></div></div><div class="progress-label" id="p-progress-label">0 / 5</div></div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-num" id="p-streak">0</div><div class="stat-label">Streak</div></div>
+          <div class="stat-card"><div class="stat-num" id="p-total">0</div><div class="stat-label">Total days</div></div>
+          <div class="stat-card"><div class="stat-num" id="p-rewards">0</div><div class="stat-label">$20 rewards</div></div>
+        </div>
+        <div id="p-pending-section" style="display:none;">
+          <div class="section-title" style="color:var(--amber);">&#9889; Pending review</div>
+          <div id="p-pending-wrap"></div>
+        </div>
+        <div id="p-no-pending" class="empty-state">
+          <div class="empty-icon">&#128526;</div>
+          <div class="empty-text">No submissions waiting.<br>Check back after they work out.</div>
+        </div>
+        <div id="p-qustodio-wrap" class="qustodio-btn-wrap">
+          <a href="https://family.qustodio.com" class="qustodio-btn" target="_blank">&#128274; OPEN QUSTODIO</a>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:6px;">Opens Qustodio — toggle internet from there</div>
+        </div>
+        <hr class="divider-line">
+        <div class="section-title">Approval history</div>
+        <div id="p-history-list"></div>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
 // ── FIREBASE ──
 firebase.initializeApp({
-  apiKey: "AIzaSyCF9Edprk9FwL5Y6S3eTLwOVhB5nNMxN-8",
-  authDomain: "gympass-3255a.firebaseapp.com",
-  projectId: "gympass-3255a",
-  storageBucket: "gympass-3255a.firebasestorage.app",
-  messagingSenderId: "184335729314",
-  appId: "1:184335729314:web:84f3452d7891089bbf4dfb"
+  apiKey:'AIzaSyCF9Edprk9FwL5Y6S3eTLwOVhB5nNMxN-8',
+  authDomain:'gympass-3255a.firebaseapp.com',
+  projectId:'gympass-3255a',
+  storageBucket:'gympass-3255a.firebasestorage.app',
+  messagingSenderId:'184335729314',
+  appId:'1:184335729314:web:84f3452d7891089bbf4dfb'
 });
 const db = firebase.firestore();
 
 // ── CONSTANTS ──
-const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const GOAL = 5;
-const COLORS = ['#005A9C','#1a8a4a','#c0392b','#8e44ad','#d4880a','#16a085','#c77dff','#2c3e50','#b5451b'];
-const MAX_IMAGE_PX = 900;    // max width/height in pixels
-const IMAGE_QUALITY = 0.72;  // JPEG quality 0-1
-const MAX_KB = 700;          // target max size in KB
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const GOAL=5;
+const COLORS=['#005A9C','#1a8a4a','#c0392b','#8e44ad','#d4880a','#16a085','#c77dff','#2c3e50','#b5451b'];
+const MAX_IMAGE_PX=900, IMAGE_QUALITY=0.72, MAX_KB=700;
 
-let activeKidId = null;
-let activeParentId = null;
-let compressedFileData = null; // compressed base64 ready to save
-let compressedFileType = null;
-let selectedColor = COLORS[0];
-let kidsCache = [];
-let unsubscribeListener = null;
-let knownPendingIds = new Set();
-let firstLoad = true;
+let activeKidId=null, activeParentId=null;
+let compressedFileData=null, compressedFileType=null;
+let selectedColor=COLORS[0];
+let kidsCache=[];
+let unsubscribeListener=null, unsubscribeKidListener=null;
+let knownPendingIds=new Set(), firstLoad=true;
+let lastKnownTodayStatus=null;
+
+// ── PIN ──
+const PIN_RECOVERY='1965';
+let PIN_CURRENT='1234'; // default — overwritten from Firestore on load
+let gpEntry='';
+
+// Load PIN from Firestore at startup
+db.collection('gympass_settings').doc('pin').get().then(d=>{
+  if(d.exists && d.data().value) PIN_CURRENT=d.data().value;
+}).catch(()=>{});
+
+function gpKey(digit){
+  if(gpEntry.length>=4) return;
+  gpEntry+=digit;
+  gpUpdateDots();
+  document.getElementById('pin-err').textContent='';
+  if(gpEntry.length===4){
+    var entered=gpEntry;
+    gpEntry='';
+    gpUpdateDots();
+    if(entered===PIN_CURRENT||entered===PIN_RECOVERY){
+      document.getElementById('pin-gate').style.display='none';
+      document.getElementById('parent-dashboard').style.display='block';
+      initParentView();
+    } else {
+      document.getElementById('pin-err').textContent='Incorrect PIN — try again';
+    }
+  }
+}
+function gpUpdateDots(){
+  for(var i=0;i<4;i++){
+    var d=document.getElementById('pd'+i);
+    if(d){d.style.background=i<gpEntry.length?'var(--blue)':'transparent';d.style.borderColor=i<gpEntry.length?'var(--blue)':'var(--border)';}
+  }
+}
+function gpDel(){gpEntry=gpEntry.slice(0,-1);gpUpdateDots();}
+function gpClr(){gpEntry='';gpUpdateDots();}
+function gpForgot(){alert('Your recovery code is: 1965\nEnter it as your Current PIN to change your PIN.');}
+
+async function savePin(){
+  var cur=document.getElementById('cp-cur').value.trim();
+  var np=document.getElementById('cp-new').value.trim();
+  var cn=document.getElementById('cp-con').value.trim();
+  var errEl=document.getElementById('cp-err');
+  if(cur!==PIN_CURRENT&&cur!==PIN_RECOVERY){errEl.textContent='Incorrect current PIN.';return;}
+  if(!/^[0-9]{4}$/.test(np)){errEl.textContent='Must be exactly 4 digits.';return;}
+  if(np!==cn){errEl.textContent='PINs do not match.';return;}
+  if(np===PIN_RECOVERY){errEl.textContent='Cannot use recovery code as PIN.';return;}
+  try{
+    await db.collection('gympass_settings').doc('pin').set({value:np});
+    PIN_CURRENT=np;
+    document.getElementById('cp-cur').value='';
+    document.getElementById('cp-new').value='';
+    document.getElementById('cp-con').value='';
+    errEl.textContent='';
+    showToast('PIN updated!');
+  }catch(e){errEl.textContent='Error saving. Check connection.';}
+}
 
 // ── HELPERS ──
-function todayStr() { return new Date().toISOString().split('T')[0]; }
-function formatDate(iso) {
-  return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-}
-function getWeekDates() {
-  const now=new Date(),dow=now.getDay();
-  return Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-dow+i);return d.toISOString().split('T')[0];});
-}
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function formatDate(iso){return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
+function getWeekDates(){const now=new Date(),dow=now.getDay();return Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-dow+i);return d.toISOString().split('T')[0];});}
 function initials(name){return name.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
-function weekApprovedCount(kid){
-  const week=getWeekDates();
-  return (kid.submissions||[]).filter(s=>week.includes(s.date)&&s.status==='approved').length;
-}
-function formatKB(bytes){return Math.round(bytes/1024)+'KB';}
-
-// ── IMAGE COMPRESSION ──
-function compressImage(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        // Calculate new dimensions
-        let w = img.width, h = img.height;
-        if (w > MAX_IMAGE_PX || h > MAX_IMAGE_PX) {
-          if (w > h) { h = Math.round(h * MAX_IMAGE_PX / w); w = MAX_IMAGE_PX; }
-          else { w = Math.round(w * MAX_IMAGE_PX / h); h = MAX_IMAGE_PX; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        // Try progressively lower quality until under MAX_KB
-        let quality = IMAGE_QUALITY;
-        let dataUrl = canvas.toDataURL('image/jpeg', quality);
-        while (dataUrl.length * 0.75 > MAX_KB * 1024 && quality > 0.3) {
-          quality -= 0.08;
-          dataUrl = canvas.toDataURL('image/jpeg', quality);
-        }
-        resolve({ dataUrl, originalKB: Math.round(file.size/1024), compressedKB: Math.round(dataUrl.length*0.75/1024) });
-      };
-      img.onerror = reject;
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-// For videos — grab a thumbnail frame and store that + a flag
-function captureVideoThumbnail(file) {
-  return new Promise((resolve) => {
-    const video = document.createElement('video');
-    video.preload = 'metadata';
-    video.muted = true;
-    video.playsInline = true;
-    const url = URL.createObjectURL(file);
-    video.src = url;
-    video.onloadeddata = () => {
-      video.currentTime = 1; // seek to 1 second for thumbnail
-    };
-    video.onseeked = () => {
-      const canvas = document.createElement('canvas');
-      const w = Math.min(video.videoWidth, MAX_IMAGE_PX);
-      const h = Math.round(video.videoHeight * w / video.videoWidth);
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-      URL.revokeObjectURL(url);
-      resolve({ dataUrl, originalKB: Math.round(file.size/1024), compressedKB: Math.round(dataUrl.length*0.75/1024) });
-    };
-    video.onerror = () => {
-      URL.revokeObjectURL(url);
-      resolve(null);
-    };
-  });
-}
+function weekApprovedCount(kid){const week=getWeekDates();return(kid.submissions||[]).filter(s=>week.includes(s.date)&&s.status==='approved').length;}
 
 // ── FIRESTORE ──
-async function loadKids(){
-  const snap=await db.collection('gympass_kids').orderBy('createdAt').get();
-  return snap.docs.map(d=>({id:d.id,...d.data()}));
-}
-async function saveKidData(id,data){
-  await db.collection('gympass_kids').doc(id).set(data,{merge:true});
-}
-async function getKidDoc(id){
-  const doc=await db.collection('gympass_kids').doc(id).get();
-  return doc.exists?{id:doc.id,...doc.data()}:null;
-}
+async function loadKids(){const snap=await db.collection('gympass_kids').orderBy('createdAt').get();return snap.docs.map(d=>({id:d.id,...d.data()}));}
+async function saveKidData(id,data){await db.collection('gympass_kids').doc(id).set(data,{merge:true});}
+async function getKidDoc(id){const doc=await db.collection('gympass_kids').doc(id).get();return doc.exists?{id:doc.id,...doc.data()}:null;}
 
 // ── NOTIFICATIONS ──
-function checkNotifBanner(){
-  if('Notification' in window&&Notification.permission==='default'){
-    document.getElementById('notif-banner').style.display='flex';
-  }
-}
-function requestNotifPermission(){
-  Notification.requestPermission().then(p=>{
-    document.getElementById('notif-banner').style.display='none';
-    if(p==='granted') showToast('Notifications enabled!');
-  });
-}
-function sendNotification(title,body){
-  if('Notification' in window&&Notification.permission==='granted'){
-    new Notification(title,{body});
-  }
-}
+function checkNotifBanner(){if('Notification' in window&&Notification.permission==='default')document.getElementById('notif-banner').style.display='flex';}
+function requestNotifPermission(){Notification.requestPermission().then(p=>{document.getElementById('notif-banner').style.display='none';if(p==='granted')showToast('Notifications enabled!');});}
+function sendNotification(title,body){if('Notification' in window&&Notification.permission==='granted')new Notification(title,{body});}
 
-// ── REAL-TIME LISTENER ──
+// ── REAL-TIME LISTENERS ──
 function startParentListener(){
-  if(unsubscribeListener) unsubscribeListener();
+  if(unsubscribeListener)unsubscribeListener();
   unsubscribeListener=db.collection('gympass_kids').onSnapshot(snap=>{
     kidsCache=snap.docs.map(d=>({id:d.id,...d.data()}));
     const t=todayStr();
     if(!firstLoad){
       kidsCache.forEach(kid=>{
         const pending=(kid.submissions||[]).find(s=>s.date===t&&s.status==='pending');
-        if(pending){
-          const key=kid.id+'_'+t;
-          if(!knownPendingIds.has(key)){
-            knownPendingIds.add(key);
-            sendNotification('GymPass ⚡',kid.name+' submitted workout proof — tap to review!');
-          }
-        }
+        if(pending){const key=kid.id+'_'+t;if(!knownPendingIds.has(key)){knownPendingIds.add(key);sendNotification('GymPass ⚡',kid.name+' submitted workout proof — tap to review!');}}
       });
     }
     firstLoad=false;
-    if(document.getElementById('view-parent').classList.contains('active')){
-      renderParentFromCache();
-    }
+    if(document.getElementById('view-parent').classList.contains('active')&&document.getElementById('parent-dashboard').style.display!=='none')renderParentFromCache();
   });
 }
+
+function startKidListener(kidId){
+  if(unsubscribeKidListener)unsubscribeKidListener();
+  lastKnownTodayStatus=null;
+  unsubscribeKidListener=db.collection('gympass_kids').doc(kidId).onSnapshot(snap=>{
+    if(!snap.exists)return;
+    const kid={id:snap.id,...snap.data()};
+    const idx=kidsCache.findIndex(k=>k.id===kidId);
+    if(idx>=0)kidsCache[idx]=kid;else kidsCache.push(kid);
+    const t=todayStr();
+    const todaySub=(kid.submissions||[]).find(s=>s.date===t);
+    const newStatus=todaySub?todaySub.status:null;
+    if(lastKnownTodayStatus==='pending'&&newStatus==='denied'){sendNotification('GymPass ❌','Your proof was denied. Take a better photo and try again!');showToast('Your proof was denied — take another photo and try again.');}
+    if(lastKnownTodayStatus==='pending'&&newStatus==='approved'){sendNotification('GymPass ✅','Proof approved! You are unlocked for today.');showToast('Approved! You are unlocked for today.');}
+    lastKnownTodayStatus=newStatus;
+    if(document.getElementById('kid-active').style.display!=='none'&&activeKidId===kidId)renderKidActive(kid);
+  });
+}
+function stopKidListener(){if(unsubscribeKidListener){unsubscribeKidListener();unsubscribeKidListener=null;}lastKnownTodayStatus=null;}
 
 // ── KID PICKER ──
 async function initKidView(){
@@ -540,73 +526,46 @@ async function initKidView(){
   document.getElementById('kid-picker').style.display='block';
   renderKidPicker();
 }
-
 function renderKidPicker(){
   const grid=document.getElementById('kid-profile-grid');
   grid.innerHTML='';
   kidsCache.forEach(kid=>{
-    const btn=document.createElement('div');
-    btn.className='profile-btn';
+    const btn=document.createElement('div');btn.className='profile-btn';
     btn.innerHTML=`<div class="profile-avatar" style="background:${kid.color}">${initials(kid.name)}</div><div class="profile-name">${kid.name}</div><div class="profile-streak">${kid.streak||0} day streak</div>`;
-    btn.onclick=()=>selectKid(kid.id);
-    grid.appendChild(btn);
+    btn.onclick=()=>selectKid(kid.id);grid.appendChild(btn);
   });
-  const addBtn=document.createElement('div');
-  addBtn.className='add-profile-btn';
-  addBtn.innerHTML='<div style="font-size:24px;">+</div><div>Add name</div>';
-  addBtn.onclick=showKidAddForm;
-  grid.appendChild(addBtn);
+  const addBtn=document.createElement('div');addBtn.className='add-profile-btn';
+  addBtn.innerHTML='<div style="font-size:24px;">+</div><div>Add name</div>';addBtn.onclick=showKidAddForm;grid.appendChild(addBtn);
 }
-
 function showKidAddForm(){
   document.getElementById('kid-add-form').style.display='block';
   document.getElementById('kid-name-input').focus();
-  const row=document.getElementById('kid-color-row');
-  row.innerHTML='';
-  selectedColor=COLORS[0];
-  COLORS.forEach((c,i)=>{
-    const sw=document.createElement('div');
-    sw.className='color-swatch'+(i===0?' selected':'');
-    sw.style.background=c;
-    sw.onclick=()=>{selectedColor=c;document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));sw.classList.add('selected');};
-    row.appendChild(sw);
-  });
+  const row=document.getElementById('kid-color-row');row.innerHTML='';selectedColor=COLORS[0];
+  COLORS.forEach((c,i)=>{const sw=document.createElement('div');sw.className='color-swatch'+(i===0?' selected':'');sw.style.background=c;sw.onclick=()=>{selectedColor=c;document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));sw.classList.add('selected');};row.appendChild(sw);});
 }
-function hideKidAddForm(){
-  document.getElementById('kid-add-form').style.display='none';
-  document.getElementById('kid-name-input').value='';
-}
+function hideKidAddForm(){document.getElementById('kid-add-form').style.display='none';document.getElementById('kid-name-input').value='';}
 async function saveNewKid(){
   const name=document.getElementById('kid-name-input').value.trim();
   if(!name){showToast('Enter a name first!');return;}
   if(kidsCache.find(k=>k.name.toLowerCase()===name.toLowerCase())){showToast('That name is already added.');return;}
   const id='kid_'+Date.now();
   const kidData={name,color:selectedColor,streak:0,totalRewards:0,submissions:[],createdAt:new Date().toISOString()};
-  try{
-    await db.collection('gympass_kids').doc(id).set(kidData);
-    kidsCache.push({id,...kidData});
-    hideKidAddForm();
-    renderKidPicker();
-    showToast(name+' added!');
-  }catch(e){showToast('Error saving — check connection.');console.error(e);}
+  try{await db.collection('gympass_kids').doc(id).set(kidData);kidsCache.push({id,...kidData});hideKidAddForm();renderKidPicker();showToast(name+' added!');}
+  catch(e){showToast('Error saving — check connection.');console.error(e);}
 }
-
 async function selectKid(id){
   activeKidId=id;
   document.getElementById('kid-loading').style.display='flex';
   document.getElementById('kid-picker').style.display='none';
-  const kid=await getKidDoc(id);
-  if(!kid){showToast('Error loading profile.');return;}
-  const idx=kidsCache.findIndex(k=>k.id===id);
-  if(idx>=0) kidsCache[idx]=kid; else kidsCache.push(kid);
+  if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
+  const kid=await getKidDoc(id);if(!kid){showToast('Error loading profile.');return;}
+  const idx=kidsCache.findIndex(k=>k.id===id);if(idx>=0)kidsCache[idx]=kid;else kidsCache.push(kid);
   document.getElementById('kid-loading').style.display='none';
   document.getElementById('kid-active').style.display='block';
-  // ask kid for notification permission so they get denied alerts
-  if('Notification' in window && Notification.permission==='default') Notification.requestPermission();
   document.getElementById('kid-active-avatar').style.background=kid.color;
   document.getElementById('kid-active-avatar').textContent=initials(kid.name);
   document.getElementById('kid-active-name').textContent=kid.name.toUpperCase();
-  compressedFileData=null; compressedFileType=null;
+  compressedFileData=null;compressedFileType=null;
   document.getElementById('kid-preview-wrap').style.display='none';
   document.getElementById('kid-upload-zone').style.display='block';
   document.getElementById('kid-file-input').value='';
@@ -616,45 +575,57 @@ async function selectKid(id){
   renderKidActive(kid);
   startKidListener(id);
 }
+function backToKidPicker(){stopKidListener();activeKidId=null;document.getElementById('kid-active').style.display='none';document.getElementById('kid-picker').style.display='block';initKidView();}
 
-// ── KID REAL-TIME LISTENER ──
-let unsubscribeKidListener = null;
-let lastKnownTodayStatus = null;
-
-function startKidListener(kidId) {
-  if(unsubscribeKidListener) unsubscribeKidListener();
-  lastKnownTodayStatus = null;
-  unsubscribeKidListener = db.collection('gympass_kids').doc(kidId).onSnapshot(snap => {
-    if(!snap.exists) return;
-    const kid = {id: snap.id, ...snap.data()};
-    const idx = kidsCache.findIndex(k=>k.id===kidId);
-    if(idx>=0) kidsCache[idx]=kid; else kidsCache.push(kid);
-    const t = todayStr();
-    const todaySub = (kid.submissions||[]).find(s=>s.date===t);
-    const newStatus = todaySub ? todaySub.status : null;
-    // only notify if status changed from pending to denied
-    if(lastKnownTodayStatus === 'pending' && newStatus === 'denied') {
-      sendNotification('GymPass ❌', 'Your proof was denied. Take a better photo and try again!');
-      showToast('Your proof was denied — take another photo and try again.');
-    }
-    if(lastKnownTodayStatus === 'pending' && newStatus === 'approved') {
-      sendNotification('GymPass ✅', 'Proof approved! You are unlocked for today.');
-      showToast('Approved! You are unlocked for today.');
-    }
-    lastKnownTodayStatus = newStatus;
-    if(document.getElementById('kid-active').style.display !== 'none' && activeKidId === kidId) {
-      renderKidActive(kid);
-    }
+// ── WEEK DOTS ──
+function renderWeekDots(containerId,fillId,labelId,kid,badgeId){
+  const week=getWeekDates(),today=todayStr();
+  const container=document.getElementById(containerId);container.innerHTML='';
+  week.forEach(dateStr=>{
+    const sub=(kid.submissions||[]).find(s=>s.date===dateStr);
+    const cell=document.createElement('div');cell.className='day-cell';
+    const lbl=document.createElement('div');lbl.className='day-label';lbl.textContent=DAYS[new Date(dateStr+'T12:00:00').getDay()];
+    const bubble=document.createElement('div');bubble.className='day-bubble';
+    if(sub&&sub.status==='approved'){bubble.classList.add('done');bubble.textContent='✓';}
+    else if(sub&&sub.status==='pending'){bubble.classList.add('pending-day');bubble.textContent='?';}
+    else if(dateStr===today)bubble.classList.add('today-empty');
+    cell.appendChild(lbl);cell.appendChild(bubble);container.appendChild(cell);
   });
+  const cnt=weekApprovedCount(kid);
+  const fill=document.getElementById(fillId);fill.style.width=Math.min((cnt/GOAL)*100,100)+'%';
+  fill.className='progress-fill'+(cnt>=GOAL?' goal-met':'');
+  document.getElementById(labelId).textContent=cnt+' / '+GOAL;
+  if(badgeId)document.getElementById(badgeId).textContent=cnt>=GOAL?'🏆 $20 EARNED!':'5 days = $20 reward';
 }
 
-function stopKidListener() {
-  if(unsubscribeKidListener) { unsubscribeKidListener(); unsubscribeKidListener=null; }
-  lastKnownTodayStatus = null;
+// ── KID ACTIVE ──
+function renderKidActive(kid){
+  if(!kid){kid=kidsCache.find(k=>k.id===activeKidId);if(!kid)return;}
+  const t=todayStr(),todaySub=(kid.submissions||[]).find(s=>s.date===t);
+  document.getElementById('kid-streak').textContent=kid.streak||0;
+  renderWeekDots('kid-week-days','kid-progress-fill','kid-progress-label',kid,'kid-reward-badge');
+  const cnt=weekApprovedCount(kid);
+  document.getElementById('kid-reward-banner').style.display=cnt>=GOAL?'flex':'none';
+  const form=document.getElementById('kid-form'),subMsg=document.getElementById('kid-submitted-msg');
+  const unlMsg=document.getElementById('kid-unlocked-msg'),denMsg=document.getElementById('kid-denied-msg');
+  const pill=document.getElementById('kid-status-pill');
+  [form,subMsg,unlMsg,denMsg].forEach(el=>el.style.display='none');
+  if(todaySub&&todaySub.status==='approved'){unlMsg.style.display='block';pill.className='status-pill unlocked';pill.innerHTML='<span class="s-dot"></span> Unlocked Today';}
+  else if(todaySub&&todaySub.status==='pending'){subMsg.style.display='block';pill.className='status-pill pending';pill.innerHTML='<span class="s-dot pending-pulse"></span> Proof Pending';}
+  else if(todaySub&&todaySub.status==='denied'){denMsg.style.display='block';pill.className='status-pill locked';pill.innerHTML='<span class="s-dot"></span> Internet Locked';}
+  else{form.style.display='block';pill.className='status-pill locked';pill.innerHTML='<span class="s-dot"></span> Internet Locked';}
+  const list=document.getElementById('kid-history-list');
+  const past=(kid.submissions||[]).filter(s=>s.date!==t).slice(0,25);
+  if(!past.length){list.innerHTML='<div class="empty-state"><div class="empty-text" style="color:var(--muted)">Your workout history will show here.</div></div>';return;}
+  list.innerHTML=past.map(s=>{
+    const thumb=s.fileData?`<img class="history-thumb" src="${s.fileData}" onerror="this.style.display='none'">`:`<div class="history-thumb-vid">&#127909;</div>`;
+    const sc=s.status==='approved'?'unlocked':s.status==='denied'?'locked':'pending';
+    const sl=s.status==='approved'?'Approved':s.status==='denied'?'Denied':'Pending';
+    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks&&s.checks.length?s.checks.join(', '):'—')}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span></div>`;
+  }).join('');
 }
-
-function resetForResubmit() {
-  compressedFileData=null; compressedFileType=null;
+function resetForResubmit(){
+  compressedFileData=null;compressedFileType=null;
   document.getElementById('kid-preview-wrap').style.display='none';
   document.getElementById('kid-upload-zone').style.display='block';
   document.getElementById('kid-file-input').value='';
@@ -665,158 +636,59 @@ function resetForResubmit() {
   document.getElementById('kid-form').style.display='block';
 }
 
-function backToKidPicker(){
-  stopKidListener();
-  activeKidId=null;
-  document.getElementById('kid-active').style.display='none';
-  document.getElementById('kid-picker').style.display='block';
-  initKidView();
-}
-
-// ── WEEK DOTS ──
-function renderWeekDots(containerId,fillId,labelId,kid,badgeId){
-  const week=getWeekDates(),today=todayStr();
-  const container=document.getElementById(containerId);
-  container.innerHTML='';
-  week.forEach(dateStr=>{
-    const sub=(kid.submissions||[]).find(s=>s.date===dateStr);
-    const cell=document.createElement('div');cell.className='day-cell';
-    const lbl=document.createElement('div');lbl.className='day-label';
-    lbl.textContent=DAYS[new Date(dateStr+'T12:00:00').getDay()];
-    const bubble=document.createElement('div');bubble.className='day-bubble';
-    if(sub&&sub.status==='approved'){bubble.classList.add('done');bubble.textContent='✓';}
-    else if(sub&&sub.status==='pending'){bubble.classList.add('pending-day');bubble.textContent='?';}
-    else if(dateStr===today) bubble.classList.add('today-empty');
-    cell.appendChild(lbl);cell.appendChild(bubble);container.appendChild(cell);
+// ── IMAGE COMPRESSION ──
+function compressImage(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>MAX_IMAGE_PX||h>MAX_IMAGE_PX){if(w>h){h=Math.round(h*MAX_IMAGE_PX/w);w=MAX_IMAGE_PX;}else{w=Math.round(w*MAX_IMAGE_PX/h);h=MAX_IMAGE_PX;}}
+        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        let q=IMAGE_QUALITY,dataUrl=canvas.toDataURL('image/jpeg',q);
+        while(dataUrl.length*.75>MAX_KB*1024&&q>0.3){q-=0.08;dataUrl=canvas.toDataURL('image/jpeg',q);}
+        resolve({dataUrl,originalKB:Math.round(file.size/1024),compressedKB:Math.round(dataUrl.length*.75/1024)});
+      };img.onerror=reject;img.src=e.target.result;
+    };reader.onerror=reject;reader.readAsDataURL(file);
   });
-  const cnt=weekApprovedCount(kid);
-  const fill=document.getElementById(fillId);
-  fill.style.width=Math.min((cnt/GOAL)*100,100)+'%';
-  fill.className='progress-fill'+(cnt>=GOAL?' goal-met':'');
-  document.getElementById(labelId).textContent=cnt+' / '+GOAL;
-  if(badgeId) document.getElementById(badgeId).textContent=cnt>=GOAL?'🏆 $20 EARNED!':'5 days = $20 reward';
 }
-
-// ── KID ACTIVE RENDER ──
-function renderKidActive(kid){
-  if(!kid){kid=kidsCache.find(k=>k.id===activeKidId);if(!kid)return;}
-  const t=todayStr();
-  const todaySub=(kid.submissions||[]).find(s=>s.date===t);
-  document.getElementById('kid-streak').textContent=kid.streak||0;
-  renderWeekDots('kid-week-days','kid-progress-fill','kid-progress-label',kid,'kid-reward-badge');
-  const cnt=weekApprovedCount(kid);
-  document.getElementById('kid-reward-banner').style.display=cnt>=GOAL?'flex':'none';
-  const form=document.getElementById('kid-form');
-  const subMsg=document.getElementById('kid-submitted-msg');
-  const unlMsg=document.getElementById('kid-unlocked-msg');
-  const deniedMsg=document.getElementById('kid-denied-msg');
-  const pill=document.getElementById('kid-status-pill');
-  [form,subMsg,unlMsg,deniedMsg].forEach(el=>el.style.display='none');
-  if(todaySub&&todaySub.status==='approved'){
-    unlMsg.style.display='block';
-    pill.className='status-pill unlocked';pill.innerHTML='<span class="s-dot"></span> Unlocked Today';
-  }else if(todaySub&&todaySub.status==='pending'){
-    subMsg.style.display='block';
-    pill.className='status-pill pending';pill.innerHTML='<span class="s-dot pending-pulse"></span> Proof Pending';
-  }else if(todaySub&&todaySub.status==='denied'){
-    deniedMsg.style.display='block';
-    pill.className='status-pill locked';pill.innerHTML='<span class="s-dot"></span> Internet Locked';
-  }else{
-    form.style.display='block';
-    pill.className='status-pill locked';pill.innerHTML='<span class="s-dot"></span> Internet Locked';
-  }
-  const list=document.getElementById('kid-history-list');
-  const past=(kid.submissions||[]).filter(s=>s.date!==t).slice(0,25);
-  if(!past.length){list.innerHTML='<div class="empty-state"><div class="empty-text" style="color:var(--muted)">Your workout history will show here.</div></div>';return;}
-  list.innerHTML=past.map(s=>{
-    const thumb=s.fileData
-      ?`<img class="history-thumb" src="${s.fileData}" onerror="this.parentNode.innerHTML='<div class=history-thumb-vid>📹</div>'">`
-      :`<div class="history-thumb-vid">${s.fileType==='video'?'&#127909;':'📷'}</div>`;
-    const sc=s.status==='approved'?'unlocked':s.status==='denied'?'locked':'pending';
-    const sl=s.status==='approved'?'Approved':s.status==='denied'?'Denied':'Pending';
-    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks&&s.checks.length?s.checks.join(', '):'—')}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span></div>`;
-  }).join('');
+function captureVideoThumbnail(file){
+  return new Promise(resolve=>{
+    const video=document.createElement('video');video.preload='metadata';video.muted=true;video.playsInline=true;
+    const url=URL.createObjectURL(file);video.src=url;
+    video.onloadeddata=()=>{video.currentTime=1;};
+    video.onseeked=()=>{
+      const canvas=document.createElement('canvas');const w=Math.min(video.videoWidth,MAX_IMAGE_PX);const h=Math.round(video.videoHeight*w/video.videoWidth);
+      canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(video,0,0,w,h);
+      const dataUrl=canvas.toDataURL('image/jpeg',0.7);URL.revokeObjectURL(url);
+      resolve({dataUrl,compressedKB:Math.round(dataUrl.length*.75/1024)});
+    };video.onerror=()=>{URL.revokeObjectURL(url);resolve(null);};
+  });
 }
-
-// ── FILE HANDLING + COMPRESSION ──
 async function handleFile(input){
-  const file=input.files[0]; if(!file) return;
-  const isVideo=file.type.startsWith('video');
-  compressedFileType=isVideo?'video':'image';
-  const statusEl=document.getElementById('compress-status');
-  statusEl.style.display='block';
-  statusEl.className='compress-status';
+  const file=input.files[0];if(!file)return;
+  const isVideo=file.type.startsWith('video');compressedFileType=isVideo?'video':'image';
+  const statusEl=document.getElementById('compress-status');statusEl.style.display='block';statusEl.className='compress-status';
   statusEl.textContent=isVideo?'Processing video thumbnail...':'Compressing image...';
-
-  // Show preview immediately using object URL
   const wrap=document.getElementById('kid-preview-wrap');
   wrap.innerHTML='<button class="remove-btn" onclick="removeFile()">&#10005;</button>';
-  if(isVideo){
-    const vid=document.createElement('video');
-    vid.src=URL.createObjectURL(file);vid.controls=true;
-    vid.style.cssText='width:100%;border-radius:10px;max-height:260px;';
-    wrap.appendChild(vid);
-  }else{
-    const img=document.createElement('img');
-    img.src=URL.createObjectURL(file);
-    wrap.appendChild(img);
-  }
-  wrap.style.display='block';
-  document.getElementById('kid-upload-zone').style.display='none';
-
+  if(isVideo){const vid=document.createElement('video');vid.src=URL.createObjectURL(file);vid.controls=true;vid.style.cssText='width:100%;border-radius:10px;max-height:260px;';wrap.appendChild(vid);}
+  else{const img=document.createElement('img');img.src=URL.createObjectURL(file);wrap.appendChild(img);}
+  wrap.style.display='block';document.getElementById('kid-upload-zone').style.display='none';
   try{
-    if(isVideo){
-      // For video: capture thumbnail frame for display, store it as proof image
-      const result=await captureVideoThumbnail(file);
-      if(result){
-        compressedFileData=result.dataUrl;
-        statusEl.className='compress-status done';
-        statusEl.textContent=`✓ Video thumbnail captured (${result.compressedKB}KB)`;
-      }else{
-        // fallback: no thumbnail, just note it's a video
-        compressedFileData=null;
-        statusEl.className='compress-status error';
-        statusEl.textContent='Video noted — no thumbnail preview will be shown to parent';
-      }
-    }else{
-      const result=await compressImage(file);
-      compressedFileData=result.dataUrl;
-      statusEl.className='compress-status done';
-      statusEl.textContent=`✓ Compressed: ${result.originalKB}KB → ${result.compressedKB}KB`;
-    }
-  }catch(e){
-    console.error('Compression error:',e);
-    // Fallback: read as-is but warn if large
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      compressedFileData=ev.target.result;
-      const kb=Math.round(ev.target.result.length*0.75/1024);
-      if(kb>700){
-        statusEl.className='compress-status error';
-        statusEl.textContent=`⚠ File is ${kb}KB — may be large. Try a smaller photo.`;
-      }else{
-        statusEl.className='compress-status done';
-        statusEl.textContent=`✓ Ready (${kb}KB)`;
-      }
-    };
-    reader.readAsDataURL(file);
-  }
+    if(isVideo){const r=await captureVideoThumbnail(file);if(r){compressedFileData=r.dataUrl;statusEl.className='compress-status done';statusEl.textContent='✓ Video thumbnail captured ('+r.compressedKB+'KB)';}else{compressedFileData=null;statusEl.className='compress-status';statusEl.textContent='Video noted';}}
+    else{const r=await compressImage(file);compressedFileData=r.dataUrl;statusEl.className='compress-status done';statusEl.textContent='✓ Compressed: '+r.originalKB+'KB → '+r.compressedKB+'KB';}
+  }catch(e){console.error(e);statusEl.className='compress-status';statusEl.textContent='Ready';}
 }
-
-function removeFile(){
-  compressedFileData=null;compressedFileType=null;
-  document.getElementById('kid-preview-wrap').style.display='none';
-  document.getElementById('kid-upload-zone').style.display='block';
-  document.getElementById('kid-file-input').value='';
-  document.getElementById('compress-status').style.display='none';
-}
+function removeFile(){compressedFileData=null;compressedFileType=null;document.getElementById('kid-preview-wrap').style.display='none';document.getElementById('kid-upload-zone').style.display='block';document.getElementById('kid-file-input').value='';document.getElementById('compress-status').style.display='none';}
 function toggleCheck(el){el.classList.toggle('checked');}
 
 // ── SUBMIT PROOF ──
 async function submitProof(){
   if(!compressedFileData&&compressedFileType!=='video'){showToast('Add a photo or video first!');return;}
-  const btn=document.getElementById('submit-btn');
-  btn.disabled=true;btn.textContent='SUBMITTING...';
+  const btn=document.getElementById('submit-btn');btn.disabled=true;btn.textContent='SUBMITTING...';
   const note=document.getElementById('kid-note').value.trim();
   const checks=[...document.querySelectorAll('#kid-form .check-item.checked')].map(el=>el.querySelector('.check-label').textContent);
   const t=todayStr();
@@ -826,116 +698,58 @@ async function submitProof(){
     if(existing&&existing.status==='pending'){showToast('Already submitted!');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
     if(existing&&existing.status==='approved'){showToast('Already unlocked today!');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
     const subs=(kid.submissions||[]).filter(s=>s.date!==t);
-    subs.unshift({
-      date:t,
-      fileData: compressedFileData||null,
-      fileType: compressedFileType||'image',
-      note,checks,
-      status:'pending',
-      submittedAt:new Date().toISOString()
-    });
+    subs.unshift({date:t,fileData:compressedFileData||null,fileType:compressedFileType||'image',note,checks,status:'pending',submittedAt:new Date().toISOString()});
     await saveKidData(activeKidId,{submissions:subs});
-    kid.submissions=subs;
-    const idx=kidsCache.findIndex(k=>k.id===activeKidId);
-    if(idx>=0) kidsCache[idx]=kid;
-    renderKidActive(kid);
-    showToast('Proof sent to your parent!');
-  }catch(e){
-    console.error(e);
-    if(e.message&&e.message.includes('exceeds the maximum')){
-      showToast('File too large even after compression. Try a shorter video or smaller photo.');
-    }else{
-      showToast('Error submitting — check connection.');
-    }
-  }
+    kid.submissions=subs;const idx=kidsCache.findIndex(k=>k.id===activeKidId);if(idx>=0)kidsCache[idx]=kid;
+    renderKidActive(kid);showToast('Proof sent to your parent!');
+  }catch(e){console.error(e);showToast('Error submitting — check connection.');}
   btn.disabled=false;btn.textContent='SUBMIT PROOF';
 }
 
 // ── PARENT VIEW ──
 async function initParentView(){
-  // Simple PIN check
-  var PPIN = null;
-  try { var pd = await db.collection('gympass_settings').doc('pin').get(); PPIN = pd.exists ? pd.data().value : '1234'; } catch(e){ PPIN='1234'; }
-  var entered = prompt('Enter parent PIN:');
-  if(entered !== PPIN && entered !== '1965') {
-    showToast('Incorrect PIN.');
-    switchMainTab('kid');
-    return;
-  }
   document.getElementById('parent-loading').style.display='flex';
   document.getElementById('parent-content').style.display='none';
-  checkNotifBanner();
-  firstLoad=true;
-  startParentListener();
+  checkNotifBanner();firstLoad=true;startParentListener();
   await new Promise(r=>setTimeout(r,900));
   document.getElementById('parent-loading').style.display='none';
   document.getElementById('parent-content').style.display='block';
   renderParentFromCache();
 }
-
 function renderParentFromCache(){
-  if(!kidsCache.length){
-    document.getElementById('parent-no-children').style.display='block';
-    document.getElementById('parent-main').style.display='none';
-    return;
-  }
-  document.getElementById('parent-no-children').style.display='none';
-  document.getElementById('parent-main').style.display='block';
-  if(!activeParentId||!kidsCache.find(k=>k.id===activeParentId)) activeParentId=kidsCache[0].id;
-  const switcher=document.getElementById('parent-child-switcher');
-  switcher.innerHTML='';
+  if(!kidsCache.length){document.getElementById('parent-no-children').style.display='block';document.getElementById('parent-main').style.display='none';return;}
+  document.getElementById('parent-no-children').style.display='none';document.getElementById('parent-main').style.display='block';
+  if(!activeParentId||!kidsCache.find(k=>k.id===activeParentId))activeParentId=kidsCache[0].id;
+  const switcher=document.getElementById('parent-child-switcher');switcher.innerHTML='';
   kidsCache.forEach(kid=>{
     const hasPending=(kid.submissions||[]).some(s=>s.date===todayStr()&&s.status==='pending');
-    const btn=document.createElement('div');
-    btn.className='child-tab'+(kid.id===activeParentId?' active':'');
+    const btn=document.createElement('div');btn.className='child-tab'+(kid.id===activeParentId?' active':'');
     btn.innerHTML=`<div class="child-tab-avatar" style="background:${kid.color}">${initials(kid.name)}</div>${kid.name}${hasPending?' ⚡':''}`;
-    btn.onclick=()=>{activeParentId=kid.id;renderParentFromCache();};
-    switcher.appendChild(btn);
+    btn.onclick=()=>{activeParentId=kid.id;renderParentFromCache();};switcher.appendChild(btn);
   });
-  const kid=kidsCache.find(k=>k.id===activeParentId);
-  if(!kid) return;
+  const kid=kidsCache.find(k=>k.id===activeParentId);if(!kid)return;
   renderWeekDots('p-week-days','p-progress-fill','p-progress-label',kid,'p-reward-badge');
   document.getElementById('p-week-title').textContent=kid.name.toUpperCase()+"'S WEEK";
   const approved=(kid.submissions||[]).filter(s=>s.status==='approved');
   document.getElementById('p-streak').textContent=kid.streak||0;
   document.getElementById('p-total').textContent=approved.length;
   document.getElementById('p-rewards').textContent=kid.totalRewards||0;
-  const t=todayStr();
-  const pending=(kid.submissions||[]).find(s=>s.date===t&&s.status==='pending');
+  const t=todayStr(),pending=(kid.submissions||[]).find(s=>s.date===t&&s.status==='pending');
   if(pending){
-    document.getElementById('p-pending-section').style.display='block';
-    document.getElementById('p-no-pending').style.display='none';
-    hideQustodioBtn();
-    const media=pending.fileData
-      ?(pending.fileType==='video'
-        ?`<img class="pending-media" src="${pending.fileData}" title="Video thumbnail">`
-        :`<img class="pending-media" src="${pending.fileData}">`)
-      :`<div style="padding:1rem;text-align:center;color:var(--muted);font-size:13px;">📹 Video submitted — no preview available</div>`;
+    document.getElementById('p-pending-section').style.display='block';document.getElementById('p-no-pending').style.display='none';
+    document.getElementById('p-qustodio-wrap').style.display='none';
+    const media=pending.fileData?(pending.fileType==='video'?`<img class="pending-media" src="${pending.fileData}" title="Video thumbnail">`:`<img class="pending-media" src="${pending.fileData}">`):('<div style="padding:1rem;text-align:center;color:var(--muted);font-size:13px;">📹 Video submitted</div>');
     const checks=pending.checks&&pending.checks.length?`<div class="checks-row">${pending.checks.map(c=>`<span class="check-tag">✓ ${c}</span>`).join('')}</div>`:'';
     const note=pending.note?`<div class="pending-note">"${pending.note}"</div>`:'';
     const time=new Date(pending.submittedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    document.getElementById('p-pending-wrap').innerHTML=`
-      <div class="pending-card">
-        <div class="pending-time">${kid.name} submitted at ${time}</div>
-        ${media}${checks}${note}
-        <div class="action-row">
-          <button class="approve-btn" onclick="approveKid('${kid.id}')">✓ APPROVE &amp; UNLOCK</button>
-          <button class="deny-btn" onclick="denyKid('${kid.id}')">✕ DENY</button>
-        </div>
-      </div>`;
-  }else{
-    document.getElementById('p-pending-section').style.display='none';
-    document.getElementById('p-no-pending').style.display='block';
-  }
+    document.getElementById('p-pending-wrap').innerHTML=`<div class="pending-card"><div class="pending-time">${kid.name} submitted at ${time}</div>${media}${checks}${note}<div class="action-row"><button class="approve-btn" onclick="approveKid('${kid.id}')">✓ APPROVE & UNLOCK</button><button class="deny-btn" onclick="denyKid('${kid.id}')">✕ DENY</button></div></div>`;
+  }else{document.getElementById('p-pending-section').style.display='none';document.getElementById('p-no-pending').style.display='block';}
   const phList=document.getElementById('p-history-list');
   const hist=(kid.submissions||[]).filter(s=>s.status!=='pending').slice(0,30);
   if(!hist.length){phList.innerHTML=`<div class="empty-state"><div class="empty-text">No history yet for ${kid.name}.</div></div>`;return;}
   phList.innerHTML=hist.map(s=>{
-    const thumb=s.fileData
-      ?`<img class="history-thumb" src="${s.fileData}" onerror="this.parentNode.innerHTML='<div class=history-thumb-vid>📷</div>'">`
-      :`<div class="history-thumb-vid">&#127909;</div>`;
-    const sc=s.status==='approved'?'unlocked':'locked';
-    const sl=s.status==='approved'?'Approved':'Denied';
+    const thumb=s.fileData?`<img class="history-thumb" src="${s.fileData}" onerror="this.style.display='none'">`:`<div class="history-thumb-vid">&#127909;</div>`;
+    const sc=s.status==='approved'?'unlocked':'locked';const sl=s.status==='approved'?'Approved':'Denied';
     return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks&&s.checks.join(', '))||'—'}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span><button class="delete-btn" onclick="deleteWorkout('${kid.id}','${s.date}')" title="Delete">&#128465;</button></div>`;
   }).join('');
 }
@@ -943,68 +757,37 @@ function renderParentFromCache(){
 // ── APPROVE / DENY / DELETE ──
 async function approveKid(id){
   try{
-    const kid=await getKidDoc(id);
-    const t=todayStr();
-    const subs=kid.submissions||[];
-    const sub=subs.find(s=>s.date===t&&s.status==='pending');
-    if(!sub) return;
+    const kid=await getKidDoc(id);const t=todayStr();const subs=kid.submissions||[];
+    const sub=subs.find(s=>s.date===t&&s.status==='pending');if(!sub)return;
     sub.status='approved';sub.approvedAt=new Date().toISOString();
     const yd=new Date();yd.setDate(yd.getDate()-1);
     const hadYd=subs.find(s=>s.date===yd.toISOString().split('T')[0]&&s.status==='approved');
     kid.streak=hadYd?(kid.streak||0)+1:1;
-    let rewards=kid.totalRewards||0;
-    const wc=weekApprovedCount(kid);
+    let rewards=kid.totalRewards||0;const wc=weekApprovedCount(kid);
     if(wc===GOAL){rewards++;showToast(kid.name+' hit 5 this week — pay out that $20!');}
     else showToast('Approved! '+kid.name+' is at '+wc+'/'+GOAL+' this week.');
     await saveKidData(id,{submissions:subs,streak:kid.streak,totalRewards:rewards});
-    activeParentId=id;
-    showQustodioBtn();
+    activeParentId=id;document.getElementById('p-qustodio-wrap').style.display='block';
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
-
 async function denyKid(id){
   try{
-    const kid=await getKidDoc(id);
-    const t=todayStr();
-    const subs=kid.submissions||[];
-    const sub=subs.find(s=>s.date===t&&s.status==='pending');
-    if(sub) sub.status='denied';
-    await saveKidData(id,{submissions:subs});
-    showToast('Denied. '+kid.name+' can resubmit.');
-    showQustodioBtn();
+    const kid=await getKidDoc(id);const t=todayStr();const subs=kid.submissions||[];
+    const sub=subs.find(s=>s.date===t&&s.status==='pending');if(sub)sub.status='denied';
+    await saveKidData(id,{submissions:subs});showToast('Denied. '+kid.name+' can resubmit.');
+    document.getElementById('p-qustodio-wrap').style.display='block';
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
-
 async function deleteWorkout(kidId,date){
-  if(!confirm('Delete this workout entry for '+formatDate(date)+'? This cannot be undone.')) return;
+  if(!confirm('Delete this workout entry for '+formatDate(date)+'? This cannot be undone.'))return;
   try{
-    const kid=await getKidDoc(kidId);
-    const subs=(kid.submissions||[]).filter(s=>s.date!==date);
+    const kid=await getKidDoc(kidId);const subs=(kid.submissions||[]).filter(s=>s.date!==date);
     const sortedApproved=subs.filter(s=>s.status==='approved').map(s=>s.date).sort().reverse();
     let streak=0;
-    if(sortedApproved.length){
-      const today=todayStr();
-      let cursor=sortedApproved.includes(today)?today:(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().split('T')[0];})();
-      for(let i=0;i<365;i++){
-        if(sortedApproved.includes(cursor)) streak++;
-        else break;
-        const d=new Date(cursor+'T12:00:00');d.setDate(d.getDate()-1);
-        cursor=d.toISOString().split('T')[0];
-      }
-    }
-    await saveKidData(kidId,{submissions:subs,streak});
-    showToast('Workout deleted.');
+    if(sortedApproved.length){const today=todayStr();let cursor=sortedApproved.includes(today)?today:(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().split('T')[0];})();
+      for(let i=0;i<365;i++){if(sortedApproved.includes(cursor))streak++;else break;const d=new Date(cursor+'T12:00:00');d.setDate(d.getDate()-1);cursor=d.toISOString().split('T')[0];}}
+    await saveKidData(kidId,{submissions:subs,streak});showToast('Workout deleted.');
   }catch(e){showToast('Error — check connection.');console.error(e);}
-}
-
-// ── QUSTODIO BUTTON ──
-function showQustodioBtn() {
-  const wrap = document.getElementById('p-qustodio-wrap');
-  if(wrap) wrap.style.display = 'block';
-}
-function hideQustodioBtn() {
-  const wrap = document.getElementById('p-qustodio-wrap');
-  if(wrap) wrap.style.display = 'none';
 }
 
 // ── TAB SWITCHING ──
@@ -1012,18 +795,19 @@ function switchMainTab(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='kid')||(i===1&&tab==='parent')));
   document.getElementById('view-kid').classList.toggle('active',tab==='kid');
   document.getElementById('view-parent').classList.toggle('active',tab==='parent');
-  if(tab==='parent') initParentView(); else initKidView();
+  if(tab==='parent'){
+    // Always show PIN gate, hide dashboard when switching to parent
+    document.getElementById('pin-gate').style.display='block';
+    document.getElementById('parent-dashboard').style.display='none';
+    gpEntry='';gpUpdateDots();document.getElementById('pin-err').textContent='';
+  } else {
+    initKidView();
+  }
 }
 
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
 
 initKidView();
-
-
-
-
-
-
 </script>
-</div>
 </body>
 </html>
