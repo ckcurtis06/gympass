@@ -161,6 +161,9 @@ textarea:focus{border-color:var(--blue);}
 .child-switcher{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;}
 .child-tab{display:flex;align-items:center;gap:7px;padding:7px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s;color:var(--text);}
 .child-tab.active{background:var(--blue);color:var(--white);border-color:var(--blue);}
+.child-tab-del{background:none;border:none;color:rgba(255,255,255,0.6);font-size:13px;cursor:pointer;padding:0 0 0 4px;line-height:1;display:none;}
+.child-tab.active .child-tab-del{display:inline;}
+.child-tab-del:hover{color:#fff;}
 .child-tab-avatar{width:20px;height:20px;border-radius:50%;font-family:'Anton',sans-serif;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--white);}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem;}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;}
@@ -724,8 +727,8 @@ function renderParentFromCache(){
   kidsCache.forEach(kid=>{
     const hasPending=(kid.submissions||[]).some(s=>s.date===todayStr()&&s.status==='pending');
     const btn=document.createElement('div');btn.className='child-tab'+(kid.id===activeParentId?' active':'');
-    btn.innerHTML=`<div class="child-tab-avatar" style="background:${kid.color}">${initials(kid.name)}</div>${kid.name}${hasPending?' ⚡':''}`;
-    btn.onclick=()=>{activeParentId=kid.id;renderParentFromCache();};switcher.appendChild(btn);
+    btn.innerHTML=`<div class="child-tab-avatar" style="background:${kid.color}">${initials(kid.name)}</div>${kid.name}${hasPending?' ⚡':''}<button class="child-tab-del" title="Delete ${kid.name}" onclick="deleteKid(event,'${kid.id}','${kid.name}')">✕</button>`;
+    btn.onclick=(e)=>{if(e.target.classList.contains('child-tab-del'))return;activeParentId=kid.id;renderParentFromCache();};switcher.appendChild(btn);
   });
   const kid=kidsCache.find(k=>k.id===activeParentId);if(!kid)return;
   renderWeekDots('p-week-days','p-progress-fill','p-progress-label',kid,'p-reward-badge');
@@ -803,6 +806,18 @@ function switchMainTab(tab){
   } else {
     initKidView();
   }
+}
+
+async function deleteKid(e,id,name){
+  e.stopPropagation();
+  if(!confirm('Delete ' + name + ' and ALL their workout history? This cannot be undone.')) return;
+  try {
+    await db.collection('gympass_kids').doc(id).delete();
+    kidsCache = kidsCache.filter(k=>k.id!==id);
+    if(activeParentId===id) activeParentId = kidsCache.length ? kidsCache[0].id : null;
+    showToast(name + ' deleted.');
+    renderParentFromCache();
+  } catch(e) { showToast('Error deleting — check connection.'); console.error(e); }
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
