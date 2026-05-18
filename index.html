@@ -380,6 +380,7 @@ textarea:focus{border-color:var(--blue);}
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
@@ -407,6 +408,21 @@ let kidsCache=[];
 let unsubscribeListener=null, unsubscribeKidListener=null;
 let knownPendingIds=new Set(), firstLoad=true;
 let lastKnownTodayStatus=null;
+
+// ── EMAILJS ──
+emailjs.init('4gI5nnJj5fGafw--n');
+
+function sendProofEmail(kidName, time) {
+  emailjs.send('service_40wjk6u', 'template_3584mku', {
+    name: kidName,
+    time: time,
+    message: 'Open GymPass to review: https://ckcurtis06.github.io/gympass/'
+  }).then(function(){
+    console.log('Email sent successfully');
+  }).catch(function(e){
+    console.error('Email error:', e);
+  });
+}
 
 // ── PIN ──
 const PIN_RECOVERY='1965';
@@ -705,6 +721,8 @@ async function submitProof(){
     await saveKidData(activeKidId,{submissions:subs});
     kid.submissions=subs;const idx=kidsCache.findIndex(k=>k.id===activeKidId);if(idx>=0)kidsCache[idx]=kid;
     renderKidActive(kid);showToast('Proof sent to your parent!');
+    var submitTime=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    sendProofEmail(kid.name, submitTime);
   }catch(e){console.error(e);showToast('Error submitting — check connection.');}
   btn.disabled=false;btn.textContent='SUBMIT PROOF';
 }
