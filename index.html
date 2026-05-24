@@ -707,8 +707,9 @@ function toggleCheck(el){el.classList.toggle('checked');}
 // ── SUBMIT PROOF ──
 async function submitProof(){
   if(!compressedFileData&&compressedFileType!=='video'){showToast('Add a photo or video first!');return;}
+  var allChores=document.querySelectorAll('#kid-form .check-item');
   var checked=document.querySelectorAll('#kid-form .check-item.checked');
-  if(checked.length===0){showToast('Check off at least one chore first!');return;}
+  if(checked.length<allChores.length){showToast('You must check off ALL chores before submitting!');return;}
   const btn=document.getElementById('submit-btn');btn.disabled=true;btn.textContent='SUBMITTING...';
   const note=document.getElementById('kid-note').value.trim();
   const checks=[...document.querySelectorAll('#kid-form .check-item.checked')].map(el=>el.querySelector('.check-label').textContent);
