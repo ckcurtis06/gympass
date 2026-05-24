@@ -233,7 +233,7 @@ textarea:focus{border-color:var(--blue);}
       <div class="active-name" id="kid-active-name"></div>
     </div>
     <div class="week-card">
-      <div class="week-header"><div class="week-title">THIS WEEK</div><div class="reward-badge" id="kid-reward-badge">5 days = $20</div></div>
+      <div class="week-header"><div class="week-title">THIS WEEK</div><div class="reward-badge" id="kid-reward-badge">5 days = $10</div></div>
       <div class="days-row" id="kid-week-days"></div>
       <div class="progress-row"><div class="progress-track"><div class="progress-fill" id="kid-progress-fill" style="width:0%"></div></div><div class="progress-label" id="kid-progress-label">0 / 5</div></div>
     </div>
@@ -264,7 +264,7 @@ textarea:focus{border-color:var(--blue);}
     <div id="kid-form">
       <div class="section-title">Submit today's proof</div>
       <div class="card">
-        <label class="field-label">Photo or video of your workout</label>
+        <label class="field-label">Photo or Video of Workout or Chore</label>
         <div class="upload-zone" id="kid-upload-zone">
           <input type="file" accept="image/*,video/*" id="kid-file-input" onchange="handleFile(this)">
           <div class="upload-icon">&#128247;</div>
@@ -279,12 +279,12 @@ textarea:focus{border-color:var(--blue);}
         <textarea id="kid-note" rows="3" placeholder="e.g. 5 miles + weights. Crushed it."></textarea>
       </div>
       <div class="card">
-        <label class="field-label">Check off what you completed</label>
+        <label class="field-label">Check off Completed Chores</label>
         <div class="checklist">
-          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Cardio (20+ min)</span></div>
-          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Strength / weights</span></div>
-          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Stretching / cool down</span></div>
-          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Stayed hydrated</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Make Bed</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Brush Teeth</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Get Dressed</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Tidy up Room</span></div>
         </div>
       </div>
       <button class="submit-btn" id="submit-btn" onclick="submitProof()">SUBMIT PROOF</button>
@@ -349,14 +349,14 @@ textarea:focus{border-color:var(--blue);}
       <div id="parent-main" style="display:none;">
         <div class="child-switcher" id="parent-child-switcher"></div>
         <div class="week-card">
-          <div class="week-header"><div class="week-title" id="p-week-title">THIS WEEK</div><div class="reward-badge" id="p-reward-badge">5 days = $20</div></div>
+          <div class="week-header"><div class="week-title" id="p-week-title">THIS WEEK</div><div class="reward-badge" id="p-reward-badge">5 days = $10</div></div>
           <div class="days-row" id="p-week-days"></div>
           <div class="progress-row"><div class="progress-track"><div class="progress-fill" id="p-progress-fill" style="width:0%"></div></div><div class="progress-label" id="p-progress-label">0 / 5</div></div>
         </div>
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-num" id="p-streak">0</div><div class="stat-label">Streak</div></div>
           <div class="stat-card"><div class="stat-num" id="p-total">0</div><div class="stat-label">Total days</div></div>
-          <div class="stat-card"><div class="stat-num" id="p-rewards">0</div><div class="stat-label">$20 rewards</div></div>
+          <div class="stat-card"><div class="stat-num" id="p-rewards">0</div><div class="stat-label">$10 rewards</div></div>
         </div>
         <div id="p-pending-section" style="display:none;">
           <div class="section-title" style="color:var(--amber);">&#9889; Pending review</div>
@@ -614,7 +614,7 @@ function renderWeekDots(containerId,fillId,labelId,kid,badgeId){
   const fill=document.getElementById(fillId);fill.style.width=Math.min((cnt/GOAL)*100,100)+'%';
   fill.className='progress-fill'+(cnt>=GOAL?' goal-met':'');
   document.getElementById(labelId).textContent=cnt+' / '+GOAL;
-  if(badgeId)document.getElementById(badgeId).textContent=cnt>=GOAL?'🏆 $20 EARNED!':'5 days = $20 reward';
+  if(badgeId)document.getElementById(badgeId).textContent=cnt>=GOAL?'🏆 $10 EARNED!':'5 days = $10 reward';
 }
 
 // ── KID ACTIVE ──
@@ -785,7 +785,7 @@ async function approveKid(id){
     const hadYd=subs.find(s=>s.date===yd.toISOString().split('T')[0]&&s.status==='approved');
     kid.streak=hadYd?(kid.streak||0)+1:1;
     let rewards=kid.totalRewards||0;const wc=weekApprovedCount(kid);
-    if(wc===GOAL){rewards++;showToast(kid.name+' hit 5 this week — pay out that $20!');}
+    if(wc===GOAL){rewards++;showToast(kid.name+' hit 5 this week — pay out that $10!');}
     else showToast('Approved! '+kid.name+' is at '+wc+'/'+GOAL+' this week.');
     await saveKidData(id,{submissions:subs,streak:kid.streak,totalRewards:rewards});
     activeParentId=id;document.getElementById('p-qustodio-wrap').style.display='block';
