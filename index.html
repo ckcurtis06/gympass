@@ -287,6 +287,10 @@ textarea:focus{border-color:var(--blue);}
           <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Tidy up Room</span></div>
         </div>
       </div>
+      <div class="card" id="afternoon-chores-card" style="display:none;">
+        <label class="field-label">Afternoon Chores</label>
+        <div class="checklist" id="afternoon-checklist"></div>
+      </div>
       <button class="submit-btn" id="submit-btn" onclick="submitProof()">SUBMIT PROOF</button>
     </div>
     <hr class="divider-line" style="margin-top:1.5rem;">
@@ -358,7 +362,14 @@ textarea:focus{border-color:var(--blue);}
           <div class="stat-card"><div class="stat-num" id="p-total">0</div><div class="stat-label">Total days</div></div>
           <div class="stat-card"><div class="stat-num" id="p-rewards">0</div><div class="stat-label">$10 rewards</div></div>
         </div>
-        <div id="p-pending-section" style="display:none;">
+        <div id="p-afternoon-section" class="card" style="margin-bottom:1rem;">
+        <label class="field-label">&#9997; Afternoon Chores for <span id="p-afternoon-name"></span></label>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Add up to 4 chores (one per line). Saved instantly.</div>
+        <textarea id="p-afternoon-input" rows="4" placeholder="e.g. Vacuum living room&#10;Unload dishwasher&#10;Feed the dog" style="font-size:14px;" oninput="enforceChoreLimit(this)" onblur="saveAfternoonChores()"></textarea>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;" id="p-afternoon-count">0 / 4 chores</div>
+      </div>
+
+      <div id="p-pending-section" style="display:none;">
           <div class="section-title" style="color:var(--amber);">&#9889; Pending review</div>
           <div id="p-pending-wrap"></div>
         </div>
@@ -530,7 +541,10 @@ function startKidListener(kidId){
     if(lastKnownTodayStatus==='pending'&&newStatus==='denied'){sendNotification('GymPass ❌','Your proof was denied. Take a better photo and try again!');showToast('Your proof was denied — take another photo and try again.');}
     if(lastKnownTodayStatus==='pending'&&newStatus==='approved'){sendNotification('GymPass ✅','Proof approved! You are unlocked for today.');showToast('Approved! You are unlocked for today.');}
     lastKnownTodayStatus=newStatus;
-    if(document.getElementById('kid-active').style.display!=='none'&&activeKidId===kidId)renderKidActive(kid);
+    if(document.getElementById('kid-active').style.display!=='none'&&activeKidId===kidId){
+      renderKidActive(kid);
+      renderAfternoonChoresKid(kid.afternoonChores||[]);
+    }
   });
 }
 function stopKidListener(){if(unsubscribeKidListener){unsubscribeKidListener();unsubscribeKidListener=null;}lastKnownTodayStatus=null;}
@@ -592,6 +606,7 @@ async function selectKid(id){
   document.getElementById('compress-status').style.display='none';
   document.querySelectorAll('#kid-form .check-item').forEach(el=>el.classList.remove('checked'));
   renderKidActive(kid);
+  renderAfternoonChoresKid(kid.afternoonChores || []);
   startKidListener(id);
 }
 function backToKidPicker(){stopKidListener();activeKidId=null;document.getElementById('kid-active').style.display='none';document.getElementById('kid-picker').style.display='block';initKidView();}
@@ -720,7 +735,7 @@ async function submitProof(){
     if(existing&&existing.status==='pending'){showToast('Already submitted!');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
     if(existing&&existing.status==='approved'){showToast('Already unlocked today!');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
     const subs=(kid.submissions||[]).filter(s=>s.date!==t);
-    subs.unshift({date:t,fileData:compressedFileData||null,fileType:compressedFileType||'image',note,checks,status:'pending',submittedAt:new Date().toISOString()});
+    subs.unshift({date:t,fileData:compressedFileData||null,fileType:compressedFileType||'image',note,checks,afternoonChecked:afternoonChecked||[],status:'pending',submittedAt:new Date().toISOString()});
     await saveKidData(activeKidId,{submissions:subs});
     kid.submissions=subs;const idx=kidsCache.findIndex(k=>k.id===activeKidId);if(idx>=0)kidsCache[idx]=kid;
     renderKidActive(kid);showToast('Proof sent to your parent!');
@@ -753,6 +768,15 @@ function renderParentFromCache(){
   });
   const kid=kidsCache.find(k=>k.id===activeParentId);if(!kid)return;
   renderWeekDots('p-week-days','p-progress-fill','p-progress-label',kid,'p-reward-badge');
+  // Load afternoon chores for this kid into parent input
+  var afternoonInput = document.getElementById('p-afternoon-input');
+  var afternoonName = document.getElementById('p-afternoon-name');
+  if(afternoonInput) {
+    var chores = kid.afternoonChores || [];
+    afternoonInput.value = chores.join('\n');
+    enforceChoreLimit(afternoonInput);
+  }
+  if(afternoonName) afternoonName.textContent = kid.name;
   document.getElementById('p-week-title').textContent=kid.name.toUpperCase()+"'S WEEK";
   const approved=(kid.submissions||[]).filter(s=>s.status==='approved');
   document.getElementById('p-streak').textContent=kid.streak||0;
@@ -763,10 +787,10 @@ function renderParentFromCache(){
     document.getElementById('p-pending-section').style.display='block';document.getElementById('p-no-pending').style.display='none';
     document.getElementById('p-qustodio-wrap').style.display='none';
     const media=pending.fileData?(pending.fileType==='video'?`<img class="pending-media" src="${pending.fileData}" title="Video thumbnail">`:`<img class="pending-media" src="${pending.fileData}">`):('<div style="padding:1rem;text-align:center;color:var(--muted);font-size:13px;">📹 Video submitted</div>');
-    const checks=pending.checks&&pending.checks.length?`<div class="checks-row">${pending.checks.map(c=>`<span class="check-tag">✓ ${c}</span>`).join('')}</div>`:'';
+    const checks=pending.checks&&pending.checks.length?`<div class="checks-row"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;">MORNING</div>${pending.checks.map(c=>`<span class="check-tag">✓ ${c}</span>`).join('')}</div>`:'';const afternoonDone=pending.afternoonChecked&&pending.afternoonChecked.length?`<div class="checks-row" style="margin-top:6px;"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;">AFTERNOON</div>${pending.afternoonChecked.map(c=>`<span class="check-tag" style="background:#d4f0e0;color:#1a8a4a;">✓ ${c}</span>`).join('')}</div>`:'';;
     const note=pending.note?`<div class="pending-note">"${pending.note}"</div>`:'';
     const time=new Date(pending.submittedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    document.getElementById('p-pending-wrap').innerHTML=`<div class="pending-card"><div class="pending-time">${kid.name} submitted at ${time}</div>${media}${checks}${note}<div class="action-row"><button class="approve-btn" onclick="approveKid('${kid.id}')">✓ APPROVE & UNLOCK</button><button class="deny-btn" onclick="denyKid('${kid.id}')">✕ DENY</button></div></div>`;
+    document.getElementById('p-pending-wrap').innerHTML=`<div class="pending-card"><div class="pending-time">${kid.name} submitted at ${time}</div>${media}${checks}${afternoonDone}${note}<div class="action-row"><button class="approve-btn" onclick="approveKid('${kid.id}')">✓ APPROVE & UNLOCK</button><button class="deny-btn" onclick="denyKid('${kid.id}')">✕ DENY</button></div></div>`;
   }else{document.getElementById('p-pending-section').style.display='none';document.getElementById('p-no-pending').style.display='block';}
   const phList=document.getElementById('p-history-list');
   const hist=(kid.submissions||[]).filter(s=>s.status!=='pending').slice(0,30);
@@ -839,6 +863,50 @@ async function deleteKid(e,id,name){
     showToast(name + ' deleted.');
     renderParentFromCache();
   } catch(e) { showToast('Error deleting — check connection.'); console.error(e); }
+}
+
+// ── AFTERNOON CHORES ──
+function enforceChoreLimit(textarea) {
+  var lines = textarea.value.split('
+').filter(function(l){ return l.trim() !== ''; });
+  if(lines.length > 4) {
+    textarea.value = lines.slice(0,4).join('
+');
+  }
+  var count = textarea.value.split('
+').filter(function(l){ return l.trim() !== ''; }).length;
+  var countEl = document.getElementById('p-afternoon-count');
+  if(countEl) countEl.textContent = count + ' / 4 chores';
+}
+
+async function saveAfternoonChores() {
+  if(!activeParentId) return;
+  var input = document.getElementById('p-afternoon-input');
+  if(!input) return;
+  var lines = input.value.split('
+').map(function(l){ return l.trim(); }).filter(function(l){ return l !== ''; }).slice(0,4);
+  try {
+    await saveKidData(activeParentId, { afternoonChores: lines });
+    var idx = kidsCache.findIndex(function(k){ return k.id === activeParentId; });
+    if(idx >= 0) kidsCache[idx].afternoonChores = lines;
+    showToast('Afternoon chores saved!');
+    // update kid view if watching same kid
+    renderAfternoonChoresKid(lines);
+  } catch(e) { showToast('Error saving chores.'); console.error(e); }
+}
+
+function renderAfternoonChoresKid(chores) {
+  var card = document.getElementById('afternoon-chores-card');
+  var list = document.getElementById('afternoon-checklist');
+  if(!card || !list) return;
+  if(!chores || chores.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
+  list.innerHTML = chores.map(function(chore) {
+    return '<div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">' + chore + '</span></div>';
+  }).join('');
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
