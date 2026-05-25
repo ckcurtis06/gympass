@@ -867,14 +867,11 @@ async function deleteKid(e,id,name){
 
 // ── AFTERNOON CHORES ──
 function enforceChoreLimit(textarea) {
-  var lines = textarea.value.split('
-').filter(function(l){ return l.trim() !== ''; });
+  var lines = textarea.value.split('\n').filter(function(l){ return l.trim() !== ''; });
   if(lines.length > 4) {
-    textarea.value = lines.slice(0,4).join('
-');
+    textarea.value = lines.slice(0,4).join('\n');
   }
-  var count = textarea.value.split('
-').filter(function(l){ return l.trim() !== ''; }).length;
+  var count = textarea.value.split('\n').filter(function(l){ return l.trim() !== ''; }).length;
   var countEl = document.getElementById('p-afternoon-count');
   if(countEl) countEl.textContent = count + ' / 4 chores';
 }
@@ -883,8 +880,7 @@ async function saveAfternoonChores() {
   if(!activeParentId) return;
   var input = document.getElementById('p-afternoon-input');
   if(!input) return;
-  var lines = input.value.split('
-').map(function(l){ return l.trim(); }).filter(function(l){ return l !== ''; }).slice(0,4);
+  var lines = input.value.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l !== ''; }).slice(0,4);
   try {
     await saveKidData(activeParentId, { afternoonChores: lines });
     var idx = kidsCache.findIndex(function(k){ return k.id === activeParentId; });
