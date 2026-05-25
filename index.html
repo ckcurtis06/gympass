@@ -725,6 +725,7 @@ async function submitProof(){
   var allChores=document.querySelectorAll('#kid-form .check-item');
   var checked=document.querySelectorAll('#kid-form .check-item.checked');
   if(checked.length<allChores.length){showToast('You must check off ALL chores before submitting!');return;}
+  var afternoonChecked=[...document.querySelectorAll('#afternoon-checklist .check-item.checked')].map(function(el){return el.querySelector('.check-label').textContent;});
   const btn=document.getElementById('submit-btn');btn.disabled=true;btn.textContent='SUBMITTING...';
   const note=document.getElementById('kid-note').value.trim();
   const checks=[...document.querySelectorAll('#kid-form .check-item.checked')].map(el=>el.querySelector('.check-label').textContent);
