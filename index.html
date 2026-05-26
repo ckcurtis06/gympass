@@ -441,13 +441,14 @@ let knownPendingIds=new Set(), firstLoad=true;
 let lastKnownTodayStatus=null;
 
 // ── EMAILJS ──
-emailjs.init('4gI5nnJj5fGafw--n');
+emailjs.init({publicKey: '4gI5nnJj5fGafw--n'});
 
 function sendProofEmail(kidName, time) {
   emailjs.send('service_40wjk6u', 'template_3584mku', {
     name: kidName,
     time: time,
-    message: 'Open GymPass to review: https://ckcurtis06.github.io/gympass/'
+    message: 'Open GymPass to review: https://ckcurtis06.github.io/gympass/',
+    to_email: 'ckcurtis.cc@gmail.com'
   }).then(function(){
     console.log('Email sent successfully');
   }).catch(function(e){
