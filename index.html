@@ -382,9 +382,29 @@ textarea:focus{border-color:var(--blue);}
           <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:6px;">Opens Qustodio — toggle internet from there</div>
         </div>
         <hr class="divider-line">
-        <div class="section-title">Approval history</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;">
+          <div class="section-title" style="margin-bottom:0;">Approval history</div>
+          <button onclick="openMissedDay()" style="padding:6px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">+ Add Missed Day</button>
+        </div>
         <div id="p-history-list"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MISSED DAY MODAL -->
+<div id="missed-day-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:8888;align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="background:#fff;border-radius:16px;padding:1.5rem;width:100%;max-width:360px;">
+    <div style="font-family:Anton,sans-serif;font-size:20px;letter-spacing:1px;margin-bottom:6px;color:#0d1f30;">ADD MISSED DAY</div>
+    <div style="font-size:13px;color:#6b8aa8;margin-bottom:1.25rem;">Manually approve a day for <strong id="missed-kid-name"></strong></div>
+    <label style="font-size:12px;font-weight:600;color:#6b8aa8;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Select Date</label>
+    <input type="date" id="missed-date-input" style="width:100%;background:#f4f8fc;border:1.5px solid #d0e2f0;border-radius:10px;padding:10px 12px;font-family:DM Sans,sans-serif;font-size:15px;outline:none;margin-bottom:10px;color:#0d1f30;">
+    <label style="font-size:12px;font-weight:600;color:#6b8aa8;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Note (optional)</label>
+    <input type="text" id="missed-note-input" placeholder="e.g. Did all chores, forgot to submit" style="width:100%;background:#f4f8fc;border:1.5px solid #d0e2f0;border-radius:10px;padding:10px 12px;font-family:DM Sans,sans-serif;font-size:14px;outline:none;margin-bottom:14px;color:#0d1f30;">
+    <div id="missed-err" style="color:#c0392b;font-size:13px;min-height:18px;margin-bottom:8px;"></div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeMissedDay()" style="padding:11px 16px;background:#f4f8fc;color:#6b8aa8;border:1px solid #d0e2f0;border-radius:10px;font-size:14px;cursor:pointer;">Cancel</button>
+      <button onclick="saveMissedDay()" style="flex:1;padding:11px;background:#005A9C;color:#fff;border:none;border-radius:10px;font-family:Anton,sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;">APPROVE DAY</button>
     </div>
   </div>
 </div>
@@ -494,7 +514,10 @@ async function savePin(){
 }
 
 // ── HELPERS ──
-function todayStr(){return new Date().toISOString().split('T')[0];}
+function todayStr(){
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
 function formatDate(iso){return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
 function getWeekDates(){const now=new Date(),dow=now.getDay();return Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-dow+i);return d.toISOString().split('T')[0];});}
 function initials(name){return name.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
@@ -797,9 +820,11 @@ function renderParentFromCache(){
   const hist=(kid.submissions||[]).filter(s=>s.status!=='pending').slice(0,30);
   if(!hist.length){phList.innerHTML=`<div class="empty-state"><div class="empty-text">No history yet for ${kid.name}.</div></div>`;return;}
   phList.innerHTML=hist.map(s=>{
-    const thumb=s.fileData?`<img class="history-thumb" src="${s.fileData}" onerror="this.style.display='none'">`:`<div class="history-thumb-vid">&#127909;</div>`;
+    const isManual=s.fileType==='manual';
+    const thumb=isManual?`<div class="history-thumb-vid" style="background:#d4f0e0;font-size:13px;color:#1a8a4a;font-weight:600;">MAN</div>`:s.fileData?`<img class="history-thumb" src="${s.fileData}" onerror="this.style.display='none'">`:`<div class="history-thumb-vid">&#127909;</div>`;
     const sc=s.status==='approved'?'unlocked':'locked';const sl=s.status==='approved'?'Approved':'Denied';
-    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks&&s.checks.join(', '))||'—'}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span><button class="delete-btn" onclick="deleteWorkout('${kid.id}','${s.date}')" title="Delete">&#128465;</button></div>`;
+    const backBtn=s.status!=='approved'?`<button onclick="backApprove('${kid.id}','${s.date}')" style="background:none;border:none;color:var(--green);font-size:13px;cursor:pointer;padding:4px 6px;border-radius:6px;flex-shrink:0;" title="Back-approve">&#10003;</button>`:'';
+    return `<div class="history-item">${thumb}<div class="history-info"><div class="history-date">${formatDate(s.date)}</div><div class="history-note">${s.note||(s.checks&&s.checks.join(', '))||'—'}</div></div><span class="status-pill ${sc}" style="flex-shrink:0;font-size:11px;padding:4px 10px;"><span class="s-dot"></span>${sl}</span>${backBtn}<button class="delete-btn" onclick="deleteWorkout('${kid.id}','${s.date}')" title="Delete">&#128465;</button></div>`;
   }).join('');
 }
 
@@ -904,6 +929,97 @@ function renderAfternoonChoresKid(chores) {
   list.innerHTML = chores.map(function(chore) {
     return '<div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">' + chore + '</span></div>';
   }).join('');
+}
+
+// ── MISSED DAY / BACK APPROVE ──
+function openMissedDay(){
+  if(!activeParentId) return;
+  var kid=kidsCache.find(function(k){return k.id===activeParentId;});
+  if(!kid) return;
+  document.getElementById('missed-kid-name').textContent=kid.name;
+  // default to yesterday
+  var y=new Date(); y.setDate(y.getDate()-1);
+  var yStr=y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
+  document.getElementById('missed-date-input').value=yStr;
+  // set max to yesterday, min to 30 days ago
+  var maxD=new Date(); maxD.setDate(maxD.getDate()-1);
+  var minD=new Date(); minD.setDate(minD.getDate()-30);
+  document.getElementById('missed-date-input').max=maxD.getFullYear()+'-'+String(maxD.getMonth()+1).padStart(2,'0')+'-'+String(maxD.getDate()).padStart(2,'0');
+  document.getElementById('missed-date-input').min=minD.getFullYear()+'-'+String(minD.getMonth()+1).padStart(2,'0')+'-'+String(minD.getDate()).padStart(2,'0');
+  document.getElementById('missed-note-input').value='';
+  document.getElementById('missed-err').textContent='';
+  document.getElementById('missed-day-modal').style.display='flex';
+}
+function closeMissedDay(){
+  document.getElementById('missed-day-modal').style.display='none';
+}
+async function saveMissedDay(){
+  var date=document.getElementById('missed-date-input').value;
+  var note=document.getElementById('missed-note-input').value.trim()||'Manually approved by parent';
+  var errEl=document.getElementById('missed-err');
+  if(!date){errEl.textContent='Please select a date.';return;}
+  var today=todayStr();
+  if(date>=today){errEl.textContent='Can only back-approve past days, not today.';return;}
+  try{
+    var kid=await getKidDoc(activeParentId);
+    var subs=kid.submissions||[];
+    // check if already approved for this date
+    var existing=subs.find(function(s){return s.date===date;});
+    if(existing&&existing.status==='approved'){errEl.textContent='This day is already approved.';return;}
+    // remove any existing entry for this date then add approved one
+    subs=subs.filter(function(s){return s.date!==date;});
+    subs.push({date:date,fileData:null,fileType:'manual',note:note,checks:[],afternoonChecked:[],status:'approved',submittedAt:new Date().toISOString(),approvedAt:new Date().toISOString()});
+    // sort newest first
+    subs.sort(function(a,b){return b.date.localeCompare(a.date);});
+    // recalculate streak
+    var sortedApproved=subs.filter(function(s){return s.status==='approved';}).map(function(s){return s.date;}).sort().reverse();
+    var streak=0;
+    var cursor=sortedApproved.includes(today)?today:(function(){var d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}());
+    for(var i=0;i<365;i++){
+      if(sortedApproved.includes(cursor)) streak++;
+      else break;
+      var dd=new Date(cursor+'T12:00:00');dd.setDate(dd.getDate()-1);
+      cursor=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    }
+    // check rewards
+    var week=getWeekDates();
+    var wc=subs.filter(function(s){return week.includes(s.date)&&s.status==='approved';}).length;
+    var rewards=kid.totalRewards||0;
+    var prevWc=(kid.submissions||[]).filter(function(s){return week.includes(s.date)&&s.status==='approved';}).length;
+    if(wc>=GOAL&&prevWc<GOAL) rewards++;
+    await saveKidData(activeParentId,{submissions:subs,streak:streak,totalRewards:rewards});
+    closeMissedDay();
+    showToast('Missed day approved for '+formatDate(date)+'!');
+    if(wc>=GOAL&&prevWc<GOAL) showToast(kid.name+' hit 5 this week — pay out that $10!');
+  }catch(e){errEl.textContent='Error saving — check connection.';console.error(e);}
+}
+async function backApprove(kidId,date){
+  if(!confirm('Back-approve '+formatDate(date)+'? This will mark it as approved.')) return;
+  try{
+    var kid=await getKidDoc(kidId);
+    var subs=kid.submissions||[];
+    var sub=subs.find(function(s){return s.date===date;});
+    if(!sub) return;
+    sub.status='approved';sub.approvedAt=new Date().toISOString();
+    var today=todayStr();
+    var sortedApproved=subs.filter(function(s){return s.status==='approved';}).map(function(s){return s.date;}).sort().reverse();
+    var streak=0;
+    var cursor=sortedApproved.includes(today)?today:(function(){var d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}());
+    for(var i=0;i<365;i++){
+      if(sortedApproved.includes(cursor)) streak++;
+      else break;
+      var dd=new Date(cursor+'T12:00:00');dd.setDate(dd.getDate()-1);
+      cursor=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    }
+    var week=getWeekDates();
+    var wc=subs.filter(function(s){return week.includes(s.date)&&s.status==='approved';}).length;
+    var rewards=kid.totalRewards||0;
+    var prevWc=(kid.submissions||[]).filter(function(s){return week.includes(s.date)&&s.status==='approved'&&s.date!==date;}).length;
+    if(wc>=GOAL&&prevWc<GOAL) rewards++;
+    await saveKidData(kidId,{submissions:subs,streak:streak,totalRewards:rewards});
+    showToast('Approved! '+formatDate(date)+' marked as done.');
+    if(wc>=GOAL&&prevWc<GOAL) showToast(kid.name+' hit 5 this week — pay out that $10!');
+  }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
