@@ -539,7 +539,23 @@ async function saveKidData(id,data){await db.collection('gympass_kids').doc(id).
 async function getKidDoc(id){const doc=await db.collection('gympass_kids').doc(id).get();return doc.exists?{id:doc.id,...doc.data()}:null;}
 
 // ── NOTIFICATIONS ──
-function checkNotifBanner(){if('Notification' in window&&Notification.permission==='default')document.getElementById('notif-banner').style.display='flex';}
+function checkNotifBanner(){
+  if(!('Notification' in window)) return;
+  if(Notification.permission==='default'){
+    // Request directly instead of showing banner
+    Notification.requestPermission().then(function(p){
+      document.getElementById('notif-banner').style.display='none';
+      if(p==='granted') showToast('Notifications enabled!');
+    });
+  } else if(Notification.permission==='granted'){
+    document.getElementById('notif-banner').style.display='none';
+  } else {
+    // denied - show banner with instructions
+    document.getElementById('notif-banner').style.display='flex';
+    document.getElementById('notif-banner').querySelector('span').textContent='Enable notifications in iPhone Settings > GymPass';
+    document.getElementById('notif-banner').querySelector('button').style.display='none';
+  }
+}
 function requestNotifPermission(){Notification.requestPermission().then(p=>{document.getElementById('notif-banner').style.display='none';if(p==='granted')showToast('Notifications enabled!');});}
 function sendNotification(title,body){if('Notification' in window&&Notification.permission==='granted')new Notification(title,{body});}
 
