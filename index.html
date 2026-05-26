@@ -519,7 +519,16 @@ function todayStr(){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 function formatDate(iso){return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
-function getWeekDates(){const now=new Date(),dow=now.getDay();return Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-dow+i);return d.toISOString().split('T')[0];});}
+function getWeekDates(){
+  var now=new Date(),dow=now.getDay();
+  var dates=[];
+  for(var i=0;i<7;i++){
+    var d=new Date(now);
+    d.setDate(now.getDate()-dow+i);
+    dates.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
+  }
+  return dates;
+}
 function initials(name){return name.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
 function weekApprovedCount(kid){const week=getWeekDates();return(kid.submissions||[]).filter(s=>week.includes(s.date)&&s.status==='approved').length;}
 
@@ -991,6 +1000,7 @@ async function saveMissedDay(){
     closeMissedDay();
     showToast('Missed day approved for '+formatDate(date)+'!');
     if(wc>=GOAL&&prevWc<GOAL) showToast(kid.name+' hit 5 this week — pay out that $10!');
+    renderParentFromCache();
   }catch(e){errEl.textContent='Error saving — check connection.';console.error(e);}
 }
 async function backApprove(kidId,date){
@@ -1019,6 +1029,7 @@ async function backApprove(kidId,date){
     await saveKidData(kidId,{submissions:subs,streak:streak,totalRewards:rewards});
     showToast('Approved! '+formatDate(date)+' marked as done.');
     if(wc>=GOAL&&prevWc<GOAL) showToast(kid.name+' hit 5 this week — pay out that $10!');
+    renderParentFromCache();
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 
