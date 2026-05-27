@@ -285,6 +285,7 @@ textarea:focus{border-color:var(--blue);}
           <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Brush Teeth</span></div>
           <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Get Dressed</span></div>
           <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Tidy up Room</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">&#10003;</span></div><span class="check-label">Daily Workout</span></div>
         </div>
       </div>
       <div class="card" id="afternoon-chores-card" style="display:none;">
@@ -451,8 +452,10 @@ function sendProofEmail(kidName, time) {
     to_email: 'ckcurtis.cc@gmail.com'
   }).then(function(){
     console.log('Email sent successfully');
+    showToast('Email notification sent!');
   }).catch(function(e){
     console.error('Email error:', e);
+    showToast('Email failed: ' + (e.text||e.message||JSON.stringify(e)));
   });
 }
 
