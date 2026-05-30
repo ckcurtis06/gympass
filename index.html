@@ -537,9 +537,79 @@ function initials(name){return name.trim().split(' ').map(w=>w[0]).join('').toUp
 function weekApprovedCount(kid){const week=getWeekDates();return(kid.submissions||[]).filter(s=>week.includes(s.date)&&s.status==='approved').length;}
 
 // ── FIRESTORE ──
-async function loadKids(){const snap=await db.collection('gympass_kids').orderBy('createdAt').get();return snap.docs.map(d=>({id:d.id,...d.data()}));}
-async function saveKidData(id,data){await db.collection('gympass_kids').doc(id).set(data,{merge:true});}
-async function getKidDoc(id){const doc=await db.collection('gympass_kids').doc(id).get();return doc.exists?{id:doc.id,...doc.data()}:null;}
+// ── FIRESTORE: subcollection architecture ──
+// Kid doc: name, color, streak, totalRewards, createdAt, afternoonChores
+// Submissions: gympass_kids/{kidId}/submissions/{date}
+
+async function loadKids(){
+  const snap=await db.collection('gympass_kids').orderBy('createdAt').get();
+  const kids=snap.docs.map(d=>({id:d.id,...d.data(),submissions:[]}));
+  // load submissions for each kid
+  await Promise.all(kids.map(async function(kid){
+    const sSnap=await db.collection('gympass_kids').doc(kid.id).collection('submissions').orderBy('date','desc').get();
+    kid.submissions=sSnap.docs.map(d=>d.data());
+  }));
+  return kids;
+}
+
+async function saveKidMeta(id,data){
+  // saves only meta fields (no submissions array)
+  var meta={};
+  ['name','color','streak','totalRewards','createdAt','afternoonChores'].forEach(function(k){if(data[k]!==undefined)meta[k]=data[k];});
+  if(Object.keys(meta).length>0) await db.collection('gympass_kids').doc(id).set(meta,{merge:true});
+}
+
+async function saveSubmission(kidId,sub){
+  // each submission is its own doc keyed by date
+  await db.collection('gympass_kids').doc(kidId).collection('submissions').doc(sub.date).set(sub);
+}
+
+async function deleteSubmission(kidId,date){
+  await db.collection('gympass_kids').doc(kidId).collection('submissions').doc(date).delete();
+}
+
+async function getKidDoc(id){
+  const doc=await db.collection('gympass_kids').doc(id).get();
+  if(!doc.exists) return null;
+  const kid={id:doc.id,...doc.data(),submissions:[]};
+  const sSnap=await db.collection('gympass_kids').doc(id).collection('submissions').orderBy('date','desc').get();
+  kid.submissions=sSnap.docs.map(d=>d.data());
+  return kid;
+}
+
+// One-time migration: move submissions array to subcollection
+async function migrateKidIfNeeded(kidId, kidData){
+  if(!kidData.submissions || kidData.submissions.length===0) return;
+  console.log('Migrating submissions for kid:', kidId);
+  const batch=db.batch();
+  kidData.submissions.forEach(function(sub){
+    const ref=db.collection('gympass_kids').doc(kidId).collection('submissions').doc(sub.date);
+    batch.set(ref, sub);
+  });
+  // remove submissions array from kid doc
+  batch.update(db.collection('gympass_kids').doc(kidId), {submissions: db.app.options ? firebase.firestore.FieldValue.delete() : firebase.firestore.FieldValue.delete()});
+  await batch.commit();
+  console.log('Migration complete for:', kidId);
+}
+
+async function loadKidsWithMigration(){
+  const snap=await db.collection('gympass_kids').orderBy('createdAt').get();
+  const kids=[];
+  for(var i=0;i<snap.docs.length;i++){
+    var d=snap.docs[i];
+    var kidData={id:d.id,...d.data()};
+    // check if old submissions array exists and migrate
+    if(kidData.submissions && kidData.submissions.length>0){
+      await migrateKidIfNeeded(d.id, kidData);
+      delete kidData.submissions;
+    }
+    kidData.submissions=[];
+    var sSnap=await db.collection('gympass_kids').doc(d.id).collection('submissions').orderBy('date','desc').get();
+    kidData.submissions=sSnap.docs.map(function(sd){return sd.data();});
+    kids.push(kidData);
+  }
+  return kids;
+}
 
 // ── NOTIFICATIONS ──
 function checkNotifBanner(){
@@ -565,8 +635,9 @@ function sendNotification(title,body){if('Notification' in window&&Notification.
 // ── REAL-TIME LISTENERS ──
 function startParentListener(){
   if(unsubscribeListener)unsubscribeListener();
-  unsubscribeListener=db.collection('gympass_kids').onSnapshot(snap=>{
-    kidsCache=snap.docs.map(d=>({id:d.id,...d.data()}));
+  unsubscribeListener=db.collection('gympass_kids').onSnapshot(async snap=>{
+    // reload full kids with submissions on any change
+    try{ kidsCache=await loadKidsWithMigration(); }catch(e){ kidsCache=snap.docs.map(d=>({id:d.id,...d.data(),submissions:[]})); }
     const t=todayStr();
     if(!firstLoad){
       kidsCache.forEach(kid=>{
@@ -582,9 +653,13 @@ function startParentListener(){
 function startKidListener(kidId){
   if(unsubscribeKidListener)unsubscribeKidListener();
   lastKnownTodayStatus=null;
-  unsubscribeKidListener=db.collection('gympass_kids').doc(kidId).onSnapshot(snap=>{
+  unsubscribeKidListener=db.collection('gympass_kids').doc(kidId).onSnapshot(async snap=>{
     if(!snap.exists)return;
-    const kid={id:snap.id,...snap.data()};
+    const kid={id:snap.id,...snap.data(),submissions:[]};
+    try{
+      const sSnap=await db.collection('gympass_kids').doc(kidId).collection('submissions').orderBy('date','desc').get();
+      kid.submissions=sSnap.docs.map(d=>d.data());
+    }catch(e){console.error('Error loading submissions:',e);}
     const idx=kidsCache.findIndex(k=>k.id===kidId);
     if(idx>=0)kidsCache[idx]=kid;else kidsCache.push(kid);
     const t=todayStr();
@@ -606,7 +681,7 @@ async function initKidView(){
   document.getElementById('kid-loading').style.display='flex';
   document.getElementById('kid-picker').style.display='none';
   document.getElementById('kid-active').style.display='none';
-  try{kidsCache=await loadKids();}catch(e){console.error(e);}
+  try{kidsCache=await loadKidsWithMigration();}catch(e){console.error(e);}
   document.getElementById('kid-loading').style.display='none';
   document.getElementById('kid-picker').style.display='block';
   renderKidPicker();
@@ -634,7 +709,7 @@ async function saveNewKid(){
   if(!name){showToast('Enter a name first!');return;}
   if(kidsCache.find(k=>k.name.toLowerCase()===name.toLowerCase())){showToast('That name is already added.');return;}
   const id='kid_'+Date.now();
-  const kidData={name,color:selectedColor,streak:0,totalRewards:0,submissions:[],createdAt:new Date().toISOString()};
+  const kidData={name,color:selectedColor,streak:0,totalRewards:0,createdAt:new Date().toISOString()};
   try{await db.collection('gympass_kids').doc(id).set(kidData);kidsCache.push({id,...kidData});hideKidAddForm();renderKidPicker();showToast(name+' added!');}
   catch(e){showToast('Error saving — check connection.');console.error(e);}
 }
@@ -787,10 +862,12 @@ async function submitProof(){
     const existing=(kid.submissions||[]).find(s=>s.date===t);
     if(existing&&existing.status==='pending'){showToast('Already submitted!');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
     if(existing&&existing.status==='approved'){showToast('Already unlocked today!');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
-    const subs=(kid.submissions||[]).filter(s=>s.date!==t);
-    subs.unshift({date:t,fileData:compressedFileData||null,fileType:compressedFileType||'image',note,checks,afternoonChecked:afternoonChecked||[],status:'pending',submittedAt:new Date().toISOString()});
-    await saveKidData(activeKidId,{submissions:subs});
-    kid.submissions=subs;const idx=kidsCache.findIndex(k=>k.id===activeKidId);if(idx>=0)kidsCache[idx]=kid;
+    const newSub={date:t,fileData:compressedFileData||null,fileType:compressedFileType||'image',note,checks,afternoonChecked:afternoonChecked||[],status:'pending',submittedAt:new Date().toISOString()};
+    await saveSubmission(activeKidId,newSub);
+    // update local cache
+    kid.submissions=(kid.submissions||[]).filter(s=>s.date!==t);
+    kid.submissions.unshift(newSub);
+    const idx=kidsCache.findIndex(k=>k.id===activeKidId);if(idx>=0)kidsCache[idx]=kid;
     renderKidActive(kid);showToast('Proof sent to your parent!');
     var submitTime=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     sendProofEmail(kid.name, submitTime);
@@ -863,33 +940,37 @@ async function approveKid(id){
     const kid=await getKidDoc(id);const t=todayStr();const subs=kid.submissions||[];
     const sub=subs.find(s=>s.date===t&&s.status==='pending');if(!sub)return;
     sub.status='approved';sub.approvedAt=new Date().toISOString();
+    await saveSubmission(id,sub);
     const yd=new Date();yd.setDate(yd.getDate()-1);
     const hadYd=subs.find(s=>s.date===yd.toISOString().split('T')[0]&&s.status==='approved');
     kid.streak=hadYd?(kid.streak||0)+1:1;
     let rewards=kid.totalRewards||0;const wc=weekApprovedCount(kid);
     if(wc===GOAL){rewards++;showToast(kid.name+' hit 5 this week — pay out that $10!');}
     else showToast('Approved! '+kid.name+' is at '+wc+'/'+GOAL+' this week.');
-    await saveKidData(id,{submissions:subs,streak:kid.streak,totalRewards:rewards});
+    await saveKidMeta(id,{streak:kid.streak,totalRewards:rewards});
     activeParentId=id;document.getElementById('p-qustodio-wrap').style.display='block';
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 async function denyKid(id){
   try{
     const kid=await getKidDoc(id);const t=todayStr();const subs=kid.submissions||[];
-    const sub=subs.find(s=>s.date===t&&s.status==='pending');if(sub)sub.status='denied';
-    await saveKidData(id,{submissions:subs});showToast('Denied. '+kid.name+' can resubmit.');
+    const sub=subs.find(s=>s.date===t&&s.status==='pending');
+    if(sub){sub.status='denied';await saveSubmission(id,sub);}
+    showToast('Denied. '+kid.name+' can resubmit.');
     document.getElementById('p-qustodio-wrap').style.display='block';
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 async function deleteWorkout(kidId,date){
   if(!confirm('Delete this workout entry for '+formatDate(date)+'? This cannot be undone.'))return;
   try{
-    const kid=await getKidDoc(kidId);const subs=(kid.submissions||[]).filter(s=>s.date!==date);
+    const kid=await getKidDoc(kidId);
+    await deleteSubmission(kidId,date);
+    const subs=(kid.submissions||[]).filter(s=>s.date!==date);
     const sortedApproved=subs.filter(s=>s.status==='approved').map(s=>s.date).sort().reverse();
     let streak=0;
-    if(sortedApproved.length){const today=todayStr();let cursor=sortedApproved.includes(today)?today:(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().split('T')[0];})();
+    if(sortedApproved.length){const today=todayStr();let cursor=sortedApproved.includes(today)?today:(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})();
       for(let i=0;i<365;i++){if(sortedApproved.includes(cursor))streak++;else break;const d=new Date(cursor+'T12:00:00');d.setDate(d.getDate()-1);cursor=d.toISOString().split('T')[0];}}
-    await saveKidData(kidId,{submissions:subs,streak});showToast('Workout deleted.');
+    await saveKidMeta(kidId,{streak});showToast('Workout deleted.');
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 
@@ -937,7 +1018,7 @@ async function saveAfternoonChores() {
   if(!input) return;
   var lines = input.value.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l !== ''; }).slice(0,4);
   try {
-    await saveKidData(activeParentId, { afternoonChores: lines });
+    await saveKidMeta(activeParentId, { afternoonChores: lines });
     var idx = kidsCache.findIndex(function(k){ return k.id === activeParentId; });
     if(idx >= 0) kidsCache[idx].afternoonChores = lines;
     showToast('Afternoon chores saved!');
@@ -1016,7 +1097,8 @@ async function saveMissedDay(){
     var rewards=kid.totalRewards||0;
     var prevWc=(kid.submissions||[]).filter(function(s){return week.includes(s.date)&&s.status==='approved';}).length;
     if(wc>=GOAL&&prevWc<GOAL) rewards++;
-    await saveKidData(activeParentId,{submissions:subs,streak:streak,totalRewards:rewards});
+    await saveSubmission(activeParentId, subs[subs.findIndex(function(s){return s.date===date;})]);
+    await saveKidMeta(activeParentId,{streak:streak,totalRewards:rewards});
     closeMissedDay();
     showToast('Missed day approved for '+formatDate(date)+'!');
     if(wc>=GOAL&&prevWc<GOAL) showToast(kid.name+' hit 5 this week — pay out that $10!');
@@ -1046,7 +1128,8 @@ async function backApprove(kidId,date){
     var rewards=kid.totalRewards||0;
     var prevWc=(kid.submissions||[]).filter(function(s){return week.includes(s.date)&&s.status==='approved'&&s.date!==date;}).length;
     if(wc>=GOAL&&prevWc<GOAL) rewards++;
-    await saveKidData(kidId,{submissions:subs,streak:streak,totalRewards:rewards});
+    await saveSubmission(kidId,sub);
+    await saveKidMeta(kidId,{streak:streak,totalRewards:rewards});
     showToast('Approved! '+formatDate(date)+' marked as done.');
     if(wc>=GOAL&&prevWc<GOAL) showToast(kid.name+' hit 5 this week — pay out that $10!');
     renderParentFromCache();
