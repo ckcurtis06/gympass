@@ -794,7 +794,7 @@ async function submitProof(){
     renderKidActive(kid);showToast('Proof sent to your parent!');
     var submitTime=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     sendProofEmail(kid.name, submitTime);
-  }catch(e){console.error(e);showToast('Error submitting — check connection.');}
+  }catch(e){console.error(e);showToast('Error: '+(e.code||e.message||JSON.stringify(e)).slice(0,60));}
   btn.disabled=false;btn.textContent='SUBMIT PROOF';
 }
 
