@@ -635,9 +635,21 @@ function sendNotification(title,body){if('Notification' in window&&Notification.
 // ── REAL-TIME LISTENERS ──
 function startParentListener(){
   if(unsubscribeListener)unsubscribeListener();
-  unsubscribeListener=db.collection('gympass_kids').onSnapshot(async snap=>{
-    // reload full kids with submissions on any change
-    try{ kidsCache=await loadKidsWithMigration(); }catch(e){ kidsCache=snap.docs.map(d=>({id:d.id,...d.data(),submissions:[]})); }
+  unsubscribeListener=db.collection('gympass_kids').onSnapshot(snap=>{
+    // update meta fields only (streak, totalRewards, name, color etc)
+    // submissions are loaded separately via subcollection
+    snap.docs.forEach(d=>{
+      const meta={id:d.id,...d.data()};
+      const idx=kidsCache.findIndex(k=>k.id===d.id);
+      if(idx>=0){
+        // preserve existing submissions, update meta
+        meta.submissions=kidsCache[idx].submissions||[];
+        kidsCache[idx]=meta;
+      } else {
+        meta.submissions=[];
+        kidsCache.push(meta);
+      }
+    });
     const t=todayStr();
     if(!firstLoad){
       kidsCache.forEach(kid=>{
@@ -653,13 +665,11 @@ function startParentListener(){
 function startKidListener(kidId){
   if(unsubscribeKidListener)unsubscribeKidListener();
   lastKnownTodayStatus=null;
-  unsubscribeKidListener=db.collection('gympass_kids').doc(kidId).onSnapshot(async snap=>{
+  unsubscribeKidListener=db.collection('gympass_kids').doc(kidId).onSnapshot(snap=>{
     if(!snap.exists)return;
-    const kid={id:snap.id,...snap.data(),submissions:[]};
-    try{
-      const sSnap=await db.collection('gympass_kids').doc(kidId).collection('submissions').orderBy('date','desc').get();
-      kid.submissions=sSnap.docs.map(d=>d.data());
-    }catch(e){console.error('Error loading submissions:',e);}
+    // get existing submissions from cache, update meta only
+    const existing=kidsCache.find(k=>k.id===kidId);
+    const kid={id:snap.id,...snap.data(),submissions:(existing&&existing.submissions)||[]};
     const idx=kidsCache.findIndex(k=>k.id===kidId);
     if(idx>=0)kidsCache[idx]=kid;else kidsCache.push(kid);
     const t=todayStr();
@@ -879,8 +889,11 @@ async function submitProof(){
 async function initParentView(){
   document.getElementById('parent-loading').style.display='flex';
   document.getElementById('parent-content').style.display='none';
-  checkNotifBanner();firstLoad=true;startParentListener();
-  await new Promise(r=>setTimeout(r,900));
+  checkNotifBanner();firstLoad=true;
+  // load full data including subcollections first
+  try{kidsCache=await loadKidsWithMigration();}catch(e){console.error(e);}
+  startParentListener();
+  await new Promise(r=>setTimeout(r,300));
   document.getElementById('parent-loading').style.display='none';
   document.getElementById('parent-content').style.display='block';
   renderParentFromCache();
