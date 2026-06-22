@@ -595,18 +595,17 @@ async function migrateKidIfNeeded(kidId, kidData){
 async function loadKidsWithMigration(){
   // Phase 1: load meta only (fast - just kid docs, no subcollections)
   const snap=await db.collection('gympass_kids').orderBy('createdAt').get();
-  const kids=[];
-  for(var i=0;i<snap.docs.length;i++){
-    var d=snap.docs[i];
+  // process all kids in parallel instead of one-by-one
+  const kids=await Promise.all(snap.docs.map(async function(d){
     var kidData={id:d.id,...d.data()};
-    // migrate old submissions array if present
+    // migrate old submissions array if present (only runs for un-migrated kids)
     if(kidData.submissions && kidData.submissions.length>0){
       await migrateKidIfNeeded(d.id, kidData);
       delete kidData.submissions;
     }
     kidData.submissions=[];
-    kids.push(kidData);
-  }
+    return kidData;
+  }));
   return kids;
 }
 
@@ -912,7 +911,6 @@ async function initParentView(){
     }));
   }catch(e){console.error(e);}
   startParentListener();
-  await new Promise(r=>setTimeout(r,200));
   document.getElementById('parent-loading').style.display='none';
   document.getElementById('parent-content').style.display='block';
   renderParentFromCache();
