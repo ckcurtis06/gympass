@@ -878,19 +878,19 @@ async function submitProof(){
   const checks=[...document.querySelectorAll('#kid-form .check-item.checked')].map(el=>el.querySelector('.check-label').textContent);
   const t=todayStr();
   try{
-    const kid=await getKidDoc(activeKidId);
+    const kid=kidsCache.find(k=>k.id===activeKidId);
+    if(!kid){showToast('Error loading profile.');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
     const existing=(kid.submissions||[]).find(s=>s.date===t);
     if(existing&&existing.status==='pending'){showToast('Already submitted!');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
     if(existing&&existing.status==='approved'){showToast('Already unlocked today!');btn.disabled=false;btn.textContent='SUBMIT PROOF';return;}
     const newSub={date:t,fileData:compressedFileData||null,fileType:compressedFileType||'image',note,checks,afternoonChecked:afternoonChecked||[],status:'pending',submittedAt:new Date().toISOString()};
-    await saveSubmission(activeKidId,newSub);
-    // update local cache
+    // update local cache and UI immediately
     kid.submissions=(kid.submissions||[]).filter(s=>s.date!==t);
     kid.submissions.unshift(newSub);
-    const idx=kidsCache.findIndex(k=>k.id===activeKidId);if(idx>=0)kidsCache[idx]=kid;
     renderKidActive(kid);showToast('Proof sent to your parent!');
     var submitTime=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     sendProofEmail(kid.name, submitTime);
+    await saveSubmission(activeKidId,newSub);
   }catch(e){console.error(e);showToast('Error: '+(e.code||e.message||JSON.stringify(e)).slice(0,60));}
   btn.disabled=false;btn.textContent='SUBMIT PROOF';
 }
@@ -967,40 +967,46 @@ function renderParentFromCache(){
 // ── APPROVE / DENY / DELETE ──
 async function approveKid(id){
   try{
-    const kid=await getKidDoc(id);const t=todayStr();const subs=kid.submissions||[];
+    const kid=kidsCache.find(k=>k.id===id);if(!kid)return;
+    const t=todayStr();const subs=kid.submissions||[];
     const sub=subs.find(s=>s.date===t&&s.status==='pending');if(!sub)return;
     sub.status='approved';sub.approvedAt=new Date().toISOString();
-    await saveSubmission(id,sub);
     const yd=new Date();yd.setDate(yd.getDate()-1);
     const hadYd=subs.find(s=>s.date===yd.toISOString().split('T')[0]&&s.status==='approved');
     kid.streak=hadYd?(kid.streak||0)+1:1;
     let rewards=kid.totalRewards||0;const wc=weekApprovedCount(kid);
     if(wc===GOAL){rewards++;showToast(kid.name+' hit 5 this week — pay out that $10!');}
     else showToast('Approved! '+kid.name+' is at '+wc+'/'+GOAL+' this week.');
-    await saveKidMeta(id,{streak:kid.streak,totalRewards:rewards});
     activeParentId=id;document.getElementById('p-qustodio-wrap').style.display='block';
+    renderParentFromCache();
+    await Promise.all([saveSubmission(id,sub),saveKidMeta(id,{streak:kid.streak,totalRewards:rewards})]);
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 async function denyKid(id){
   try{
-    const kid=await getKidDoc(id);const t=todayStr();const subs=kid.submissions||[];
+    const kid=kidsCache.find(k=>k.id===id);if(!kid)return;
+    const t=todayStr();const subs=kid.submissions||[];
     const sub=subs.find(s=>s.date===t&&s.status==='pending');
-    if(sub){sub.status='denied';await saveSubmission(id,sub);}
+    if(sub) sub.status='denied';
     showToast('Denied. '+kid.name+' can resubmit.');
     document.getElementById('p-qustodio-wrap').style.display='block';
+    renderParentFromCache();
+    if(sub) await saveSubmission(id,sub);
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 async function deleteWorkout(kidId,date){
   if(!confirm('Delete this workout entry for '+formatDate(date)+'? This cannot be undone.'))return;
   try{
-    const kid=await getKidDoc(kidId);
-    await deleteSubmission(kidId,date);
-    const subs=(kid.submissions||[]).filter(s=>s.date!==date);
-    const sortedApproved=subs.filter(s=>s.status==='approved').map(s=>s.date).sort().reverse();
+    const kid=kidsCache.find(k=>k.id===kidId);if(!kid)return;
+    kid.submissions=(kid.submissions||[]).filter(s=>s.date!==date);
+    const sortedApproved=kid.submissions.filter(s=>s.status==='approved').map(s=>s.date).sort().reverse();
     let streak=0;
     if(sortedApproved.length){const today=todayStr();let cursor=sortedApproved.includes(today)?today:(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})();
       for(let i=0;i<365;i++){if(sortedApproved.includes(cursor))streak++;else break;const d=new Date(cursor+'T12:00:00');d.setDate(d.getDate()-1);cursor=d.toISOString().split('T')[0];}}
-    await saveKidMeta(kidId,{streak});showToast('Workout deleted.');
+    kid.streak=streak;
+    showToast('Workout deleted.');
+    renderParentFromCache();
+    await Promise.all([deleteSubmission(kidId,date),saveKidMeta(kidId,{streak})]);
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 
@@ -1101,14 +1107,15 @@ async function saveMissedDay(){
   var today=todayStr();
   if(date>=today){errEl.textContent='Can only back-approve past days, not today.';return;}
   try{
-    var kid=await getKidDoc(activeParentId);
+    var kid=kidsCache.find(function(k){return k.id===activeParentId;});if(!kid)return;
     var subs=kid.submissions||[];
     // check if already approved for this date
     var existing=subs.find(function(s){return s.date===date;});
     if(existing&&existing.status==='approved'){errEl.textContent='This day is already approved.';return;}
     // remove any existing entry for this date then add approved one
     subs=subs.filter(function(s){return s.date!==date;});
-    subs.push({date:date,fileData:null,fileType:'manual',note:note,checks:[],afternoonChecked:[],status:'approved',submittedAt:new Date().toISOString(),approvedAt:new Date().toISOString()});
+    var newEntry={date:date,fileData:null,fileType:'manual',note:note,checks:[],afternoonChecked:[],status:'approved',submittedAt:new Date().toISOString(),approvedAt:new Date().toISOString()};
+    subs.push(newEntry);
     // sort newest first
     subs.sort(function(a,b){return b.date.localeCompare(a.date);});
     // recalculate streak
@@ -1127,18 +1134,18 @@ async function saveMissedDay(){
     var rewards=kid.totalRewards||0;
     var prevWc=(kid.submissions||[]).filter(function(s){return week.includes(s.date)&&s.status==='approved';}).length;
     if(wc>=GOAL&&prevWc<GOAL) rewards++;
-    await saveSubmission(activeParentId, subs[subs.findIndex(function(s){return s.date===date;})]);
-    await saveKidMeta(activeParentId,{streak:streak,totalRewards:rewards});
+    kid.submissions=subs;kid.streak=streak;kid.totalRewards=rewards;
     closeMissedDay();
     showToast('Missed day approved for '+formatDate(date)+'!');
     if(wc>=GOAL&&prevWc<GOAL) showToast(kid.name+' hit 5 this week — pay out that $10!');
     renderParentFromCache();
+    await Promise.all([saveSubmission(activeParentId,newEntry),saveKidMeta(activeParentId,{streak:streak,totalRewards:rewards})]);
   }catch(e){errEl.textContent='Error saving — check connection.';console.error(e);}
 }
 async function backApprove(kidId,date){
   if(!confirm('Back-approve '+formatDate(date)+'? This will mark it as approved.')) return;
   try{
-    var kid=await getKidDoc(kidId);
+    var kid=kidsCache.find(function(k){return k.id===kidId;});if(!kid)return;
     var subs=kid.submissions||[];
     var sub=subs.find(function(s){return s.date===date;});
     if(!sub) return;
@@ -1153,16 +1160,17 @@ async function backApprove(kidId,date){
       var dd=new Date(cursor+'T12:00:00');dd.setDate(dd.getDate()-1);
       cursor=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
     }
+    kid.streak=streak;
     var week=getWeekDates();
     var wc=subs.filter(function(s){return week.includes(s.date)&&s.status==='approved';}).length;
     var rewards=kid.totalRewards||0;
-    var prevWc=(kid.submissions||[]).filter(function(s){return week.includes(s.date)&&s.status==='approved'&&s.date!==date;}).length;
+    var prevWc=subs.filter(function(s){return week.includes(s.date)&&s.status==='approved'&&s.date!==date;}).length;
     if(wc>=GOAL&&prevWc<GOAL) rewards++;
-    await saveSubmission(kidId,sub);
-    await saveKidMeta(kidId,{streak:streak,totalRewards:rewards});
+    kid.totalRewards=rewards;
     showToast('Approved! '+formatDate(date)+' marked as done.');
     if(wc>=GOAL&&prevWc<GOAL) showToast(kid.name+' hit 5 this week — pay out that $10!');
     renderParentFromCache();
+    await Promise.all([saveSubmission(kidId,sub),saveKidMeta(kidId,{streak:streak,totalRewards:rewards})]);
   }catch(e){showToast('Error — check connection.');console.error(e);}
 }
 
