@@ -900,20 +900,25 @@ async function initParentView(){
   document.getElementById('parent-loading').style.display='flex';
   document.getElementById('parent-content').style.display='none';
   checkNotifBanner();firstLoad=true;
-  // load meta first (fast), then submissions for each kid
-  try{
-    kidsCache=await loadKidsWithMigration();
-    // load submissions for all kids in parallel
-    await Promise.all(kidsCache.map(async function(kid){
-      try{
-        kid.submissions=await loadKidSubmissions(kid.id);
-      }catch(e){kid.submissions=[];}
-    }));
-  }catch(e){console.error(e);}
+  // Phase 1: load meta only — show dashboard immediately
+  try{kidsCache=await loadKidsWithMigration();}catch(e){console.error(e);}
   startParentListener();
   document.getElementById('parent-loading').style.display='none';
   document.getElementById('parent-content').style.display='block';
   renderParentFromCache();
+  // Phase 2: load submissions for active kid first, then others in background
+  if(kidsCache.length){
+    const firstId=activeParentId||kidsCache[0].id;
+    activeParentId=firstId;
+    try{
+      kidsCache.find(k=>k.id===firstId).submissions=await loadKidSubmissions(firstId);
+      renderParentFromCache();
+    }catch(e){console.error(e);}
+    // then load remaining kids in background
+    kidsCache.filter(k=>k.id!==firstId).forEach(async function(kid){
+      try{kid.submissions=await loadKidSubmissions(kid.id);}catch(e){kid.submissions=[];}
+    });
+  }
 }
 function renderParentFromCache(){
   if(!kidsCache.length){document.getElementById('parent-no-children').style.display='block';document.getElementById('parent-main').style.display='none';return;}
@@ -924,7 +929,18 @@ function renderParentFromCache(){
     const hasPending=(kid.submissions||[]).some(s=>s.date===todayStr()&&s.status==='pending');
     const btn=document.createElement('div');btn.className='child-tab'+(kid.id===activeParentId?' active':'');
     btn.innerHTML=`<div class="child-tab-avatar" style="background:${kid.color}">${initials(kid.name)}</div>${kid.name}${hasPending?' ⚡':''}<button class="child-tab-del" title="Delete ${kid.name}" onclick="deleteKid(event,'${kid.id}','${kid.name}')">✕</button>`;
-    btn.onclick=(e)=>{if(e.target.classList.contains('child-tab-del'))return;activeParentId=kid.id;renderParentFromCache();};switcher.appendChild(btn);
+    btn.onclick=async (e)=>{
+      if(e.target.classList.contains('child-tab-del'))return;
+      activeParentId=kid.id;
+      renderParentFromCache();
+      // lazy load submissions if not yet loaded for this kid
+      if(!kid.submissions||kid.submissions.length===0){
+        try{
+          kid.submissions=await loadKidSubmissions(kid.id);
+          renderParentFromCache();
+        }catch(e){console.error(e);}
+      }
+    };switcher.appendChild(btn);
   });
   const kid=kidsCache.find(k=>k.id===activeParentId);if(!kid)return;
   renderWeekDots('p-week-days','p-progress-fill','p-progress-label',kid,'p-reward-badge');
